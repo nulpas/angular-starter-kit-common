@@ -8,7 +8,7 @@
      * @description
      * Definition of main module "BCA Core".
      */
-    .module('bca.core', [
+    .module('afs.core', [
       /* External Modules */
       'ngAnimate',
       'ui.sortable',
