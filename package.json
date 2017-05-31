@@ -6,11 +6,10 @@
     "type": "git",
     "url": ""
   },
-  "author": "Nul Pàs <manuel.pastor.lendinez.sa@everis.com> (http://hd-2k8-ss02:7990/users/mpastorl)",
+  "author": "Nul Pàs <manu@lunaeme.com> (https://twitter.com/NulPas)",
   "license": "MIT",
   "private": true,
   "scripts": {
-    "preinstall": "npm install",
     "postinstall": "npm prune && bower install && bower prune"
   },
   "dependencies": {},
