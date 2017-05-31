@@ -1,0 +1,29 @@
+{
+  "name": "angular-starter-kit-commom",
+  "description": "Application Dependency BOWER for Frontend seed.",
+  "version": "0.9.0",
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "author": "Nul Pàs <manuel.pastor.lendinez.sa@everis.com> (http://hd-2k8-ss02:7990/users/mpastorl)",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "preinstall": "npm install",
+    "postinstall": "npm prune && bower install && bower prune"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "event-stream": "^3.3.4",
+    "gulp": "^3.9.1",
+    "gulp-angular-templatecache": "^2.0.0",
+    "gulp-concat": "^2.6.1",
+    "gulp-htmlmin": "^3.0.0",
+    "gulp-jscs": "^4.0.0",
+    "gulp-jshint": "^2.0.4",
+    "gulp-watch": "^4.3.11",
+    "jshint": "^2.9.4",
+    "jshint-stylish": "^2.2.1"
+  }
+}

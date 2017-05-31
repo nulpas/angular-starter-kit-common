@@ -1,0 +1,66 @@
+{
+  "name": "angular-starter-kit-commom",
+  "description": "Application Dependency BOWER for Frontend seed.",
+  "version": "0.9.0",
+  "main": "release/angular-seed-core.js",
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "authors": [
+    "Nul Pàs <manuel.pastor.lendinez.sa@everis.com> (http://hd-2k8-ss02:7990/users/mpastorl)"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "gulpfile*",
+    "package.json",
+    "source"
+  ],
+  "dependencies": {
+    "angular": "1.5.8",
+    "angular-sanitize": "1.5.8",
+    "material-design-lite": "^1.3.0",
+    "animate.css": "^3.5.2",
+    "restangular": "1.5.2",
+    "angular-ui-router": "^0.3.2",
+    "angular-toastr": "^2.1.1",
+    "angular-animate": "1.5.8",
+    "angular-base64": "^2.0.5",
+    "dialog-polyfill": "^0.4.5",
+    "angular-ui-sortable": "^0.16.1",
+    "angular-chart.js": "^1.1.1",
+    "moment": "^2.17.1",
+    "moment-timezone": "^0.5.11",
+    "dragular": "^4.2.5",
+    "angular-local-storage": "^0.5.2",
+    "adm-dtp": "*"
+  },
+  "devDependencies": {},
+  "resolutions": {
+    "angular": "1.5.8"
+  },
+  "overrides": {
+    "material-design-lite": {
+      "main": [
+        "material.js",
+        "material.css"
+      ]
+    },
+    "dragular": {
+      "main": [
+        "dist/dragular.js",
+        "dist/dragular.css"
+      ]
+    },
+    "adm-dtp": {
+      "main": [
+        "dist/ADM-dateTimePicker.js",
+        "dist/ADM-dateTimePicker.css"
+      ]
+    }
+  }
+}
