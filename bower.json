@@ -5,10 +5,10 @@
   "main": "release/angular-seed-core.js",
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "https://github.com/nulpas/angular-starter-kit-common.git"
   },
   "authors": [
-    "Nul Pàs <manuel.pastor.lendinez.sa@everis.com> (http://hd-2k8-ss02:7990/users/mpastorl)"
+    "Nul Pàs <manu@lunaeme.com> (https://twitter.com/NulPas)"
   ],
   "license": "MIT",
   "private": true,
