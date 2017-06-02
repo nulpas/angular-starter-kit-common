@@ -9,8 +9,5 @@
      * @description
      * Definition of module "_shared" for common minor services.
      */
-    .module('source._shared', [
-      /* External Modules */
-      'base64'
-    ]);
+    .module('source._shared', []);
 })();

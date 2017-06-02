@@ -6,17 +6,13 @@
      * @namespace source
      *
      * @description
-     * Definition of main module "BCA Core".
+     * Definition of main module "Core".
      */
     .module('afs.core', [
       /* External Modules */
       'ngAnimate',
-      'ui.sortable',
       'ngSanitize',
       'chart.js',
-      'dragularModule',
-      'ADM-dateTimePicker',
-      'LocalStorageModule',
       /* Source Core Modules */
       'source._shared',
       'source.api',

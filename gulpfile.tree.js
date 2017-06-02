@@ -6,11 +6,11 @@
   var releaseDir = 'release';
 
   //# File Names
-  var bcaCoreFile = 'angular-seed-core.js';
+  var coreFile = 'angular-starter-kit-core.js';
 
   module.exports = {
     files: {
-      bcaCore: bcaCoreFile
+      core: coreFile
     },
     paths: {
       source: './' + sourceDir,

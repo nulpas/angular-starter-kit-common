@@ -1,11 +1,11 @@
 {
-  "name": "angular-starter-kit-commom",
+  "name": "angular-starter-kit-core",
   "description": "Application Dependency BOWER for Frontend seed.",
-  "version": "0.9.1",
-  "main": "release/angular-seed-core.js",
+  "version": "0.9.8",
+  "main": "release/angular-starter-kit-core.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/nulpas/angular-starter-kit-common.git"
+    "url": "ssh://git@gitlab.alm.gsnetcloud.corp:2220/seguros-vida/life-insurances-front-core.git"
   },
   "authors": [
     "Nul Pàs <manu@lunaeme.com> (https://twitter.com/NulPas)"
@@ -29,15 +29,9 @@
     "angular-ui-router": "^0.3.2",
     "angular-toastr": "^2.1.1",
     "angular-animate": "1.5.8",
-    "angular-base64": "^2.0.5",
-    "dialog-polyfill": "^0.4.5",
-    "angular-ui-sortable": "^0.16.1",
     "angular-chart.js": "^1.1.1",
     "moment": "^2.17.1",
-    "moment-timezone": "^0.5.11",
-    "dragular": "^4.2.5",
-    "angular-local-storage": "^0.5.2",
-    "adm-dtp": "*"
+    "moment-timezone": "^0.5.11"
   },
   "devDependencies": {},
   "resolutions": {
@@ -48,18 +42,6 @@
       "main": [
         "material.js",
         "material.css"
-      ]
-    },
-    "dragular": {
-      "main": [
-        "dist/dragular.js",
-        "dist/dragular.css"
-      ]
-    },
-    "adm-dtp": {
-      "main": [
-        "dist/ADM-dateTimePicker.js",
-        "dist/ADM-dateTimePicker.css"
       ]
     }
   }
