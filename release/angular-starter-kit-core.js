@@ -6,17 +6,13 @@
      * @namespace source
      *
      * @description
-     * Definition of main module "BCA Core".
+     * Definition of main module "Core".
      */
     .module('afs.core', [
       /* External Modules */
       'ngAnimate',
-      'ui.sortable',
       'ngSanitize',
       'chart.js',
-      'dragularModule',
-      'ADM-dateTimePicker',
-      'LocalStorageModule',
       /* Source Core Modules */
       'source._shared',
       'source.api',
@@ -106,10 +102,7 @@
      * @description
      * Definition of module "_shared" for common minor services.
      */
-    .module('source._shared', [
-      /* External Modules */
-      'base64'
-    ]);
+    .module('source._shared', []);
 })();
 
 (function() {
@@ -1802,7 +1795,7 @@
       $: $,
       /* Object tools */
       setObjectUsingSchema: setObjectUsingSchemaProvider,
-      $get: ['$base64', $get]
+      $get: [$get]
     };
 
     /**
@@ -1869,23 +1862,6 @@
         output += possibilities.charAt(Math.floor(Math.random() * possibilities.length));
       }
       return output;
-    }
-
-    /**
-     * @name _base64ParseString
-     * @memberof source._shared.$toolsProvider
-     *
-     * @description
-     * Function that encoding or decoding base64 strings.
-     *
-     * @param {String} string
-     * @param {Boolean} mode --> Encode (true) or decode (false) mode.
-     * @param {Object} base64 --> External service $base64
-     * @returns {String}
-     * @private
-     */
-    function _base64ParseString(string, mode, base64) {
-      return (mode === $.ENCODE) ? base64.encode(string) : base64.decode(string) ;
     }
 
     /**
@@ -2066,7 +2042,7 @@
      * @description
      * Factory statement for several useful tools.
      */
-    function $get($base64) {
+    function $get() {
       return {
         /* Global Constants */
         $: $,
@@ -2075,8 +2051,6 @@
         toCamelCase: toCamelCase,
         ucWords: ucWords,
         getRandomString: getRandomString,
-        base64Encode: base64Encode,
-        base64Decode: base64Decode,
         /* Array tools */
         removeArrayItem: removeArrayItem,
         removeArrayKey: removeArrayKey,
@@ -2143,34 +2117,6 @@
        */
       function getRandomString(stringLength) {
         return _getRandomString(stringLength);
-      }
-
-      /**
-       * @name base64Encode
-       * @memberof source._shared.$toolsProvider.$tools
-       *
-       * @description
-       * Encode string in base64.
-       *
-       * @param {String} string
-       * @returns {String}
-       */
-      function base64Encode(string) {
-        return _base64ParseString(string, $.ENCODE, $base64);
-      }
-
-      /**
-       * @name base64Decode
-       * @memberof source._shared.$toolsProvider.$tools
-       *
-       * @description
-       * Decode string from base64.
-       *
-       * @param {String} string
-       * @returns {String}
-       */
-      function base64Decode(string) {
-        return _base64ParseString(string, $.DECODE, $base64);
       }
 
       /**

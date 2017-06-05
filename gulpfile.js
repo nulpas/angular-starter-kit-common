@@ -56,7 +56,7 @@
   //## Compile source JS into release directory with concat
   gulp.task('source:concat', function() {
     return es.merge(gulp.src($.source.javascript.load), getTplCache())
-      .pipe(concat($.files.bcaCore))
+      .pipe(concat($.files.core))
       .pipe(gulp.dest($.paths.release));
   });
 
