@@ -31,23 +31,6 @@
 
   angular
     /**
-     * @namespace api
-     * @memberof source
-     *
-     * @description
-     * Definition of module "api" for API calling services.
-     */
-    .module('source.api', [
-      /* External Modules */
-      'restangular'
-    ]);
-})();
-
-(function() {
-  'use strict';
-
-  angular
-    /**
      * @namespace router
      * @memberof source
      *
@@ -65,16 +48,30 @@
 
   angular
     /**
-     * @namespace toast
+     * @namespace api
      * @memberof source
      *
      * @description
-     * Definition of module "toast" for alert messages services.
+     * Definition of module "api" for API calling services.
      */
-    .module('source.toast', [
+    .module('source.api', [
       /* External Modules */
-      'toastr'
+      'restangular'
     ]);
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    /**
+     * @namespace _shared
+     * @memberof source
+     *
+     * @description
+     * Definition of module "_shared" for common minor services.
+     */
+    .module('source._shared', []);
 })();
 
 (function() {
@@ -96,13 +93,16 @@
 
   angular
     /**
-     * @namespace _shared
+     * @namespace toast
      * @memberof source
      *
      * @description
-     * Definition of module "_shared" for common minor services.
+     * Definition of module "toast" for alert messages services.
      */
-    .module('source._shared', []);
+    .module('source.toast', [
+      /* External Modules */
+      'toastr'
+    ]);
 })();
 
 (function() {
@@ -184,6 +184,62 @@
       preventOpenDuplicates: false,
       target: 'body'
     });
+  }
+})();
+
+(function() {
+  'use strict';
+
+  angular
+  .module('source.router')
+  /**
+   * @namespace $router
+   * @memberof source.router
+   *
+   * @requires $state
+   * @requires $timeout
+   *
+   * @description
+   * Provider statement manage routing of the application.
+   */
+  .factory('$router', $router);
+
+  $router.$inject = ['$state', '$timeout'];
+
+  function $router($state, $timeout) {
+
+    return {
+      $state: $state,
+      resolveStateGo: resolveStateGo
+    };
+
+    /**
+     * @name _resolveStateGo
+     * @memberof source.router.$router
+     *
+     * @description
+     * Executes $state.go function into $timeout for use into state resolve.
+     *
+     * @param {String} stateName
+     */
+    function _resolveStateGo(stateName) {
+      $timeout(function() {
+        $state.go(stateName);
+      });
+    }
+
+    /**
+     * @name resolveStateGo
+     * @memberof source.router.$router
+     *
+     * @description
+     * Executes _resolveStateGo function.
+     *
+     * @param {String} stateName
+     */
+    function resolveStateGo(stateName) {
+      _resolveStateGo(stateName);
+    }
   }
 })();
 
@@ -342,6 +398,18 @@
                   $top: 30
                 }
               },
+              /**
+               * @name QUERY.SERVER.subProcess
+               * @memberof source.api.apiModelProvider
+               *
+               * @description
+               * It makes a "GET" Api call through Restangular. If the requestObject provided has an entity that have
+               * an entityId, it will make a call to retrieve that concrete entity. Otherwise, it will make a call
+               * to retrieve all existing entities.
+               *
+               * @param {Object} requestObject
+               * @returns {Promise}
+               */
               subProcess: function(requestObject) {
                 var e = requestObject.entity;
                 if (!e.entityId) {
@@ -356,6 +424,16 @@
                 defaultHeaders: _defaults.defaultHeaders,
                 defaultParams: _defaults.defaultParams
               },
+              /**
+               * @name QUERY.LOCAL.subProcess
+               * @memberof source.api.apiModelProvider
+               *
+               * @description
+               * It makes a local "GET" API call through Restangular.
+               *
+               * @param {Object} requestObject
+               * @returns {Promise}
+               */
               subProcess: function(requestObject) {
                 var e = requestObject.entity;
                 var eUrl = requestObject.json + '/' + e.entityName + '.json';
@@ -458,120 +536,6 @@
       }
     }
   }
-})();
-
-(function() {
-  'use strict';
-
-  angular.module('source.api')
-    .factory('$params', [
-      '$tools',
-      'apiData',
-      function($tools, apiData) {
-        var $c = apiData.constants;
-        var requestParams = angular.extend({}, $c.paramObject, $c.bpmnParamObject);
-
-        var _partialClear = function() {
-          requestParams = angular.extend({}, requestParams, $c.paramObject);
-          return requestParams;
-        };
-
-        var _totalClear = function() {
-          requestParams = angular.extend({}, $c.paramObject, $c.bpmnParamObject);
-          return requestParams;
-        };
-
-        return {
-          //# Reset Methods
-          clearAll: function() {
-            return _totalClear();
-          },
-          clear: function() {
-            return _partialClear();
-          },
-
-          //# Filter Methods
-          getFilters: function() {
-            return requestParams.queryFilter;
-          },
-          addFilter: function(item) {
-            requestParams.queryFilter.push(item);
-            return requestParams;
-          },
-          removeFilter: function(item) {
-            requestParams.queryFilter = $tools.removeArrayItem(requestParams.queryFilter, item);
-            return requestParams;
-          },
-
-          //# Order Methods
-          getOrders: function() {
-            return requestParams.order;
-          },
-          addOrder: function(item) {
-            requestParams.order.push(item);
-            return requestParams;
-          },
-          removeOrder: function(item) {
-            requestParams.order = $tools.removeArrayItem(requestParams.order, item);
-            return requestParams;
-          },
-
-          //# Last Page Methods
-          setNextPage: function() {
-            requestParams.lastPage ++;
-            return requestParams;
-          },
-          clearLastPage: function() {
-            requestParams.lastPage = 0;
-          },
-
-          //# Format params in order to request API:
-          setParams: function() {
-            var parameters = {};
-            if (requestParams.bpmnFilter || requestParams.queryFilter.length) {
-              parameters.$filter = '';
-              if (requestParams.bpmnFilter) {
-                parameters.$filter += requestParams.bpmnFilter;
-              }
-              if (requestParams.queryFilter.length) {
-
-              }
-            }
-            if (requestParams.top) {
-              parameters.$top = requestParams.top;
-            }
-            var skip = requestParams.skip * requestParams.lastPage;
-            if (skip) {
-              parameters.$skip = skip;
-            }
-
-            // var parameters = {
-            //   $orderby: '',
-            //   $top: requestParams.top,
-            //   $skip: requestParams.skip * requestParams.lastPage
-            // };
-            // if (queryParams.filter.length > 0) {
-            //   parameters.$filter = '';
-            //   for (var j = 0; j < queryParams.filter.length; j++) {
-            //     if (j !== 0) {
-            //       parameters.$filter += ' AND ';
-            //     }
-            //     parameters.$filter += queryParams.filter[j].field.name + ' ' + queryParams.filter[j].condition;
-            //   }
-            // }
-            //
-            // for (var i = 0; i < queryParams.order.length; i++) {
-            //   parameters.$orderby +=
-            //     queryParams.order[i].name + ' ' + (queryParams.order[i].orderDescending ? 'desc' : 'asc') + ',';
-            // }
-            // while (parameters.$orderby.includes('.')) {
-            //   parameters.$orderby = parameters.$orderby.replace('.', '/');
-            // }
-            // return parameters;
-          }
-        };
-      }
-    ]);
 })();
 
 (function() {
@@ -713,7 +677,6 @@
         /* GET actions */
         getEntity: getEntity,
         getLocalEntity: getLocalEntity,
-        getBimsVersion: getBimsVersion,
         /* POST actions */
         auth: auth,
         postEntity: postEntity,
@@ -921,25 +884,6 @@
       }
 
       /**
-       * @name getBimsVersion
-       * @memberof source.api.$apiProvider.$api
-       *
-       * @description
-       * Get software versions from server. This special call is done because its response comes directly from NGINX.
-       *
-       * @param {Function} callback
-       * @param {Function} callbackError
-       * @returns {Promise}
-       */
-      function getBimsVersion(callback, callbackError) {
-        var connectionObject = $tools.setObjectUsingSchema($c.schemas.connectionObject, {
-          entityObject: _createEntityObject({ entityName: 'bims_version' }),
-          checkSuperAdmin: false
-        }, _connectionObject);
-        return _processConnection(connectionObject, callback, callbackError);
-      }
-
-      /**
        * @name auth
        * @memberof source.api.$apiProvider.$api
        *
@@ -1054,608 +998,6 @@
 (function() {
   'use strict';
 
-  angular.module('source.router')
-    .factory('$router', [
-      '$state',
-      '$timeout',
-      function($state, $timeout) {
-        /**
-         * _resolveStateGo
-         * Executes $state.go function into $timeout for use into state resolve.
-         *
-         * @param {String} stateName
-         * @private
-         */
-        var _resolveStateGo = function(stateName) {
-          $timeout(function() {
-            $state.go(stateName);
-          });
-        };
-        return {
-          $state: $state,
-          resolveStateGo: function(stateName) {
-            _resolveStateGo(stateName);
-          }
-        };
-      }
-    ]);
-})();
-
-(function() {
-  'use strict';
-
-  angular.module('source.router')
-    .service('routerData', [
-      function() {
-        this.constants = {
-          //# Router param object format:
-          routerParams: {
-            param1: null,
-            param2: null,
-            param3: null
-          }
-        };
-      }
-    ]);
-})();
-
-(function() {
-  'use strict';
-
-  angular
-    .module('source.toast')
-    /**
-     * @namespace toastModelProvider
-     * @memberof source.toast
-     *
-     * @description
-     * Provider that gets constants for toast services.
-     */
-    .provider('toastModel', toastModel);
-
-  toastModel.$inject = ['$toolsProvider'];
-
-  function toastModel($toolsProvider) {
-    var _constants = {
-      SUCCESS: 'SUCCESS',
-      INFO: 'INFO',
-      WARNING: 'WARNING',
-      ERROR: 'ERROR'
-    };
-    var $ = angular.extend({}, _constants, $toolsProvider.$);
-
-    return {
-      $: $,
-      $get: ['toastr', $get]
-    };
-
-    /**
-     * @namespace toastModel
-     * @memberof source.toast.toastModelProvider
-     *
-     * @requires toastr
-     *
-     * @description
-     * Factory that gets constants for toast services.
-     */
-    function $get(toastr) {
-      var _serviceModel = {
-        SUCCESS: toastr.success,
-        INFO: toastr.info,
-        WARNING: toastr.warning,
-        ERROR: toastr.error
-      };
-
-      return {
-        $: $,
-        get: getFactory
-      };
-
-      /**
-       * @name getFactory
-       * @memberof source.toast.toastModelProvider.toastModel
-       *
-       * @description
-       * Returns API model for Factory service.
-       *
-       * @returns {Object}
-       */
-      function getFactory() {
-        return _serviceModel;
-      }
-    }
-  }
-})();
-
-(function() {
-  'use strict';
-
-  angular
-    .module('source.toast')
-    /**
-     * @namespace $alertProvider
-     * @memberof source.toast
-     *
-     * @description
-     * Provider custom statement to use toast alert's messages.
-     */
-    .provider('$alert', $alert);
-
-  $alert.$inject = ['toastModelProvider'];
-
-  function $alert(toastModelProvider) {
-    var $ = toastModelProvider.$;
-    var _toastOptions = {
-      timeOut: 9999
-    };
-
-    return {
-      $: $,
-      setDuration: _setDuration,
-      $get: ['toastModel', $get]
-    };
-
-    /**
-     * @name _setDuration
-     * @memberof source.toast.$alertProvider
-     *
-     * @description
-     * Set duration of toast message for provider configuration.
-     *
-     * @param {Integer} time
-     * @private
-     */
-    function _setDuration(time) {
-      _toastOptions.timeOut = time;
-    }
-
-    /**
-     * @name _launchToast
-     * @memberof source.toast.$alertProvider
-     *
-     * @description
-     * Launch angular-toaster alert message.
-     *
-     * @param {Object} toastFactoryModel
-     * @param {String|Array} message
-     * @param {String} type
-     * @param {String|Undefined} title
-     * @param {Integer|Undefined} duration
-     * @private
-     */
-    function _launchToast(toastFactoryModel, message, type, title, duration) {
-      if (title !== undefined && typeof title !== 'string' && !duration) {
-        duration = title;
-        title = undefined;
-      }
-
-      var toastOptions = (duration) ? angular.extend({}, _toastOptions, { timeOut: duration }) : _toastOptions ;
-      message = (angular.isArray(message)) ? message.join('<br>') : message ;
-      toastFactoryModel[type](message, title, toastOptions);
-    }
-
-    /**
-     * @namespace $alert
-     * @memberof source.toast.$alertProvider
-     *
-     * @requires toastr
-     *
-     * @description
-     * Factory statement for toast alert's messages.
-     */
-    function $get(toastModel) {
-      var toastFactoryModel = toastModel.get();
-
-      return {
-        $: $,
-        success: success,
-        info: info,
-        warning: warning,
-        error: error
-      };
-
-      /**
-       * @name success
-       * @memberof source.toast.$alertProvider.$alert
-       *
-       * @description
-       * Displays success toast message.
-       *
-       * @param {String} message
-       * @param {String} title
-       * @param {Integer|Undefined} duration
-       */
-      function success(message, title, duration) {
-        _launchToast(toastFactoryModel, message, $.SUCCESS, title, duration);
-      }
-
-      /**
-       * @name info
-       * @memberof source.toast.$alertProvider.$alert
-       *
-       * @description
-       * Displays info toast message.
-       *
-       * @param {String} message
-       * @param {String} title
-       * @param {Integer|Undefined} duration
-       */
-      function info(message, title, duration) {
-        _launchToast(toastFactoryModel, message, $.INFO, title, duration);
-      }
-
-      /**
-       * @name warning
-       * @memberof source.toast.$alertProvider.$alert
-       *
-       * @description
-       * Displays warning toast message.
-       *
-       * @param {String} message
-       * @param {String} title
-       * @param {Integer|Undefined} duration
-       */
-      function warning(message, title, duration) {
-        _launchToast(toastFactoryModel, message, $.WARNING, title, duration);
-      }
-
-      /**
-       * @name error
-       * @memberof source.toast.$alertProvider.$alert
-       *
-       * @description
-       * Displays error toast message.
-       *
-       * @param {String} message
-       * @param {String} title
-       * @param {Integer|Undefined} duration
-       */
-      function error(message, title, duration) {
-        _launchToast(toastFactoryModel, message, $.ERROR, title, duration);
-      }
-    }
-  }
-})();
-
-(function() {
-  'use strict';
-
-  angular
-    .module('source.translate', [])
-    /**
-     * @namespace translate
-     * @memberof source.translate
-     *
-     * @requires $translate
-     *
-     * @description
-     * Filter for translating labels.
-     */
-    .filter('translate', translate);
-
-  translate.$inject = ['$translate'];
-
-  function translate($translate) {
-    return function(input) {
-      return $translate.getTranslations()[input] !== undefined ? $translate.getTranslations()[input] : input;
-    };
-  }
-})();
-
-(function() {
-  'use strict';
-
-  angular
-    .module('source.translate')
-    /**
-     * @namespace $translateProvider
-     * @memberof source.translate
-     *
-     * @requires $apiProvider
-     *
-     * @description
-     * Provider definition for translation labels.
-     */
-    .provider('$translate', $translate);
-
-  $translate.$inject = ['$apiProvider'];
-
-  function $translate($apiProvider) {
-    var _translateConfig = {
-      apiTranslationSource: null,
-      apiTranslationSections: null,
-      localTranslationSource: null,
-      localTranslationSections: null,
-      preferredDefaultLanguage: null
-    };
-
-    return {
-      setApiTranslationSource: setApiTranslationSource,
-      setApiTranslationSections: setApiTranslationSections,
-      setLocalTranslationSource: setLocalTranslationSource,
-      setLocalTranslationSections: setLocalTranslationSections,
-      setPreferredLanguage: setPreferredLanguage,
-      $get: ['$api', 'availableLanguages', $get]
-    };
-
-    /**
-     * @name _setTranslationConfigProperty
-     * @memberof source.translate.$translateProvider
-     *
-     * @description
-     * Set configurations for _translateConfig object.
-     *
-     * @param {String} configKey
-     * @param {String|Object} value
-     * @returns {Object}
-     * @private
-     */
-    function _setTranslationConfigProperty(configKey, value) {
-      value = (typeof value === 'string') ? $apiProvider.createEntityObject({ entityName: value }) : value ;
-      if (value && typeof value === 'object') {
-        _translateConfig[configKey] = value;
-        return _translateConfig;
-      } else {
-        throw new Error('Lost parameter or type parameter wrong');
-      }
-    }
-
-    /**
-     * @name setApiTranslationSource
-     * @memberof source.translate.$translateProvider
-     *
-     * @description
-     * Set entity name for calling API to return translation labels.
-     *
-     * @param {String} entityName
-     * @returns {Object}
-     */
-    function setApiTranslationSource(entityName) {
-      return _setTranslationConfigProperty('apiTranslationSource', entityName);
-    }
-
-    /**
-     * @name setApiTranslationSections
-     * @memberof source.translate.$translateProvider
-     *
-     * @description
-     * Set sections from API response where will be found translations labels.
-     *
-     * @param {Object} sections
-     * @returns {Object}
-     */
-    function setApiTranslationSections(sections) {
-      return _setTranslationConfigProperty('apiTranslationSections', sections);
-    }
-
-    /**
-     * @name setLocalTranslationSource
-     * @memberof source.translate.$translateProvider
-     *
-     * @description
-     * Set file name for local JSON file where we will be found translation labels.
-     *
-     * @param {String} jsonFileName
-     * @returns {Object}
-     */
-    function setLocalTranslationSource(jsonFileName) {
-      return _setTranslationConfigProperty('localTranslationSource', jsonFileName);
-    }
-
-    /**
-     * @name setLocalTranslationSections
-     * @memberof source.translate.$translateProvider
-     *
-     * @description
-     * Set sections from local JSON file where will be found translations labels.
-     *
-     * @param {Object} sections
-     * @returns {Object}
-     */
-    function setLocalTranslationSections(sections) {
-      return _setTranslationConfigProperty('localTranslationSections', sections);
-    }
-
-    /**
-     * @name setPreferredLanguage
-     * @memberof source.translate.$translateProvider
-     *
-     * @description
-     * Set chosen language for application, defined by a locale code.
-     *
-     * @param {String} preferredLocale --> Locale code
-     * @returns {Object}
-     */
-    function setPreferredLanguage(preferredLocale) {
-      _translateConfig.preferredDefaultLanguage = preferredLocale;
-      return _translateConfig;
-    }
-
-    /**
-     * @namespace $translate
-     * @memberof source.translate.$translateProvider
-     *
-     * @requires $api
-     * @requires availableLanguages
-     *
-     * @description
-     * Factory definition for translation labels.
-     */
-    function $get($api, availableLanguages) {
-      var _translations = {};
-      var _appLanguage = null;
-
-      var $apiConstants = $api.$;
-
-      return {
-        initTranslationModule: initTranslationModule,
-        getTranslations: getTranslations,
-        getActualLanguage: getActualLanguage,
-        getAvailableLanguages: getAvailableLanguages
-      };
-
-      /**
-       * @name _initTranslationModule
-       * @memberof source.translate.$translateProvider.$translate
-       *
-       * @description
-       * Search for translation labels in source given by "source" parameter.
-       *
-       * @param {String} source --> Can be LOCAL or SERVER
-       * @returns {Promise|Null}
-       * @private
-       */
-      function _initTranslationModule(source) {
-        var config = {
-          source: _translateConfig.apiTranslationSource,
-          sections: _translateConfig.apiTranslationSections,
-          process: $api.getEntity
-        };
-        if (source === $apiConstants.API_LOCAL) {
-          config.source = _translateConfig.localTranslationSource;
-          config.sections = _translateConfig.localTranslationSections;
-          config.process = $api.getLocalEntity;
-        }
-        if (config.source) {
-          return config.process(config.source, function(success) {
-            var localTranslations = success.data;
-            if (config.sections) {
-              angular.forEach(config.sections, function(item) {
-                if (localTranslations.hasOwnProperty(item) && typeof localTranslations[item] === 'object') {
-                  _translations = angular.extend({}, _translations, localTranslations[item]);
-                }
-              });
-            } else {
-              _translations = angular.extend({}, _translations, localTranslations);
-            }
-          });
-        }
-
-        return null;
-      }
-
-      /**
-       * @name initTranslationModule
-       * @memberof source.translate.$translateProvider.$translate
-       *
-       * @description
-       * Search for translation labels in both sources: LOCAL and SERVER.
-       *
-       * @returns {Array}
-       */
-      function initTranslationModule() {
-        var translationsModules = [
-          _initTranslationModule($apiConstants.API_LOCAL),
-          _initTranslationModule($apiConstants.API_SERVER)
-        ];
-        var terms = {
-          one: _translateConfig.preferredDefaultLanguage,
-          two: typeof _translateConfig.preferredDefaultLanguage === 'string',
-          three: availableLanguages.languages.hasOwnProperty(_translateConfig.preferredDefaultLanguage)
-        };
-        if (terms.one && terms.two && terms.three) {
-          _appLanguage = availableLanguages.languages[_translateConfig.preferredDefaultLanguage];
-        } else {
-          _appLanguage = availableLanguages.default;
-          throw new Error('Locale code not found. Setting "en" automatically. Please, revise config statement.');
-        }
-
-        return translationsModules;
-      }
-
-      /**
-       * @name getTranslations
-       * @memberof source.translate.$translateProvider.$translate
-       *
-       * @description
-       * Catch general translation object: "_translations"
-       *
-       * @returns {Object}
-       */
-      function getTranslations() {
-        return _translations;
-      }
-
-      /**
-       * @name getActualLanguage
-       * @memberof source.translate.$translateProvider.$translate
-       *
-       * @description
-       * Catch actual defined language variable: "_appLanguage"
-       *
-       * @returns {Object}
-       */
-      function getActualLanguage() {
-        return _appLanguage;
-      }
-
-      /**
-       * @name getAvailableLanguages
-       * @memberof source.translate.$translateProvider.$translate
-       *
-       * @description
-       * Returns all application available languages, defined in "availableLanguages" service.
-       *
-       * @returns {Object}
-       */
-      function getAvailableLanguages() {
-        return availableLanguages.languages;
-      }
-    }
-  }
-})();
-
-(function() {
-  'use strict';
-
-  angular
-    .module('source.translate')
-    /**
-     * @namespace availableLanguages
-     * @memberof source.translate
-     *
-     * @description
-     * Service to setting all available languages into app. Languages are defined by its locale codes.
-     */
-    .service('availableLanguages', availableLanguages);
-
-  function availableLanguages() {
-    /* jshint validthis: true */
-    this.languages = {
-      en: {
-        locale: 'en',
-        name: 'English',
-        sourceName: 'English'
-      },
-      es: {
-        locale: 'es',
-        name: 'Spanish',
-        sourceName: 'Español'
-      },
-      fr: {
-        locale: 'fr',
-        name: 'French',
-        sourceName: 'Français'
-      },
-      de: {
-        locale: 'de',
-        name: 'German',
-        sourceName: 'Deutsch'
-      },
-      pt: {
-        locale: 'pt',
-        name: 'Portuguese',
-        sourceName: 'Português'
-      }
-    };
-
-    this.default = this.languages.en;
-  }
-})();
-
-(function() {
-  'use strict';
-
   angular
     .module('source._shared')
     /**
@@ -1673,18 +1015,6 @@
 
       FROM_CAMELCASE_TO_OTHER: true,
       FROM_OTHER_TO_CAMELCASE: false,
-
-      LIST_VIEW: 1,
-      GRID_VIEW: 2,
-      GRID_MINI_VIEW: 3,
-      SIMPLE_LIST_VIEW: 4,
-      DETAILS_VIEW: 5,
-      SETTINGS_VIEW: 6,
-
-      /* Constants for view type definition and setting config files. */
-      VIEW_FILE: 'fileView',
-      VIEW_LIST: 'listView',
-      VIEW_TABLE: 'tableView',
 
       MODE_KEY: true,
       MODE_VALUE: false,
@@ -2212,6 +1542,560 @@
       function setObjectUsingSchema(objectSchema, objectSettings, mergeOption) {
         mergeOption = mergeOption || $.NO_MERGE;
         return _setObjectUsingSchema(objectSchema, objectSettings, mergeOption);
+      }
+    }
+  }
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    .module('source.translate', [])
+    /**
+     * @namespace translate
+     * @memberof source.translate
+     *
+     * @requires $translate
+     *
+     * @description
+     * Filter for translating labels.
+     */
+    .filter('translate', translate);
+
+  translate.$inject = ['$translate'];
+
+  function translate($translate) {
+    return function(input) {
+      return $translate.getTranslations()[input] !== undefined ? $translate.getTranslations()[input] : input;
+    };
+  }
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    .module('source.translate')
+    /**
+     * @namespace $translateProvider
+     * @memberof source.translate
+     *
+     * @requires $apiProvider
+     *
+     * @description
+     * Provider definition for translation labels.
+     */
+    .provider('$translate', $translate);
+
+  $translate.$inject = ['$apiProvider'];
+
+  function $translate($apiProvider) {
+    var _translateConfig = {
+      apiTranslationSource: null,
+      apiTranslationSections: null,
+      localTranslationSource: null,
+      localTranslationSections: null,
+      preferredDefaultLanguage: null
+    };
+
+    return {
+      setApiTranslationSource: setApiTranslationSource,
+      setApiTranslationSections: setApiTranslationSections,
+      setLocalTranslationSource: setLocalTranslationSource,
+      setLocalTranslationSections: setLocalTranslationSections,
+      setPreferredLanguage: setPreferredLanguage,
+      $get: ['$api', 'availableLanguages', $get]
+    };
+
+    /**
+     * @name _setTranslationConfigProperty
+     * @memberof source.translate.$translateProvider
+     *
+     * @description
+     * Set configurations for _translateConfig object.
+     *
+     * @param {String} configKey
+     * @param {String|Object} value
+     * @returns {Object}
+     * @private
+     */
+    function _setTranslationConfigProperty(configKey, value) {
+      value = (typeof value === 'string') ? $apiProvider.createEntityObject({ entityName: value }) : value ;
+      if (value && typeof value === 'object') {
+        _translateConfig[configKey] = value;
+        return _translateConfig;
+      } else {
+        throw new Error('Lost parameter or type parameter wrong');
+      }
+    }
+
+    /**
+     * @name setApiTranslationSource
+     * @memberof source.translate.$translateProvider
+     *
+     * @description
+     * Set entity name for calling API to return translation labels.
+     *
+     * @param {String} entityName
+     * @returns {Object}
+     */
+    function setApiTranslationSource(entityName) {
+      return _setTranslationConfigProperty('apiTranslationSource', entityName);
+    }
+
+    /**
+     * @name setApiTranslationSections
+     * @memberof source.translate.$translateProvider
+     *
+     * @description
+     * Set sections from API response where will be found translations labels.
+     *
+     * @param {Object} sections
+     * @returns {Object}
+     */
+    function setApiTranslationSections(sections) {
+      return _setTranslationConfigProperty('apiTranslationSections', sections);
+    }
+
+    /**
+     * @name setLocalTranslationSource
+     * @memberof source.translate.$translateProvider
+     *
+     * @description
+     * Set file name for local JSON file where we will be found translation labels.
+     *
+     * @param {String} jsonFileName
+     * @returns {Object}
+     */
+    function setLocalTranslationSource(jsonFileName) {
+      return _setTranslationConfigProperty('localTranslationSource', jsonFileName);
+    }
+
+    /**
+     * @name setLocalTranslationSections
+     * @memberof source.translate.$translateProvider
+     *
+     * @description
+     * Set sections from local JSON file where will be found translations labels.
+     *
+     * @param {Object} sections
+     * @returns {Object}
+     */
+    function setLocalTranslationSections(sections) {
+      return _setTranslationConfigProperty('localTranslationSections', sections);
+    }
+
+    /**
+     * @name setPreferredLanguage
+     * @memberof source.translate.$translateProvider
+     *
+     * @description
+     * Set chosen language for application, defined by a locale code.
+     *
+     * @param {String} preferredLocale --> Locale code
+     * @returns {Object}
+     */
+    function setPreferredLanguage(preferredLocale) {
+      _translateConfig.preferredDefaultLanguage = preferredLocale;
+      return _translateConfig;
+    }
+
+    /**
+     * @namespace $translate
+     * @memberof source.translate.$translateProvider
+     *
+     * @requires $api
+     * @requires availableLanguages
+     *
+     * @description
+     * Factory definition for translation labels.
+     */
+    function $get($api, availableLanguages) {
+      var _translations = {};
+      var _appLanguage = null;
+
+      var $apiConstants = $api.$;
+
+      return {
+        initTranslationModule: initTranslationModule,
+        getTranslations: getTranslations,
+        getActualLanguage: getActualLanguage,
+        getAvailableLanguages: getAvailableLanguages
+      };
+
+      /**
+       * @name _initTranslationModule
+       * @memberof source.translate.$translateProvider.$translate
+       *
+       * @description
+       * Search for translation labels in source given by "source" parameter.
+       *
+       * @param {String} source --> Can be LOCAL or SERVER
+       * @returns {Promise|Null}
+       * @private
+       */
+      function _initTranslationModule(source) {
+        var config = {
+          source: _translateConfig.apiTranslationSource,
+          sections: _translateConfig.apiTranslationSections,
+          process: $api.getEntity
+        };
+        if (source === $apiConstants.API_LOCAL) {
+          config.source = _translateConfig.localTranslationSource;
+          config.sections = _translateConfig.localTranslationSections;
+          config.process = $api.getLocalEntity;
+        }
+        if (config.source) {
+          return config.process(config.source, function(success) {
+            var localTranslations = success.data;
+            if (config.sections) {
+              angular.forEach(config.sections, function(item) {
+                if (localTranslations.hasOwnProperty(item) && typeof localTranslations[item] === 'object') {
+                  _translations = angular.extend({}, _translations, localTranslations[item]);
+                }
+              });
+            } else {
+              _translations = angular.extend({}, _translations, localTranslations);
+            }
+          });
+        }
+
+        return null;
+      }
+
+      /**
+       * @name initTranslationModule
+       * @memberof source.translate.$translateProvider.$translate
+       *
+       * @description
+       * Search for translation labels in both sources: LOCAL and SERVER.
+       *
+       * @returns {Array}
+       */
+      function initTranslationModule() {
+        var translationsModules = [
+          _initTranslationModule($apiConstants.API_LOCAL),
+          _initTranslationModule($apiConstants.API_SERVER)
+        ];
+        var terms = {
+          one: _translateConfig.preferredDefaultLanguage,
+          two: typeof _translateConfig.preferredDefaultLanguage === 'string',
+          three: availableLanguages.languages.hasOwnProperty(_translateConfig.preferredDefaultLanguage)
+        };
+        if (terms.one && terms.two && terms.three) {
+          _appLanguage = availableLanguages.languages[_translateConfig.preferredDefaultLanguage];
+        } else {
+          _appLanguage = availableLanguages.default;
+          throw new Error('Locale code not found. Setting "en" automatically. Please, revise config statement.');
+        }
+
+        return translationsModules;
+      }
+
+      /**
+       * @name getTranslations
+       * @memberof source.translate.$translateProvider.$translate
+       *
+       * @description
+       * Catch general translation object: "_translations"
+       *
+       * @returns {Object}
+       */
+      function getTranslations() {
+        return _translations;
+      }
+
+      /**
+       * @name getActualLanguage
+       * @memberof source.translate.$translateProvider.$translate
+       *
+       * @description
+       * Catch actual defined language variable: "_appLanguage"
+       *
+       * @returns {Object}
+       */
+      function getActualLanguage() {
+        return _appLanguage;
+      }
+
+      /**
+       * @name getAvailableLanguages
+       * @memberof source.translate.$translateProvider.$translate
+       *
+       * @description
+       * Returns all application available languages, defined in "availableLanguages" service.
+       *
+       * @returns {Object}
+       */
+      function getAvailableLanguages() {
+        return availableLanguages.languages;
+      }
+    }
+  }
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    .module('source.translate')
+    /**
+     * @namespace availableLanguages
+     * @memberof source.translate
+     *
+     * @description
+     * Service to setting all available languages into app. Languages are defined by its locale codes.
+     */
+    .service('availableLanguages', availableLanguages);
+
+  function availableLanguages() {
+    /* jshint validthis: true */
+    this.languages = {
+      en: {
+        locale: 'en',
+        name: 'English',
+        sourceName: 'English'
+      },
+      es: {
+        locale: 'es',
+        name: 'Spanish',
+        sourceName: 'Español'
+      },
+      fr: {
+        locale: 'fr',
+        name: 'French',
+        sourceName: 'Français'
+      },
+      de: {
+        locale: 'de',
+        name: 'German',
+        sourceName: 'Deutsch'
+      },
+      pt: {
+        locale: 'pt',
+        name: 'Portuguese',
+        sourceName: 'Português'
+      }
+    };
+
+    this.default = this.languages.en;
+  }
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    .module('source.toast')
+    /**
+     * @namespace toastModelProvider
+     * @memberof source.toast
+     *
+     * @description
+     * Provider that gets constants for toast services.
+     */
+    .provider('toastModel', toastModel);
+
+  toastModel.$inject = ['$toolsProvider'];
+
+  function toastModel($toolsProvider) {
+    var _constants = {
+      SUCCESS: 'SUCCESS',
+      INFO: 'INFO',
+      WARNING: 'WARNING',
+      ERROR: 'ERROR'
+    };
+    var $ = angular.extend({}, _constants, $toolsProvider.$);
+
+    return {
+      $: $,
+      $get: ['toastr', $get]
+    };
+
+    /**
+     * @namespace toastModel
+     * @memberof source.toast.toastModelProvider
+     *
+     * @requires toastr
+     *
+     * @description
+     * Factory that gets constants for toast services.
+     */
+    function $get(toastr) {
+      var _serviceModel = {
+        SUCCESS: toastr.success,
+        INFO: toastr.info,
+        WARNING: toastr.warning,
+        ERROR: toastr.error
+      };
+
+      return {
+        $: $,
+        get: getFactory
+      };
+
+      /**
+       * @name getFactory
+       * @memberof source.toast.toastModelProvider.toastModel
+       *
+       * @description
+       * Returns API model for Factory service.
+       *
+       * @returns {Object}
+       */
+      function getFactory() {
+        return _serviceModel;
+      }
+    }
+  }
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    .module('source.toast')
+    /**
+     * @namespace $alertProvider
+     * @memberof source.toast
+     *
+     * @description
+     * Provider custom statement to use toast alert's messages.
+     */
+    .provider('$alert', $alert);
+
+  $alert.$inject = ['toastModelProvider'];
+
+  function $alert(toastModelProvider) {
+    var $ = toastModelProvider.$;
+    var _toastOptions = {
+      timeOut: 9999
+    };
+
+    return {
+      $: $,
+      setDuration: _setDuration,
+      $get: ['toastModel', $get]
+    };
+
+    /**
+     * @name _setDuration
+     * @memberof source.toast.$alertProvider
+     *
+     * @description
+     * Set duration of toast message for provider configuration.
+     *
+     * @param {Integer} time
+     * @private
+     */
+    function _setDuration(time) {
+      _toastOptions.timeOut = time;
+    }
+
+    /**
+     * @name _launchToast
+     * @memberof source.toast.$alertProvider
+     *
+     * @description
+     * Launch angular-toaster alert message.
+     *
+     * @param {Object} toastFactoryModel
+     * @param {String|Array} message
+     * @param {String} type
+     * @param {String|Undefined} title
+     * @param {Integer|Undefined} duration
+     * @private
+     */
+    function _launchToast(toastFactoryModel, message, type, title, duration) {
+      if (title !== undefined && typeof title !== 'string' && !duration) {
+        duration = title;
+        title = undefined;
+      }
+
+      var toastOptions = (duration) ? angular.extend({}, _toastOptions, { timeOut: duration }) : _toastOptions ;
+      message = (angular.isArray(message)) ? message.join('<br>') : message ;
+      toastFactoryModel[type](message, title, toastOptions);
+    }
+
+    /**
+     * @namespace $alert
+     * @memberof source.toast.$alertProvider
+     *
+     * @requires toastr
+     *
+     * @description
+     * Factory statement for toast alert's messages.
+     */
+    function $get(toastModel) {
+      var toastFactoryModel = toastModel.get();
+
+      return {
+        $: $,
+        success: success,
+        info: info,
+        warning: warning,
+        error: error
+      };
+
+      /**
+       * @name success
+       * @memberof source.toast.$alertProvider.$alert
+       *
+       * @description
+       * Displays success toast message.
+       *
+       * @param {String} message
+       * @param {String} title
+       * @param {Integer|Undefined} duration
+       */
+      function success(message, title, duration) {
+        _launchToast(toastFactoryModel, message, $.SUCCESS, title, duration);
+      }
+
+      /**
+       * @name info
+       * @memberof source.toast.$alertProvider.$alert
+       *
+       * @description
+       * Displays info toast message.
+       *
+       * @param {String} message
+       * @param {String} title
+       * @param {Integer|Undefined} duration
+       */
+      function info(message, title, duration) {
+        _launchToast(toastFactoryModel, message, $.INFO, title, duration);
+      }
+
+      /**
+       * @name warning
+       * @memberof source.toast.$alertProvider.$alert
+       *
+       * @description
+       * Displays warning toast message.
+       *
+       * @param {String} message
+       * @param {String} title
+       * @param {Integer|Undefined} duration
+       */
+      function warning(message, title, duration) {
+        _launchToast(toastFactoryModel, message, $.WARNING, title, duration);
+      }
+
+      /**
+       * @name error
+       * @memberof source.toast.$alertProvider.$alert
+       *
+       * @description
+       * Displays error toast message.
+       *
+       * @param {String} message
+       * @param {String} title
+       * @param {Integer|Undefined} duration
+       */
+      function error(message, title, duration) {
+        _launchToast(toastFactoryModel, message, $.ERROR, title, duration);
       }
     }
   }

@@ -137,7 +137,6 @@
         /* GET actions */
         getEntity: getEntity,
         getLocalEntity: getLocalEntity,
-        getBimsVersion: getBimsVersion,
         /* POST actions */
         auth: auth,
         postEntity: postEntity,
@@ -339,25 +338,6 @@
           source: $.API_LOCAL,
           access: $.PUBLIC,
           entityObject: entityObject,
-          checkSuperAdmin: false
-        }, _connectionObject);
-        return _processConnection(connectionObject, callback, callbackError);
-      }
-
-      /**
-       * @name getBimsVersion
-       * @memberof source.api.$apiProvider.$api
-       *
-       * @description
-       * Get software versions from server. This special call is done because its response comes directly from NGINX.
-       *
-       * @param {Function} callback
-       * @param {Function} callbackError
-       * @returns {Promise}
-       */
-      function getBimsVersion(callback, callbackError) {
-        var connectionObject = $tools.setObjectUsingSchema($c.schemas.connectionObject, {
-          entityObject: _createEntityObject({ entityName: 'bims_version' }),
           checkSuperAdmin: false
         }, _connectionObject);
         return _processConnection(connectionObject, callback, callbackError);

@@ -1,7 +1,7 @@
 {
   "name": "angular-starter-kit-core",
   "description": "Application Dependency BOWER for Frontend seed.",
-  "version": "0.9.12",
+  "version": "0.9.13",
   "main": "./release/angular-starter-kit-core.js",
   "repository": {
     "type": "git",
