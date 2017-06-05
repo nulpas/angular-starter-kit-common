@@ -1,10 +1,10 @@
 {
   "name": "angular-starter-kit-commom",
   "description": "Application Dependency BOWER for Frontend seed.",
-  "version": "0.9.1",
+  "version": "0.9.2",
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "ssh://git@github.com:nulpas/angular-starter-kit-core.git"
   },
   "author": "Nul Pàs <manu@lunaeme.com> (https://twitter.com/NulPas)",
   "license": "MIT",
