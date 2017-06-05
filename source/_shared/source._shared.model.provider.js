@@ -60,7 +60,7 @@
 
     return {
       get: getProvider,
-      $get: $get
+      $get: [$get]
     };
 
     /**

@@ -154,7 +154,7 @@
                 }
               },
               /**
-               * @name QUERY.subProcess
+               * @name QUERY.SERVER.subProcess
                * @memberof source.api.apiModelProvider
                *
                * @description
@@ -162,7 +162,7 @@
                * an entityId, it will make a call to retrieve that concrete entity. Otherwise, it will make a call
                * to retrieve all existing entities.
                *
-               * @param requestObject
+               * @param {Object} requestObject
                * @returns {Promise}
                */
               subProcess: function(requestObject) {
@@ -180,13 +180,13 @@
                 defaultParams: _defaults.defaultParams
               },
               /**
-               * @name LOCAL.subProcess
+               * @name QUERY.LOCAL.subProcess
                * @memberof source.api.apiModelProvider
                *
                * @description
                * It makes a local "GET" API call through Restangular.
                *
-               * @param requestObject
+               * @param {Object} requestObject
                * @returns {Promise}
                */
               subProcess: function(requestObject) {

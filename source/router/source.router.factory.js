@@ -4,7 +4,7 @@
   angular
   .module('source.router')
   /**
-   * @namespace $routerProvider
+   * @namespace $router
    * @memberof source.router
    *
    * @requires $state
@@ -26,7 +26,7 @@
 
     /**
      * @name _resolveStateGo
-     * @memberof source.router.$routerProvider
+     * @memberof source.router.$router
      *
      * @description
      * Executes $state.go function into $timeout for use into state resolve.
@@ -41,7 +41,7 @@
 
     /**
      * @name resolveStateGo
-     * @memberof source.router.$routerProvider
+     * @memberof source.router.$router
      *
      * @description
      * Executes _resolveStateGo function.

@@ -31,23 +31,6 @@
 
   angular
     /**
-     * @namespace api
-     * @memberof source
-     *
-     * @description
-     * Definition of module "api" for API calling services.
-     */
-    .module('source.api', [
-      /* External Modules */
-      'restangular'
-    ]);
-})();
-
-(function() {
-  'use strict';
-
-  angular
-    /**
      * @namespace router
      * @memberof source
      *
@@ -57,6 +40,23 @@
     .module('source.router', [
       /* External Modules */
       'ui.router'
+    ]);
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    /**
+     * @namespace api
+     * @memberof source
+     *
+     * @description
+     * Definition of module "api" for API calling services.
+     */
+    .module('source.api', [
+      /* External Modules */
+      'restangular'
     ]);
 })();
 
@@ -79,6 +79,20 @@
 
   angular
     /**
+     * @namespace translate
+     * @memberof source
+     *
+     * @description
+     * Definition of module "translate" for translation services.
+     */
+    .module('source.translate', []);
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    /**
      * @namespace toast
      * @memberof source
      *
@@ -89,20 +103,6 @@
       /* External Modules */
       'toastr'
     ]);
-})();
-
-(function() {
-  'use strict';
-
-  angular
-    /**
-     * @namespace translate
-     * @memberof source
-     *
-     * @description
-     * Definition of module "translate" for translation services.
-     */
-    .module('source.translate', []);
 })();
 
 (function() {
@@ -184,6 +184,62 @@
       preventOpenDuplicates: false,
       target: 'body'
     });
+  }
+})();
+
+(function() {
+  'use strict';
+
+  angular
+  .module('source.router')
+  /**
+   * @namespace $router
+   * @memberof source.router
+   *
+   * @requires $state
+   * @requires $timeout
+   *
+   * @description
+   * Provider statement manage routing of the application.
+   */
+  .factory('$router', $router);
+
+  $router.$inject = ['$state', '$timeout'];
+
+  function $router($state, $timeout) {
+
+    return {
+      $state: $state,
+      resolveStateGo: resolveStateGo
+    };
+
+    /**
+     * @name _resolveStateGo
+     * @memberof source.router.$router
+     *
+     * @description
+     * Executes $state.go function into $timeout for use into state resolve.
+     *
+     * @param {String} stateName
+     */
+    function _resolveStateGo(stateName) {
+      $timeout(function() {
+        $state.go(stateName);
+      });
+    }
+
+    /**
+     * @name resolveStateGo
+     * @memberof source.router.$router
+     *
+     * @description
+     * Executes _resolveStateGo function.
+     *
+     * @param {String} stateName
+     */
+    function resolveStateGo(stateName) {
+      _resolveStateGo(stateName);
+    }
   }
 })();
 
@@ -343,7 +399,7 @@
                 }
               },
               /**
-               * @name QUERY.subProcess
+               * @name QUERY.SERVER.subProcess
                * @memberof source.api.apiModelProvider
                *
                * @description
@@ -351,7 +407,7 @@
                * an entityId, it will make a call to retrieve that concrete entity. Otherwise, it will make a call
                * to retrieve all existing entities.
                *
-               * @param requestObject
+               * @param {Object} requestObject
                * @returns {Promise}
                */
               subProcess: function(requestObject) {
@@ -369,13 +425,13 @@
                 defaultParams: _defaults.defaultParams
               },
               /**
-               * @name LOCAL.subProcess
+               * @name QUERY.LOCAL.subProcess
                * @memberof source.api.apiModelProvider
                *
                * @description
                * It makes a local "GET" API call through Restangular.
                *
-               * @param requestObject
+               * @param {Object} requestObject
                * @returns {Promise}
                */
               subProcess: function(requestObject) {
@@ -943,89 +999,6 @@
   'use strict';
 
   angular
-  .module('source.router')
-  /**
-   * @namespace $routerProvider
-   * @memberof source.router
-   *
-   * @requires $state
-   * @requires $timeout
-   *
-   * @description
-   * Provider statement manage routing of the application.
-   */
-  .factory('$router', $router);
-
-  $router.$inject = ['$state', '$timeout'];
-
-  function $router($state, $timeout) {
-
-    return {
-      $state: $state,
-      resolveStateGo: resolveStateGo
-    };
-
-    /**
-     * @name _resolveStateGo
-     * @memberof source.router.$routerProvider
-     *
-     * @description
-     * Executes $state.go function into $timeout for use into state resolve.
-     *
-     * @param {String} stateName
-     */
-    function _resolveStateGo(stateName) {
-      $timeout(function() {
-        $state.go(stateName);
-      });
-    }
-
-    /**
-     * @name resolveStateGo
-     * @memberof source.router.$routerProvider
-     *
-     * @description
-     * Executes _resolveStateGo function.
-     *
-     * @param {String} stateName
-     */
-    function resolveStateGo(stateName) {
-      _resolveStateGo(stateName);
-    }
-  }
-})();
-
-(function() {
-  'use strict';
-
-  angular
-  .module('source.router')
-  /**
-   * @namespace routerData
-   * @memberof source.router
-   *
-   * @description
-   * Service to set some needed constants.
-   */
-  .service('routerData', routerData);
-
-  function routerData() {
-    /* jshint validthis: true */
-    this.constants = {
-      //# Router param object format:
-      routerParams: {
-        param1: null,
-        param2: null,
-        param3: null
-      }
-    };
-  }
-})();
-
-(function() {
-  'use strict';
-
-  angular
     .module('source._shared')
     /**
      * @namespace globalConstantsProvider
@@ -1084,7 +1057,7 @@
 
     return {
       get: getProvider,
-      $get: $get
+      $get: [$get]
     };
 
     /**
@@ -1152,7 +1125,7 @@
       $: $,
       /* Object tools */
       setObjectUsingSchema: setObjectUsingSchemaProvider,
-      $get: $get
+      $get: [$get]
     };
 
     /**
@@ -1578,224 +1551,6 @@
   'use strict';
 
   angular
-    .module('source.toast')
-    /**
-     * @namespace toastModelProvider
-     * @memberof source.toast
-     *
-     * @description
-     * Provider that gets constants for toast services.
-     */
-    .provider('toastModel', toastModel);
-
-  toastModel.$inject = ['$toolsProvider'];
-
-  function toastModel($toolsProvider) {
-    var _constants = {
-      SUCCESS: 'SUCCESS',
-      INFO: 'INFO',
-      WARNING: 'WARNING',
-      ERROR: 'ERROR'
-    };
-    var $ = angular.extend({}, _constants, $toolsProvider.$);
-
-    return {
-      $: $,
-      $get: ['toastr', $get]
-    };
-
-    /**
-     * @namespace toastModel
-     * @memberof source.toast.toastModelProvider
-     *
-     * @requires toastr
-     *
-     * @description
-     * Factory that gets constants for toast services.
-     */
-    function $get(toastr) {
-      var _serviceModel = {
-        SUCCESS: toastr.success,
-        INFO: toastr.info,
-        WARNING: toastr.warning,
-        ERROR: toastr.error
-      };
-
-      return {
-        $: $,
-        get: getFactory
-      };
-
-      /**
-       * @name getFactory
-       * @memberof source.toast.toastModelProvider.toastModel
-       *
-       * @description
-       * Returns API model for Factory service.
-       *
-       * @returns {Object}
-       */
-      function getFactory() {
-        return _serviceModel;
-      }
-    }
-  }
-})();
-
-(function() {
-  'use strict';
-
-  angular
-    .module('source.toast')
-    /**
-     * @namespace $alertProvider
-     * @memberof source.toast
-     *
-     * @description
-     * Provider custom statement to use toast alert's messages.
-     */
-    .provider('$alert', $alert);
-
-  $alert.$inject = ['toastModelProvider'];
-
-  function $alert(toastModelProvider) {
-    var $ = toastModelProvider.$;
-    var _toastOptions = {
-      timeOut: 9999
-    };
-
-    return {
-      $: $,
-      setDuration: _setDuration,
-      $get: ['toastModel', $get]
-    };
-
-    /**
-     * @name _setDuration
-     * @memberof source.toast.$alertProvider
-     *
-     * @description
-     * Set duration of toast message for provider configuration.
-     *
-     * @param {Integer} time
-     * @private
-     */
-    function _setDuration(time) {
-      _toastOptions.timeOut = time;
-    }
-
-    /**
-     * @name _launchToast
-     * @memberof source.toast.$alertProvider
-     *
-     * @description
-     * Launch angular-toaster alert message.
-     *
-     * @param {Object} toastFactoryModel
-     * @param {String|Array} message
-     * @param {String} type
-     * @param {String|Undefined} title
-     * @param {Integer|Undefined} duration
-     * @private
-     */
-    function _launchToast(toastFactoryModel, message, type, title, duration) {
-      if (title !== undefined && typeof title !== 'string' && !duration) {
-        duration = title;
-        title = undefined;
-      }
-
-      var toastOptions = (duration) ? angular.extend({}, _toastOptions, { timeOut: duration }) : _toastOptions ;
-      message = (angular.isArray(message)) ? message.join('<br>') : message ;
-      toastFactoryModel[type](message, title, toastOptions);
-    }
-
-    /**
-     * @namespace $alert
-     * @memberof source.toast.$alertProvider
-     *
-     * @requires toastr
-     *
-     * @description
-     * Factory statement for toast alert's messages.
-     */
-    function $get(toastModel) {
-      var toastFactoryModel = toastModel.get();
-
-      return {
-        $: $,
-        success: success,
-        info: info,
-        warning: warning,
-        error: error
-      };
-
-      /**
-       * @name success
-       * @memberof source.toast.$alertProvider.$alert
-       *
-       * @description
-       * Displays success toast message.
-       *
-       * @param {String} message
-       * @param {String} title
-       * @param {Integer|Undefined} duration
-       */
-      function success(message, title, duration) {
-        _launchToast(toastFactoryModel, message, $.SUCCESS, title, duration);
-      }
-
-      /**
-       * @name info
-       * @memberof source.toast.$alertProvider.$alert
-       *
-       * @description
-       * Displays info toast message.
-       *
-       * @param {String} message
-       * @param {String} title
-       * @param {Integer|Undefined} duration
-       */
-      function info(message, title, duration) {
-        _launchToast(toastFactoryModel, message, $.INFO, title, duration);
-      }
-
-      /**
-       * @name warning
-       * @memberof source.toast.$alertProvider.$alert
-       *
-       * @description
-       * Displays warning toast message.
-       *
-       * @param {String} message
-       * @param {String} title
-       * @param {Integer|Undefined} duration
-       */
-      function warning(message, title, duration) {
-        _launchToast(toastFactoryModel, message, $.WARNING, title, duration);
-      }
-
-      /**
-       * @name error
-       * @memberof source.toast.$alertProvider.$alert
-       *
-       * @description
-       * Displays error toast message.
-       *
-       * @param {String} message
-       * @param {String} title
-       * @param {Integer|Undefined} duration
-       */
-      function error(message, title, duration) {
-        _launchToast(toastFactoryModel, message, $.ERROR, title, duration);
-      }
-    }
-  }
-})();
-
-(function() {
-  'use strict';
-
-  angular
     .module('source.translate', [])
     /**
      * @namespace translate
@@ -2125,5 +1880,223 @@
     };
 
     this.default = this.languages.en;
+  }
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    .module('source.toast')
+    /**
+     * @namespace toastModelProvider
+     * @memberof source.toast
+     *
+     * @description
+     * Provider that gets constants for toast services.
+     */
+    .provider('toastModel', toastModel);
+
+  toastModel.$inject = ['$toolsProvider'];
+
+  function toastModel($toolsProvider) {
+    var _constants = {
+      SUCCESS: 'SUCCESS',
+      INFO: 'INFO',
+      WARNING: 'WARNING',
+      ERROR: 'ERROR'
+    };
+    var $ = angular.extend({}, _constants, $toolsProvider.$);
+
+    return {
+      $: $,
+      $get: ['toastr', $get]
+    };
+
+    /**
+     * @namespace toastModel
+     * @memberof source.toast.toastModelProvider
+     *
+     * @requires toastr
+     *
+     * @description
+     * Factory that gets constants for toast services.
+     */
+    function $get(toastr) {
+      var _serviceModel = {
+        SUCCESS: toastr.success,
+        INFO: toastr.info,
+        WARNING: toastr.warning,
+        ERROR: toastr.error
+      };
+
+      return {
+        $: $,
+        get: getFactory
+      };
+
+      /**
+       * @name getFactory
+       * @memberof source.toast.toastModelProvider.toastModel
+       *
+       * @description
+       * Returns API model for Factory service.
+       *
+       * @returns {Object}
+       */
+      function getFactory() {
+        return _serviceModel;
+      }
+    }
+  }
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    .module('source.toast')
+    /**
+     * @namespace $alertProvider
+     * @memberof source.toast
+     *
+     * @description
+     * Provider custom statement to use toast alert's messages.
+     */
+    .provider('$alert', $alert);
+
+  $alert.$inject = ['toastModelProvider'];
+
+  function $alert(toastModelProvider) {
+    var $ = toastModelProvider.$;
+    var _toastOptions = {
+      timeOut: 9999
+    };
+
+    return {
+      $: $,
+      setDuration: _setDuration,
+      $get: ['toastModel', $get]
+    };
+
+    /**
+     * @name _setDuration
+     * @memberof source.toast.$alertProvider
+     *
+     * @description
+     * Set duration of toast message for provider configuration.
+     *
+     * @param {Integer} time
+     * @private
+     */
+    function _setDuration(time) {
+      _toastOptions.timeOut = time;
+    }
+
+    /**
+     * @name _launchToast
+     * @memberof source.toast.$alertProvider
+     *
+     * @description
+     * Launch angular-toaster alert message.
+     *
+     * @param {Object} toastFactoryModel
+     * @param {String|Array} message
+     * @param {String} type
+     * @param {String|Undefined} title
+     * @param {Integer|Undefined} duration
+     * @private
+     */
+    function _launchToast(toastFactoryModel, message, type, title, duration) {
+      if (title !== undefined && typeof title !== 'string' && !duration) {
+        duration = title;
+        title = undefined;
+      }
+
+      var toastOptions = (duration) ? angular.extend({}, _toastOptions, { timeOut: duration }) : _toastOptions ;
+      message = (angular.isArray(message)) ? message.join('<br>') : message ;
+      toastFactoryModel[type](message, title, toastOptions);
+    }
+
+    /**
+     * @namespace $alert
+     * @memberof source.toast.$alertProvider
+     *
+     * @requires toastr
+     *
+     * @description
+     * Factory statement for toast alert's messages.
+     */
+    function $get(toastModel) {
+      var toastFactoryModel = toastModel.get();
+
+      return {
+        $: $,
+        success: success,
+        info: info,
+        warning: warning,
+        error: error
+      };
+
+      /**
+       * @name success
+       * @memberof source.toast.$alertProvider.$alert
+       *
+       * @description
+       * Displays success toast message.
+       *
+       * @param {String} message
+       * @param {String} title
+       * @param {Integer|Undefined} duration
+       */
+      function success(message, title, duration) {
+        _launchToast(toastFactoryModel, message, $.SUCCESS, title, duration);
+      }
+
+      /**
+       * @name info
+       * @memberof source.toast.$alertProvider.$alert
+       *
+       * @description
+       * Displays info toast message.
+       *
+       * @param {String} message
+       * @param {String} title
+       * @param {Integer|Undefined} duration
+       */
+      function info(message, title, duration) {
+        _launchToast(toastFactoryModel, message, $.INFO, title, duration);
+      }
+
+      /**
+       * @name warning
+       * @memberof source.toast.$alertProvider.$alert
+       *
+       * @description
+       * Displays warning toast message.
+       *
+       * @param {String} message
+       * @param {String} title
+       * @param {Integer|Undefined} duration
+       */
+      function warning(message, title, duration) {
+        _launchToast(toastFactoryModel, message, $.WARNING, title, duration);
+      }
+
+      /**
+       * @name error
+       * @memberof source.toast.$alertProvider.$alert
+       *
+       * @description
+       * Displays error toast message.
+       *
+       * @param {String} message
+       * @param {String} title
+       * @param {Integer|Undefined} duration
+       */
+      function error(message, title, duration) {
+        _launchToast(toastFactoryModel, message, $.ERROR, title, duration);
+      }
+    }
   }
 })();
