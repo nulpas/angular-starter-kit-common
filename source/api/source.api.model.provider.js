@@ -153,6 +153,18 @@
                   $top: 30
                 }
               },
+              /**
+               * @name QUERY.subProcess
+               * @memberof source.api.apiModelProvider
+               *
+               * @description
+               * It makes a "GET" Api call through Restangular. If the requestObject provided has an entity that have
+               * an entityId, it will make a call to retrieve that concrete entity. Otherwise, it will make a call
+               * to retrieve all existing entities.
+               *
+               * @param requestObject
+               * @returns {Promise}
+               */
               subProcess: function(requestObject) {
                 var e = requestObject.entity;
                 if (!e.entityId) {
@@ -167,6 +179,16 @@
                 defaultHeaders: _defaults.defaultHeaders,
                 defaultParams: _defaults.defaultParams
               },
+              /**
+               * @name LOCAL.subProcess
+               * @memberof source.api.apiModelProvider
+               *
+               * @description
+               * It makes a local "GET" API call through Restangular.
+               *
+               * @param requestObject
+               * @returns {Promise}
+               */
               subProcess: function(requestObject) {
                 var e = requestObject.entity;
                 var eUrl = requestObject.json + '/' + e.entityName + '.json';

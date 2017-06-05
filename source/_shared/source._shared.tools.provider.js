@@ -22,7 +22,7 @@
       $: $,
       /* Object tools */
       setObjectUsingSchema: setObjectUsingSchemaProvider,
-      $get: [$get]
+      $get: $get
     };
 
     /**

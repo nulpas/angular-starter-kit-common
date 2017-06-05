@@ -65,6 +65,20 @@
 
   angular
     /**
+     * @namespace _shared
+     * @memberof source
+     *
+     * @description
+     * Definition of module "_shared" for common minor services.
+     */
+    .module('source._shared', []);
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    /**
      * @namespace toast
      * @memberof source
      *
@@ -89,20 +103,6 @@
      * Definition of module "translate" for translation services.
      */
     .module('source.translate', []);
-})();
-
-(function() {
-  'use strict';
-
-  angular
-    /**
-     * @namespace _shared
-     * @memberof source
-     *
-     * @description
-     * Definition of module "_shared" for common minor services.
-     */
-    .module('source._shared', []);
 })();
 
 (function() {
@@ -342,6 +342,18 @@
                   $top: 30
                 }
               },
+              /**
+               * @name QUERY.subProcess
+               * @memberof source.api.apiModelProvider
+               *
+               * @description
+               * It makes a "GET" Api call through Restangular. If the requestObject provided has an entity that have
+               * an entityId, it will make a call to retrieve that concrete entity. Otherwise, it will make a call
+               * to retrieve all existing entities.
+               *
+               * @param requestObject
+               * @returns {Promise}
+               */
               subProcess: function(requestObject) {
                 var e = requestObject.entity;
                 if (!e.entityId) {
@@ -356,6 +368,16 @@
                 defaultHeaders: _defaults.defaultHeaders,
                 defaultParams: _defaults.defaultParams
               },
+              /**
+               * @name LOCAL.subProcess
+               * @memberof source.api.apiModelProvider
+               *
+               * @description
+               * It makes a local "GET" API call through Restangular.
+               *
+               * @param requestObject
+               * @returns {Promise}
+               */
               subProcess: function(requestObject) {
                 var e = requestObject.entity;
                 var eUrl = requestObject.json + '/' + e.entityName + '.json';
@@ -458,120 +480,6 @@
       }
     }
   }
-})();
-
-(function() {
-  'use strict';
-
-  angular.module('source.api')
-    .factory('$params', [
-      '$tools',
-      'apiData',
-      function($tools, apiData) {
-        var $c = apiData.constants;
-        var requestParams = angular.extend({}, $c.paramObject, $c.bpmnParamObject);
-
-        var _partialClear = function() {
-          requestParams = angular.extend({}, requestParams, $c.paramObject);
-          return requestParams;
-        };
-
-        var _totalClear = function() {
-          requestParams = angular.extend({}, $c.paramObject, $c.bpmnParamObject);
-          return requestParams;
-        };
-
-        return {
-          //# Reset Methods
-          clearAll: function() {
-            return _totalClear();
-          },
-          clear: function() {
-            return _partialClear();
-          },
-
-          //# Filter Methods
-          getFilters: function() {
-            return requestParams.queryFilter;
-          },
-          addFilter: function(item) {
-            requestParams.queryFilter.push(item);
-            return requestParams;
-          },
-          removeFilter: function(item) {
-            requestParams.queryFilter = $tools.removeArrayItem(requestParams.queryFilter, item);
-            return requestParams;
-          },
-
-          //# Order Methods
-          getOrders: function() {
-            return requestParams.order;
-          },
-          addOrder: function(item) {
-            requestParams.order.push(item);
-            return requestParams;
-          },
-          removeOrder: function(item) {
-            requestParams.order = $tools.removeArrayItem(requestParams.order, item);
-            return requestParams;
-          },
-
-          //# Last Page Methods
-          setNextPage: function() {
-            requestParams.lastPage ++;
-            return requestParams;
-          },
-          clearLastPage: function() {
-            requestParams.lastPage = 0;
-          },
-
-          //# Format params in order to request API:
-          setParams: function() {
-            var parameters = {};
-            if (requestParams.bpmnFilter || requestParams.queryFilter.length) {
-              parameters.$filter = '';
-              if (requestParams.bpmnFilter) {
-                parameters.$filter += requestParams.bpmnFilter;
-              }
-              if (requestParams.queryFilter.length) {
-
-              }
-            }
-            if (requestParams.top) {
-              parameters.$top = requestParams.top;
-            }
-            var skip = requestParams.skip * requestParams.lastPage;
-            if (skip) {
-              parameters.$skip = skip;
-            }
-
-            // var parameters = {
-            //   $orderby: '',
-            //   $top: requestParams.top,
-            //   $skip: requestParams.skip * requestParams.lastPage
-            // };
-            // if (queryParams.filter.length > 0) {
-            //   parameters.$filter = '';
-            //   for (var j = 0; j < queryParams.filter.length; j++) {
-            //     if (j !== 0) {
-            //       parameters.$filter += ' AND ';
-            //     }
-            //     parameters.$filter += queryParams.filter[j].field.name + ' ' + queryParams.filter[j].condition;
-            //   }
-            // }
-            //
-            // for (var i = 0; i < queryParams.order.length; i++) {
-            //   parameters.$orderby +=
-            //     queryParams.order[i].name + ' ' + (queryParams.order[i].orderDescending ? 'desc' : 'asc') + ',';
-            // }
-            // while (parameters.$orderby.includes('.')) {
-            //   parameters.$orderby = parameters.$orderby.replace('.', '/');
-            // }
-            // return parameters;
-          }
-        };
-      }
-    ]);
 })();
 
 (function() {
@@ -713,7 +621,6 @@
         /* GET actions */
         getEntity: getEntity,
         getLocalEntity: getLocalEntity,
-        getBimsVersion: getBimsVersion,
         /* POST actions */
         auth: auth,
         postEntity: postEntity,
@@ -921,25 +828,6 @@
       }
 
       /**
-       * @name getBimsVersion
-       * @memberof source.api.$apiProvider.$api
-       *
-       * @description
-       * Get software versions from server. This special call is done because its response comes directly from NGINX.
-       *
-       * @param {Function} callback
-       * @param {Function} callbackError
-       * @returns {Promise}
-       */
-      function getBimsVersion(callback, callbackError) {
-        var connectionObject = $tools.setObjectUsingSchema($c.schemas.connectionObject, {
-          entityObject: _createEntityObject({ entityName: 'bims_version' }),
-          checkSuperAdmin: false
-        }, _connectionObject);
-        return _processConnection(connectionObject, callback, callbackError);
-      }
-
-      /**
        * @name auth
        * @memberof source.api.$apiProvider.$api
        *
@@ -1054,49 +942,636 @@
 (function() {
   'use strict';
 
-  angular.module('source.router')
-    .factory('$router', [
-      '$state',
-      '$timeout',
-      function($state, $timeout) {
-        /**
-         * _resolveStateGo
-         * Executes $state.go function into $timeout for use into state resolve.
-         *
-         * @param {String} stateName
-         * @private
-         */
-        var _resolveStateGo = function(stateName) {
-          $timeout(function() {
-            $state.go(stateName);
-          });
-        };
-        return {
-          $state: $state,
-          resolveStateGo: function(stateName) {
-            _resolveStateGo(stateName);
-          }
-        };
-      }
-    ]);
+  angular
+  .module('source.router')
+  /**
+   * @namespace $routerProvider
+   * @memberof source.router
+   *
+   * @requires $state
+   * @requires $timeout
+   *
+   * @description
+   * Provider statement manage routing of the application.
+   */
+  .factory('$router', $router);
+
+  $router.$inject = ['$state', '$timeout'];
+
+  function $router($state, $timeout) {
+
+    return {
+      $state: $state,
+      resolveStateGo: resolveStateGo
+    };
+
+    /**
+     * @name _resolveStateGo
+     * @memberof source.router.$routerProvider
+     *
+     * @description
+     * Executes $state.go function into $timeout for use into state resolve.
+     *
+     * @param {String} stateName
+     */
+    function _resolveStateGo(stateName) {
+      $timeout(function() {
+        $state.go(stateName);
+      });
+    }
+
+    /**
+     * @name resolveStateGo
+     * @memberof source.router.$routerProvider
+     *
+     * @description
+     * Executes _resolveStateGo function.
+     *
+     * @param {String} stateName
+     */
+    function resolveStateGo(stateName) {
+      _resolveStateGo(stateName);
+    }
+  }
 })();
 
 (function() {
   'use strict';
 
-  angular.module('source.router')
-    .service('routerData', [
-      function() {
-        this.constants = {
-          //# Router param object format:
-          routerParams: {
-            param1: null,
-            param2: null,
-            param3: null
-          }
-        };
+  angular
+  .module('source.router')
+  /**
+   * @namespace routerData
+   * @memberof source.router
+   *
+   * @description
+   * Service to set some needed constants.
+   */
+  .service('routerData', routerData);
+
+  function routerData() {
+    /* jshint validthis: true */
+    this.constants = {
+      //# Router param object format:
+      routerParams: {
+        param1: null,
+        param2: null,
+        param3: null
       }
-    ]);
+    };
+  }
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    .module('source._shared')
+    /**
+     * @namespace globalConstantsProvider
+     * @memberof source._shared
+     *
+     * @description
+     * Provider that gets the global constants of the application.
+     */
+    .provider('globalConstants', globalConstants);
+
+  function globalConstants() {
+    var _constants = {
+      NO_OBJECT: {},
+
+      FROM_CAMELCASE_TO_OTHER: true,
+      FROM_OTHER_TO_CAMELCASE: false,
+
+      MODE_KEY: true,
+      MODE_VALUE: false,
+
+      ENCODE: true,
+      DECODE: false,
+
+      TITLE: 1,
+      SUBTITLE: 2,
+
+      PROCESSES: 'processes',
+      MODULES: 'modules',
+      STATES: 'states',
+
+      PROVIDER: true,
+      SERVICE: false,
+
+      MERGE: true,
+      NO_MERGE: false,
+
+      KEY: {
+        ESCAPE: {
+          NAME: 'Escape',
+          CODE: 27
+        },
+        ENTER: {
+          NAME: 'Enter',
+          CODE: 13
+        },
+        ARROW_DOWN: {
+          NAME: 'ArrowDown',
+          CODE: 40
+        },
+        ARROW_UP: {
+          NAME: 'ArrowUp',
+          CODE: 38
+        }
+      }
+    };
+
+    return {
+      get: getProvider,
+      $get: $get
+    };
+
+    /**
+     * @name getProvider
+     * @memberof source._shared.globalConstantsProvider
+     *
+     * @description
+     * Get constants object for provider.
+     *
+     * @returns {Object}
+     */
+    function getProvider() {
+      return _constants;
+    }
+
+    /**
+     * @namespace globalConstants
+     * @memberof source._shared.globalConstantsProvider
+     *
+     * @description
+     * Factory that provides the global constants of the application.
+     */
+    function $get() {
+      return {
+        get: getFactory
+      };
+
+      /**
+       * @name getFactory
+       * @memberof source._shared.globalConstantsProvider.globalConstants
+       *
+       * @description
+       * Get constants object for factory.
+       *
+       * @returns {Object}
+       */
+      function getFactory() {
+        return _constants;
+      }
+    }
+  }
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    .module('source._shared')
+    /**
+     * @namespace $toolsProvider
+     * @memberof source._shared
+     *
+     * @description
+     * Provider statement for several useful tools.
+     */
+    .provider('$tools', $tools);
+
+  $tools.$inject = ['globalConstantsProvider'];
+
+  function $tools(globalConstantsProvider) {
+    var $ = globalConstantsProvider.get();
+
+    return {
+      /* Global constants */
+      $: $,
+      /* Object tools */
+      setObjectUsingSchema: setObjectUsingSchemaProvider,
+      $get: $get
+    };
+
+    /**
+     * @name _convertString
+     * @memberof source._shared.$toolsProvider
+     *
+     * @description
+     * Function that encoding camelCase, or decoding camelCase, a given string.
+     *
+     * @param {String} string
+     * @param {String} char
+     * @param {Boolean} conversionType
+     * @returns {String}
+     * @private
+     */
+    function _convertString(string, char, conversionType) {
+      if (string !== undefined && conversionType !== undefined) {
+        var defaultChar = (char) ? char : '-' ;
+        if (conversionType === $.FROM_CAMELCASE_TO_OTHER) {
+          return string.replace(/([A-Z])/g, function($1) {
+            return defaultChar + $1.toLowerCase();
+          });
+        } else {
+          var output = string.split(defaultChar).map(function(item) {
+            return item.charAt(0).toUpperCase() + item.slice(1);
+          }).join('');
+          return output.charAt(0).toLowerCase() + output.slice(1);
+        }
+      } else {
+        throw new ReferenceError('Function parameters missing.');
+      }
+    }
+
+    /**
+     * @name _ucWords
+     * @memberof source._shared.$toolsProvider
+     *
+     * @description
+     * Returns given string with first letter in uppercase.
+     *
+     * @param {String} string
+     * @returns {string}
+     * @private
+     */
+    function _ucWords(string) {
+      return string.charAt(0).toUpperCase() + string.slice(1);
+    }
+
+    /**
+     * @name _getRandomString
+     * @memberof source._shared.$toolsProvider
+     *
+     * @description
+     * Returns random string with given number of chars.
+     *
+     * @param {Number} stringLength --> Number of chars for random string
+     * @returns {string}
+     * @private
+     */
+    function _getRandomString(stringLength) {
+      var output = '';
+      var possibilities = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+      for (var i = 0; i < stringLength; i++) {
+        output += possibilities.charAt(Math.floor(Math.random() * possibilities.length));
+      }
+      return output;
+    }
+
+    /**
+     * @name _removeFromArray
+     * @memberof source._shared.$toolsProvider
+     *
+     * @description
+     * Removes an element from an array from a given value or from a given key. Returns given array without the
+     * element we want to remove.
+     *
+     * @param {Array} arrayVar
+     * @param {Number|String|Object} givenVar
+     * @param {Boolean} mode
+     * @returns {Array}
+     * @private
+     */
+    function _removeFromArray(arrayVar, givenVar, mode) {
+      var key = givenVar;
+      if (mode === $.MODE_VALUE) {
+        key = arrayVar.indexOf(givenVar);
+      }
+      if ((key) && (key > -1)) {
+        arrayVar.splice(key, 1);
+      }
+      return arrayVar;
+    }
+
+    /**
+     * @name _arrayMerge
+     * @memberof source._shared.$toolsProvider
+     *
+     * @description
+     * Merges two arrays avoiding duplicate items.
+     *
+     * @param {Array} array1
+     * @param {Array} array2
+     * @returns {Array}
+     * @private
+     */
+    function _arrayMerge(array1, array2) {
+      if (angular.isArray(array1) && angular.isArray(array2)) {
+        return array2.reduce(function(array, key) {
+          if (array.indexOf(key) < 0) {
+            array.push(key);
+          }
+          return array;
+        }, array1);
+      } else {
+        throw new TypeError('The "_arrayMerge" method expects two array arguments and at least one of them is not.');
+      }
+    }
+
+    /**
+     * @name _index
+     * @memberof source._shared.$toolsProvider
+     *
+     * @description
+     * Auxiliary function used for reduction in getValueFromDotedKey.
+     *
+     * @param {Object} object
+     * @param {String} index
+     * @returns {*}
+     * @private
+     */
+    function _index(object, index) {
+      return object[index];
+    }
+
+    /**
+     * @name _getValueFromDotedKey
+     * @memberof source._shared.$toolsProvider
+     *
+     * @description
+     * Allows dot notation traversing (Example: object["a.b.c"] in object["a"]["b"]["c"]).
+     * Returns undefined value instead of exception if no key in object.
+     *
+     * @param {Object} object
+     * @param {String} dotedKey
+     * @returns {*|Undefined}
+     * @private
+     */
+    function _getValueFromDotedKey(object, dotedKey) {
+      if (object[dotedKey] !== undefined) {
+        return object[dotedKey];
+      }
+      try {
+        return dotedKey.split('.').reduce(_index, object);
+      } catch (e) {
+        if (e instanceof TypeError) {
+          return undefined;
+        } else {
+          throw e;
+        }
+      }
+    }
+
+    /**
+     * @name _parseObjectValues
+     * @memberof source._shared.$toolsProvider
+     *
+     * @description
+     * Parses keysObject to assign correct values from collection valuesObject.
+     *
+     * @param {Object} keysObject
+     * @param {Object} valuesObject
+     * @returns {Object}
+     */
+    function _parseObjectValues(keysObject, valuesObject) {
+      var output = {};
+      if (typeof keysObject === 'object') {
+        output = angular.copy(keysObject);
+        for (var index in keysObject) {
+          if (keysObject.hasOwnProperty(index) && valuesObject.hasOwnProperty(keysObject[index])) {
+            output[index] = valuesObject[keysObject[index]];
+          }
+        }
+      }
+      return output;
+    }
+
+    /**
+     * @name _setObjectUsingSchema
+     * @memberof source._shared.$toolsProvider
+     *
+     * @description
+     * Returns an object with values given in "objectSettings" following the pattern given by "objectSchema".
+     * Throws an exception error if "objectSettings" does not fit "objectSchema".
+     * Settings Object will be merged depending on variable "mergeOption".
+     *
+     * @param {Object} objectSchema
+     * @param {Object} objectSettings
+     * @param {Boolean|Object} mergeOption --> If Boolean: true to merge with schema, false no merge with schema.
+     *                                     --> If Object, merge with given object.
+     * @returns {Object}
+     * @private
+     */
+    function _setObjectUsingSchema(objectSchema, objectSettings, mergeOption) {
+      var output = {};
+      angular.forEach(objectSettings, function(item, key) {
+        if (objectSchema.hasOwnProperty(key)) {
+          output[key] = item;
+        } else {
+          throw new Error('Trying to set an unknown property ("' + key + '") in target object.');
+        }
+      });
+      if (mergeOption) {
+        var mergeCondition = (typeof mergeOption === 'object');
+        return (mergeCondition) ? angular.extend({}, mergeOption, output) : angular.extend({}, objectSchema, output) ;
+      } else {
+        return output;
+      }
+    }
+
+    /**
+     * @name setObjectUsingSchemaProvider
+     * @memberof source._shared.$toolsProvider
+     *
+     * @description
+     * Returns an object with values given in "objectSettings" following the pattern given by "objectSchema".
+     * Settings Object will be merged depending on optional variable "mergeOption".
+     * Provider function.
+     *
+     * @param {Object} objectSchema
+     * @param {Object} objectSettings
+     * @param {Boolean|Object} [mergeOption = false] --> If Boolean: true to merge schema, false no merge with schema.
+     *                                               --> If Object, merge with given object.
+     * @returns {Object}
+     */
+    function setObjectUsingSchemaProvider(objectSchema, objectSettings, mergeOption) {
+      mergeOption = mergeOption || $.NO_MERGE;
+      return _setObjectUsingSchema(objectSchema, objectSettings, mergeOption);
+    }
+
+    /**
+     * @namespace $tools
+     * @memberof source._shared.$toolsProvider
+     *
+     * @description
+     * Factory statement for several useful tools.
+     */
+    function $get() {
+      return {
+        /* Global Constants */
+        $: $,
+        /* String tools */
+        camelCaseTo: camelCaseTo,
+        toCamelCase: toCamelCase,
+        ucWords: ucWords,
+        getRandomString: getRandomString,
+        /* Array tools */
+        removeArrayItem: removeArrayItem,
+        removeArrayKey: removeArrayKey,
+        arrayMerge: arrayMerge,
+        /* Object tools */
+        getValueFromDotedKey: getValueFromDotedKey,
+        parseObjectValues: parseObjectValues,
+        setObjectUsingSchema: setObjectUsingSchema
+      };
+
+      /**
+       * @name camelCaseTo
+       * @memberof source._shared.$toolsProvider.$tools
+       *
+       * @description
+       * Returns a string decoded from camelCase to a char separator way.
+       *
+       * @param {String} string
+       * @param {String} char
+       * @returns {String}
+       */
+      function camelCaseTo(string, char) {
+        return _convertString(string, char, $.FROM_CAMELCASE_TO_OTHER);
+      }
+
+      /**
+       * @name toCamelCase
+       * @memberof source._shared.$toolsProvider.$tools
+       *
+       * @description
+       * Returns a string encoded in camelCase way from any string with char separator.
+       *
+       * @param {String} string
+       * @param {String} char
+       * @returns {String}
+       */
+      function toCamelCase(string, char) {
+        return _convertString(string, char, $.FROM_OTHER_TO_CAMELCASE);
+      }
+
+      /**
+       * @name ucWords
+       * @memberof source._shared.$toolsProvider.$tools
+       *
+       * @description
+       * Public factory method for using _ucWords. Returns given string with first letter in uppercase.
+       *
+       * @param {String} string
+       * @returns {string}
+       */
+      function ucWords(string) {
+        return _ucWords(string);
+      }
+
+      /**
+       * @name getRandomString
+       * @memberof source._shared.$toolsProvider.$tools
+       *
+       * @description
+       * Returns random string with given number of chars.
+       *
+       * @param {Number} stringLength --> Number of chars for random string
+       * @returns {string}
+       */
+      function getRandomString(stringLength) {
+        return _getRandomString(stringLength);
+      }
+
+      /**
+       * @name removeArrayItem
+       * @memberof source._shared.$toolsProvider.$tools
+       *
+       * @description
+       * Removes a value given from an array. Returns modified array.
+       *
+       * @param {Array} arrayVar
+       * @param {String|Object} item
+       * @returns {Array}
+       */
+      function removeArrayItem(arrayVar, item) {
+        return _removeFromArray(arrayVar, item, $.MODE_VALUE);
+      }
+
+      /**
+       * @name removeArrayKey
+       * @memberof source._shared.$toolsProvider.$tools
+       *
+       * @description
+       * Removes a key given from an array. Returns modified array.
+       *
+       * @param {Array} arrayVar
+       * @param {Number} key
+       * @returns {Array}
+       */
+      function removeArrayKey(arrayVar, key) {
+        return _removeFromArray(arrayVar, key, $.MODE_KEY);
+      }
+
+      /**
+       * @name arrayMerge
+       * @memberof source._shared.$toolsProvider.$tools
+       *
+       * @description
+       * Public factory method for using _arrayMerge. Merges two arrays avoiding duplicate items.
+       *
+       * @param {Array} array1
+       * @param {Array} array2
+       * @returns {Array}
+       */
+      function arrayMerge(array1, array2) {
+        return _arrayMerge(array1, array2);
+      }
+
+      /**
+       * @name getValueFromDotedKey
+       * @memberof source._shared.$toolsProvider.$tools
+       *
+       * @description
+       * Allows dot notation traversing (Example: object["a.b.c"] in object["a"]["b"]["c"]).
+       * Returns undefined value instead of exception if no key in object.
+       *
+       * @param {Object} object
+       * @param {String} dotedKey
+       * @returns {*|Undefined}
+       */
+      function getValueFromDotedKey(object, dotedKey) {
+        return _getValueFromDotedKey(object, dotedKey);
+      }
+
+      /**
+       * @name parseObjectValues
+       * @memberof source._shared.$toolsProvider.$tools
+       *
+       * @description
+       * Parses keysObject to assign correct values from collection valuesObject.
+       *
+       * @param {Object} keysObject
+       * @param {Object} valuesObject
+       * @returns {Object}
+       */
+      function parseObjectValues(keysObject, valuesObject) {
+        return _parseObjectValues(keysObject, valuesObject);
+      }
+
+      /**
+       * @name setObjectUsingSchema
+       * @memberof source._shared.$toolsProvider.$tools
+       *
+       * @description
+       * Returns an object with values given in "objectSettings" following the pattern given by "objectSchema".
+       * Settings Object will be merged depending on optional variable "mergeOption".
+       *
+       * @param {Object} objectSchema
+       * @param {Object} objectSettings
+       * @param {Boolean|Object} [mergeOption = true] --> If Boolean: true to merge schema, false no merge with schema.
+       *                                              --> If Object, merge with given object.
+       * @returns {Object}
+       */
+      function setObjectUsingSchema(objectSchema, objectSettings, mergeOption) {
+        mergeOption = mergeOption || $.NO_MERGE;
+        return _setObjectUsingSchema(objectSchema, objectSettings, mergeOption);
+      }
+    }
+  }
 })();
 
 (function() {
@@ -1650,569 +2125,5 @@
     };
 
     this.default = this.languages.en;
-  }
-})();
-
-(function() {
-  'use strict';
-
-  angular
-    .module('source._shared')
-    /**
-     * @namespace globalConstantsProvider
-     * @memberof source._shared
-     *
-     * @description
-     * Provider that gets the global constants of the application.
-     */
-    .provider('globalConstants', globalConstants);
-
-  function globalConstants() {
-    var _constants = {
-      NO_OBJECT: {},
-
-      FROM_CAMELCASE_TO_OTHER: true,
-      FROM_OTHER_TO_CAMELCASE: false,
-
-      LIST_VIEW: 1,
-      GRID_VIEW: 2,
-      GRID_MINI_VIEW: 3,
-      SIMPLE_LIST_VIEW: 4,
-      DETAILS_VIEW: 5,
-      SETTINGS_VIEW: 6,
-
-      /* Constants for view type definition and setting config files. */
-      VIEW_FILE: 'fileView',
-      VIEW_LIST: 'listView',
-      VIEW_TABLE: 'tableView',
-
-      MODE_KEY: true,
-      MODE_VALUE: false,
-
-      ENCODE: true,
-      DECODE: false,
-
-      TITLE: 1,
-      SUBTITLE: 2,
-
-      PROCESSES: 'processes',
-      MODULES: 'modules',
-      STATES: 'states',
-
-      PROVIDER: true,
-      SERVICE: false,
-
-      MERGE: true,
-      NO_MERGE: false,
-
-      KEY: {
-        ESCAPE: {
-          NAME: 'Escape',
-          CODE: 27
-        },
-        ENTER: {
-          NAME: 'Enter',
-          CODE: 13
-        },
-        ARROW_DOWN: {
-          NAME: 'ArrowDown',
-          CODE: 40
-        },
-        ARROW_UP: {
-          NAME: 'ArrowUp',
-          CODE: 38
-        }
-      }
-    };
-
-    return {
-      get: getProvider,
-      $get: [$get]
-    };
-
-    /**
-     * @name getProvider
-     * @memberof source._shared.globalConstantsProvider
-     *
-     * @description
-     * Get constants object for provider.
-     *
-     * @returns {Object}
-     */
-    function getProvider() {
-      return _constants;
-    }
-
-    /**
-     * @namespace globalConstants
-     * @memberof source._shared.globalConstantsProvider
-     *
-     * @description
-     * Factory that provides the global constants of the application.
-     */
-    function $get() {
-      return {
-        get: getFactory
-      };
-
-      /**
-       * @name getFactory
-       * @memberof source._shared.globalConstantsProvider.globalConstants
-       *
-       * @description
-       * Get constants object for factory.
-       *
-       * @returns {Object}
-       */
-      function getFactory() {
-        return _constants;
-      }
-    }
-  }
-})();
-
-(function() {
-  'use strict';
-
-  angular
-    .module('source._shared')
-    /**
-     * @namespace $toolsProvider
-     * @memberof source._shared
-     *
-     * @description
-     * Provider statement for several useful tools.
-     */
-    .provider('$tools', $tools);
-
-  $tools.$inject = ['globalConstantsProvider'];
-
-  function $tools(globalConstantsProvider) {
-    var $ = globalConstantsProvider.get();
-
-    return {
-      /* Global constants */
-      $: $,
-      /* Object tools */
-      setObjectUsingSchema: setObjectUsingSchemaProvider,
-      $get: [$get]
-    };
-
-    /**
-     * @name _convertString
-     * @memberof source._shared.$toolsProvider
-     *
-     * @description
-     * Function that encoding camelCase, or decoding camelCase, a given string.
-     *
-     * @param {String} string
-     * @param {String} char
-     * @param {Boolean} conversionType
-     * @returns {String}
-     * @private
-     */
-    function _convertString(string, char, conversionType) {
-      if (string !== undefined && conversionType !== undefined) {
-        var defaultChar = (char) ? char : '-' ;
-        if (conversionType === $.FROM_CAMELCASE_TO_OTHER) {
-          return string.replace(/([A-Z])/g, function($1) {
-            return defaultChar + $1.toLowerCase();
-          });
-        } else {
-          var output = string.split(defaultChar).map(function(item) {
-            return item.charAt(0).toUpperCase() + item.slice(1);
-          }).join('');
-          return output.charAt(0).toLowerCase() + output.slice(1);
-        }
-      } else {
-        throw new ReferenceError('Function parameters missing.');
-      }
-    }
-
-    /**
-     * @name _ucWords
-     * @memberof source._shared.$toolsProvider
-     *
-     * @description
-     * Returns given string with first letter in uppercase.
-     *
-     * @param {String} string
-     * @returns {string}
-     * @private
-     */
-    function _ucWords(string) {
-      return string.charAt(0).toUpperCase() + string.slice(1);
-    }
-
-    /**
-     * @name _getRandomString
-     * @memberof source._shared.$toolsProvider
-     *
-     * @description
-     * Returns random string with given number of chars.
-     *
-     * @param {Number} stringLength --> Number of chars for random string
-     * @returns {string}
-     * @private
-     */
-    function _getRandomString(stringLength) {
-      var output = '';
-      var possibilities = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
-      for (var i = 0; i < stringLength; i++) {
-        output += possibilities.charAt(Math.floor(Math.random() * possibilities.length));
-      }
-      return output;
-    }
-
-    /**
-     * @name _removeFromArray
-     * @memberof source._shared.$toolsProvider
-     *
-     * @description
-     * Removes an element from an array from a given value or from a given key. Returns given array without the
-     * element we want to remove.
-     *
-     * @param {Array} arrayVar
-     * @param {Number|String|Object} givenVar
-     * @param {Boolean} mode
-     * @returns {Array}
-     * @private
-     */
-    function _removeFromArray(arrayVar, givenVar, mode) {
-      var key = givenVar;
-      if (mode === $.MODE_VALUE) {
-        key = arrayVar.indexOf(givenVar);
-      }
-      if ((key) && (key > -1)) {
-        arrayVar.splice(key, 1);
-      }
-      return arrayVar;
-    }
-
-    /**
-     * @name _arrayMerge
-     * @memberof source._shared.$toolsProvider
-     *
-     * @description
-     * Merges two arrays avoiding duplicate items.
-     *
-     * @param {Array} array1
-     * @param {Array} array2
-     * @returns {Array}
-     * @private
-     */
-    function _arrayMerge(array1, array2) {
-      if (angular.isArray(array1) && angular.isArray(array2)) {
-        return array2.reduce(function(array, key) {
-          if (array.indexOf(key) < 0) {
-            array.push(key);
-          }
-          return array;
-        }, array1);
-      } else {
-        throw new TypeError('The "_arrayMerge" method expects two array arguments and at least one of them is not.');
-      }
-    }
-
-    /**
-     * @name _index
-     * @memberof source._shared.$toolsProvider
-     *
-     * @description
-     * Auxiliary function used for reduction in getValueFromDotedKey.
-     *
-     * @param {Object} object
-     * @param {String} index
-     * @returns {*}
-     * @private
-     */
-    function _index(object, index) {
-      return object[index];
-    }
-
-    /**
-     * @name _getValueFromDotedKey
-     * @memberof source._shared.$toolsProvider
-     *
-     * @description
-     * Allows dot notation traversing (Example: object["a.b.c"] in object["a"]["b"]["c"]).
-     * Returns undefined value instead of exception if no key in object.
-     *
-     * @param {Object} object
-     * @param {String} dotedKey
-     * @returns {*|Undefined}
-     * @private
-     */
-    function _getValueFromDotedKey(object, dotedKey) {
-      if (object[dotedKey] !== undefined) {
-        return object[dotedKey];
-      }
-      try {
-        return dotedKey.split('.').reduce(_index, object);
-      } catch (e) {
-        if (e instanceof TypeError) {
-          return undefined;
-        } else {
-          throw e;
-        }
-      }
-    }
-
-    /**
-     * @name _parseObjectValues
-     * @memberof source._shared.$toolsProvider
-     *
-     * @description
-     * Parses keysObject to assign correct values from collection valuesObject.
-     *
-     * @param {Object} keysObject
-     * @param {Object} valuesObject
-     * @returns {Object}
-     */
-    function _parseObjectValues(keysObject, valuesObject) {
-      var output = {};
-      if (typeof keysObject === 'object') {
-        output = angular.copy(keysObject);
-        for (var index in keysObject) {
-          if (keysObject.hasOwnProperty(index) && valuesObject.hasOwnProperty(keysObject[index])) {
-            output[index] = valuesObject[keysObject[index]];
-          }
-        }
-      }
-      return output;
-    }
-
-    /**
-     * @name _setObjectUsingSchema
-     * @memberof source._shared.$toolsProvider
-     *
-     * @description
-     * Returns an object with values given in "objectSettings" following the pattern given by "objectSchema".
-     * Throws an exception error if "objectSettings" does not fit "objectSchema".
-     * Settings Object will be merged depending on variable "mergeOption".
-     *
-     * @param {Object} objectSchema
-     * @param {Object} objectSettings
-     * @param {Boolean|Object} mergeOption --> If Boolean: true to merge with schema, false no merge with schema.
-     *                                     --> If Object, merge with given object.
-     * @returns {Object}
-     * @private
-     */
-    function _setObjectUsingSchema(objectSchema, objectSettings, mergeOption) {
-      var output = {};
-      angular.forEach(objectSettings, function(item, key) {
-        if (objectSchema.hasOwnProperty(key)) {
-          output[key] = item;
-        } else {
-          throw new Error('Trying to set an unknown property ("' + key + '") in target object.');
-        }
-      });
-      if (mergeOption) {
-        var mergeCondition = (typeof mergeOption === 'object');
-        return (mergeCondition) ? angular.extend({}, mergeOption, output) : angular.extend({}, objectSchema, output) ;
-      } else {
-        return output;
-      }
-    }
-
-    /**
-     * @name setObjectUsingSchemaProvider
-     * @memberof source._shared.$toolsProvider
-     *
-     * @description
-     * Returns an object with values given in "objectSettings" following the pattern given by "objectSchema".
-     * Settings Object will be merged depending on optional variable "mergeOption".
-     * Provider function.
-     *
-     * @param {Object} objectSchema
-     * @param {Object} objectSettings
-     * @param {Boolean|Object} [mergeOption = false] --> If Boolean: true to merge schema, false no merge with schema.
-     *                                               --> If Object, merge with given object.
-     * @returns {Object}
-     */
-    function setObjectUsingSchemaProvider(objectSchema, objectSettings, mergeOption) {
-      mergeOption = mergeOption || $.NO_MERGE;
-      return _setObjectUsingSchema(objectSchema, objectSettings, mergeOption);
-    }
-
-    /**
-     * @namespace $tools
-     * @memberof source._shared.$toolsProvider
-     *
-     * @description
-     * Factory statement for several useful tools.
-     */
-    function $get() {
-      return {
-        /* Global Constants */
-        $: $,
-        /* String tools */
-        camelCaseTo: camelCaseTo,
-        toCamelCase: toCamelCase,
-        ucWords: ucWords,
-        getRandomString: getRandomString,
-        /* Array tools */
-        removeArrayItem: removeArrayItem,
-        removeArrayKey: removeArrayKey,
-        arrayMerge: arrayMerge,
-        /* Object tools */
-        getValueFromDotedKey: getValueFromDotedKey,
-        parseObjectValues: parseObjectValues,
-        setObjectUsingSchema: setObjectUsingSchema
-      };
-
-      /**
-       * @name camelCaseTo
-       * @memberof source._shared.$toolsProvider.$tools
-       *
-       * @description
-       * Returns a string decoded from camelCase to a char separator way.
-       *
-       * @param {String} string
-       * @param {String} char
-       * @returns {String}
-       */
-      function camelCaseTo(string, char) {
-        return _convertString(string, char, $.FROM_CAMELCASE_TO_OTHER);
-      }
-
-      /**
-       * @name toCamelCase
-       * @memberof source._shared.$toolsProvider.$tools
-       *
-       * @description
-       * Returns a string encoded in camelCase way from any string with char separator.
-       *
-       * @param {String} string
-       * @param {String} char
-       * @returns {String}
-       */
-      function toCamelCase(string, char) {
-        return _convertString(string, char, $.FROM_OTHER_TO_CAMELCASE);
-      }
-
-      /**
-       * @name ucWords
-       * @memberof source._shared.$toolsProvider.$tools
-       *
-       * @description
-       * Public factory method for using _ucWords. Returns given string with first letter in uppercase.
-       *
-       * @param {String} string
-       * @returns {string}
-       */
-      function ucWords(string) {
-        return _ucWords(string);
-      }
-
-      /**
-       * @name getRandomString
-       * @memberof source._shared.$toolsProvider.$tools
-       *
-       * @description
-       * Returns random string with given number of chars.
-       *
-       * @param {Number} stringLength --> Number of chars for random string
-       * @returns {string}
-       */
-      function getRandomString(stringLength) {
-        return _getRandomString(stringLength);
-      }
-
-      /**
-       * @name removeArrayItem
-       * @memberof source._shared.$toolsProvider.$tools
-       *
-       * @description
-       * Removes a value given from an array. Returns modified array.
-       *
-       * @param {Array} arrayVar
-       * @param {String|Object} item
-       * @returns {Array}
-       */
-      function removeArrayItem(arrayVar, item) {
-        return _removeFromArray(arrayVar, item, $.MODE_VALUE);
-      }
-
-      /**
-       * @name removeArrayKey
-       * @memberof source._shared.$toolsProvider.$tools
-       *
-       * @description
-       * Removes a key given from an array. Returns modified array.
-       *
-       * @param {Array} arrayVar
-       * @param {Number} key
-       * @returns {Array}
-       */
-      function removeArrayKey(arrayVar, key) {
-        return _removeFromArray(arrayVar, key, $.MODE_KEY);
-      }
-
-      /**
-       * @name arrayMerge
-       * @memberof source._shared.$toolsProvider.$tools
-       *
-       * @description
-       * Public factory method for using _arrayMerge. Merges two arrays avoiding duplicate items.
-       *
-       * @param {Array} array1
-       * @param {Array} array2
-       * @returns {Array}
-       */
-      function arrayMerge(array1, array2) {
-        return _arrayMerge(array1, array2);
-      }
-
-      /**
-       * @name getValueFromDotedKey
-       * @memberof source._shared.$toolsProvider.$tools
-       *
-       * @description
-       * Allows dot notation traversing (Example: object["a.b.c"] in object["a"]["b"]["c"]).
-       * Returns undefined value instead of exception if no key in object.
-       *
-       * @param {Object} object
-       * @param {String} dotedKey
-       * @returns {*|Undefined}
-       */
-      function getValueFromDotedKey(object, dotedKey) {
-        return _getValueFromDotedKey(object, dotedKey);
-      }
-
-      /**
-       * @name parseObjectValues
-       * @memberof source._shared.$toolsProvider.$tools
-       *
-       * @description
-       * Parses keysObject to assign correct values from collection valuesObject.
-       *
-       * @param {Object} keysObject
-       * @param {Object} valuesObject
-       * @returns {Object}
-       */
-      function parseObjectValues(keysObject, valuesObject) {
-        return _parseObjectValues(keysObject, valuesObject);
-      }
-
-      /**
-       * @name setObjectUsingSchema
-       * @memberof source._shared.$toolsProvider.$tools
-       *
-       * @description
-       * Returns an object with values given in "objectSettings" following the pattern given by "objectSchema".
-       * Settings Object will be merged depending on optional variable "mergeOption".
-       *
-       * @param {Object} objectSchema
-       * @param {Object} objectSettings
-       * @param {Boolean|Object} [mergeOption = true] --> If Boolean: true to merge schema, false no merge with schema.
-       *                                              --> If Object, merge with given object.
-       * @returns {Object}
-       */
-      function setObjectUsingSchema(objectSchema, objectSettings, mergeOption) {
-        mergeOption = mergeOption || $.NO_MERGE;
-        return _setObjectUsingSchema(objectSchema, objectSettings, mergeOption);
-      }
-    }
   }
 })();

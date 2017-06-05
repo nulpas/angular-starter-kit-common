@@ -19,18 +19,6 @@
       FROM_CAMELCASE_TO_OTHER: true,
       FROM_OTHER_TO_CAMELCASE: false,
 
-      LIST_VIEW: 1,
-      GRID_VIEW: 2,
-      GRID_MINI_VIEW: 3,
-      SIMPLE_LIST_VIEW: 4,
-      DETAILS_VIEW: 5,
-      SETTINGS_VIEW: 6,
-
-      /* Constants for view type definition and setting config files. */
-      VIEW_FILE: 'fileView',
-      VIEW_LIST: 'listView',
-      VIEW_TABLE: 'tableView',
-
       MODE_KEY: true,
       MODE_VALUE: false,
 
@@ -72,7 +60,7 @@
 
     return {
       get: getProvider,
-      $get: [$get]
+      $get: $get
     };
 
     /**
