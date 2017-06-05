@@ -1,7 +1,7 @@
 {
   "name": "angular-starter-kit-core",
   "description": "Application Dependency BOWER for Frontend seed.",
-  "version": "0.9.10",
+  "version": "0.9.11",
   "repository": {
     "type": "git",
     "url": "ssh://git@github.com:nulpas/angular-starter-kit-core.git"
