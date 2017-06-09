@@ -11,7 +11,6 @@
     "Nul Pàs <manu@lunaeme.com> (https://twitter.com/NulPas)"
   ],
   "license": "MIT",
-  "private": true,
   "ignore": [
     "**/.*",
     "node_modules",
