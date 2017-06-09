@@ -1,8 +1,8 @@
 {
   "name": "angular-toolpas",
   "description": "Angular Tool Box dependency",
-  "version": "0.9.15",
-  "main": "./release/angular-starter-kit-core.js",
+  "version": "0.9.16",
+  "main": "./release/angular-toolpas.js",
   "repository": {
     "type": "git",
     "url": "git@github.com:nulpas/angular-toolpas.git"
