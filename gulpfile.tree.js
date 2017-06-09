@@ -6,7 +6,7 @@
   var releaseDir = 'release';
 
   //# File Names
-  var coreFile = 'angular-starter-kit-core.js';
+  var coreFile = 'angular-toolpas.js';
 
   module.exports = {
     files: {
