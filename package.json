@@ -1,16 +1,17 @@
 {
-  "name": "angular-starter-kit-core",
-  "description": "Application Dependency BOWER for Frontend seed.",
-  "version": "0.9.13",
+  "name": "angular-toolpas",
+  "description": "Angular Tool Box dependency",
+  "version": "0.9.14",
   "repository": {
     "type": "git",
-    "url": "ssh://git@github.com:nulpas/angular-starter-kit-core.git"
+    "url": "git@github.com:nulpas/angular-toolpas.git"
   },
   "author": "Nul Pàs <manu@lunaeme.com> (https://twitter.com/NulPas)",
   "license": "MIT",
   "private": true,
   "scripts": {
-    "postinstall": "npm prune && bower install && bower prune"
+    "postinstall": "npm prune && bower install && bower prune",
+    "build": "gulp concat"
   },
   "dependencies": {},
   "devDependencies": {
