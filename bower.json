@@ -1,7 +1,7 @@
 {
   "name": "angular-toolpas",
   "description": "Angular Tool Box dependency",
-  "version": "0.9.17",
+  "version": "0.9.18",
   "main": "./release/angular-toolpas.js",
   "repository": {
     "type": "git",
@@ -33,11 +33,12 @@
     "moment": "^2.18.1",
     "moment-timezone": "^0.5.13",
     "dragular": "^4.4.6",
-    "angular-local-storage": "^0.7.1"
+    "angular-local-storage": "^0.7.1",
+    "lodash": "^4.17.4"
   },
   "devDependencies": {},
   "resolutions": {
-    "angular": "1.6.6"
+    "angular": "^1.6.6"
   },
   "overrides": {
     "material-design-lite": {
