@@ -212,7 +212,8 @@
             entity: connectionObject.entityObject,
             headers: headers,
             params: params,
-            json: _apiGeneralConfig.localJson
+            json: _apiGeneralConfig.localJson,
+            baseUrl: _apiGeneralConfig.apiBaseUrl
           };
         } else {
           throw new Error('API call ' + cO.mode + ' not allowed in ' + cO.source + ' mode.');
@@ -237,10 +238,12 @@
           var boot = _connectionInit(cO);
           var process = boot.request.process(boot);
           var deferred = $q.defer();
-          var promise = angular.copy($c.schemas.apiPromise);
+          var promise = {};
           process.then(function(success) {
-            promise.data = (success.data.plain) ? success.data.plain() : success.data ;
-            promise._cursor = success._cursor;
+            promise = (success.plain) ? success.plain() : success ;
+            if (success._cursor) {
+              promise._cursor = success._cursor;
+            }
             deferred.resolve(promise);
             if (typeof callback === 'function') {
               callback(promise);

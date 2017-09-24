@@ -56,6 +56,8 @@
         entityObject: {
           entityName: null,
           entityId: null,
+          verb: null,
+          forceToOne: null,
           objectSent: null,
           headers: null,
           params: null
@@ -63,7 +65,6 @@
 
         /* API promise schema */
         apiPromise: {
-          data: null,
           _cursor: null,
           error: null
         },
@@ -149,9 +150,7 @@
             SERVER: {
               defaults: {
                 defaultHeaders: _defaults.defaultHeaders,
-                defaultParams: {
-                  $top: 30
-                }
+                defaultParams: _defaults.defaultParams
               },
               /**
                * @name QUERY.SERVER.subProcess
@@ -167,11 +166,24 @@
                */
               subProcess: function(requestObject) {
                 var e = requestObject.entity;
-                if (!e.entityId) {
-                  return Restangular.all(e.entityName).getList(requestObject.params, requestObject.headers);
-                } else {
-                  return Restangular.one(e.entityName, e.entityId).get(requestObject.params, requestObject.headers);
+                var hasId = e.hasOwnProperty('entityId');
+                var hasVerb = e.hasOwnProperty('verb');
+                var forceToOne = (e.hasOwnProperty('forceToOne')) ? e.forceToOne : false ;
+                var requestUrlArray = null;
+                var subProcess = Restangular.all(e.entityName).getList;
+                if (hasId && hasVerb) {
+                  requestUrlArray = [requestObject.baseUrl, e.entityName, e.entityId, e.verb];
+                  subProcess = Restangular.oneUrl(e.entityName, requestUrlArray.join('/')).get;
+                } else if (hasVerb) {
+                  requestUrlArray = [requestObject.baseUrl, e.entityName, e.verb];
+                  subProcess = Restangular.oneUrl(e.entityName, requestUrlArray.join('/')).get;
+                } else if (hasId) {
+                  subProcess = Restangular.one(e.entityName, e.entityId).get;
+                } else if (forceToOne) {
+                  requestUrlArray = [requestObject.baseUrl, e.entityName];
+                  subProcess = Restangular.oneUrl(e.entityName, requestUrlArray.join('/')).get;
                 }
+                return subProcess(requestObject.params, requestObject.headers);
               }
             },
             LOCAL: {
@@ -192,7 +204,10 @@
               subProcess: function(requestObject) {
                 var e = requestObject.entity;
                 var eUrl = requestObject.json + '/' + e.entityName + '.json';
-                return Restangular.allUrl(e.entityName, eUrl).getList(requestObject.params, requestObject.headers);
+                var forceToOne = (e.hasOwnProperty('forceToOne')) ? e.forceToOne : false ;
+                var subProcess = (forceToOne) ?
+                  Restangular.oneUrl(e.entityName, eUrl).get : Restangular.allUrl(e.entityName, eUrl).getList ;
+                return subProcess(requestObject.params, requestObject.headers);
               }
             },
             /**
