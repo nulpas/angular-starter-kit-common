@@ -125,28 +125,18 @@
 
   function apiConfig(RestangularProvider) {
     RestangularProvider.addResponseInterceptor(function(data, operation, what, url, response, deferred) {
-      var getList = (operation === 'getList');
-      var get = (operation === 'get');
-      var post = (operation === 'post');
-      var put = (operation === 'put');
-      if (getList || get || post || put) {
-        var newData = _.values(data);
-        /* Collect errors that come with 20X code. */
-        if (!data.result && !data._cursor && !data.error) {
-          var errorMessage = {
-            alert: 'Data property undefined.',
-            console: 'You\'re probably trying to read JSON file that does not exist.',
-            helper: 'Entity: (' + what + '), URL: (' + url + ')'
-          };
-          newData.error = [errorMessage.alert + ' ' + errorMessage.console + ' ' + errorMessage.helper];
-          newData.errorAlert = [errorMessage.alert];
-          deferred.reject(newData);
-          throw new Error(errorMessage.alert + ' ' + errorMessage.console + ' ' + errorMessage.helper);
-        }
-        newData.data = data.result;
-        newData._cursor = data._cursor;
-        newData.error = data.error;
-        return newData;
+      var newData = {};
+      /* Collect errors that come with 20X code. */
+      if (!angular.isObject(data)) {
+        var errorMessage = {
+          alert: 'Unexpected response from API.',
+          console: 'You\'re probably trying to read JSON file that does not exist.',
+          helper: 'Entity: (' + what + '), URL: (' + url + ')'
+        };
+        newData.error = [errorMessage.alert + ' ' + errorMessage.console + ' ' + errorMessage.helper];
+        newData.errorAlert = [errorMessage.alert];
+        deferred.reject(newData);
+        throw new Error(errorMessage.alert + ' ' + errorMessage.console + ' ' + errorMessage.helper);
       }
       return data;
     });
@@ -245,6 +235,8 @@
         entityObject: {
           entityName: null,
           entityId: null,
+          verb: null,
+          forceToOne: null,
           objectSent: null,
           headers: null,
           params: null
@@ -252,7 +244,6 @@
 
         /* API promise schema */
         apiPromise: {
-          data: null,
           _cursor: null,
           error: null
         },
@@ -338,9 +329,7 @@
             SERVER: {
               defaults: {
                 defaultHeaders: _defaults.defaultHeaders,
-                defaultParams: {
-                  $top: 30
-                }
+                defaultParams: _defaults.defaultParams
               },
               /**
                * @name QUERY.SERVER.subProcess
@@ -356,11 +345,24 @@
                */
               subProcess: function(requestObject) {
                 var e = requestObject.entity;
-                if (!e.entityId) {
-                  return Restangular.all(e.entityName).getList(requestObject.params, requestObject.headers);
-                } else {
-                  return Restangular.one(e.entityName, e.entityId).get(requestObject.params, requestObject.headers);
+                var hasId = e.hasOwnProperty('entityId');
+                var hasVerb = e.hasOwnProperty('verb');
+                var forceToOne = (e.hasOwnProperty('forceToOne')) ? e.forceToOne : false ;
+                var requestUrlArray = null;
+                var subProcess = Restangular.all(e.entityName).getList;
+                if (hasId && hasVerb) {
+                  requestUrlArray = [requestObject.baseUrl, e.entityName, e.entityId, e.verb];
+                  subProcess = Restangular.oneUrl(e.entityName, requestUrlArray.join('/')).get;
+                } else if (hasVerb) {
+                  requestUrlArray = [requestObject.baseUrl, e.entityName, e.verb];
+                  subProcess = Restangular.oneUrl(e.entityName, requestUrlArray.join('/')).get;
+                } else if (hasId) {
+                  subProcess = Restangular.one(e.entityName, e.entityId).get;
+                } else if (forceToOne) {
+                  requestUrlArray = [requestObject.baseUrl, e.entityName];
+                  subProcess = Restangular.oneUrl(e.entityName, requestUrlArray.join('/')).get;
                 }
+                return subProcess(requestObject.params, requestObject.headers);
               }
             },
             LOCAL: {
@@ -381,7 +383,10 @@
               subProcess: function(requestObject) {
                 var e = requestObject.entity;
                 var eUrl = requestObject.json + '/' + e.entityName + '.json';
-                return Restangular.allUrl(e.entityName, eUrl).getList(requestObject.params, requestObject.headers);
+                var forceToOne = (e.hasOwnProperty('forceToOne')) ? e.forceToOne : false ;
+                var subProcess = (forceToOne) ?
+                  Restangular.oneUrl(e.entityName, eUrl).get : Restangular.allUrl(e.entityName, eUrl).getList ;
+                return subProcess(requestObject.params, requestObject.headers);
               }
             },
             /**
@@ -696,7 +701,8 @@
             entity: connectionObject.entityObject,
             headers: headers,
             params: params,
-            json: _apiGeneralConfig.localJson
+            json: _apiGeneralConfig.localJson,
+            baseUrl: _apiGeneralConfig.apiBaseUrl
           };
         } else {
           throw new Error('API call ' + cO.mode + ' not allowed in ' + cO.source + ' mode.');
@@ -721,10 +727,12 @@
           var boot = _connectionInit(cO);
           var process = boot.request.process(boot);
           var deferred = $q.defer();
-          var promise = angular.copy($c.schemas.apiPromise);
+          var promise = {};
           process.then(function(success) {
-            promise.data = (success.data.plain) ? success.data.plain() : success.data ;
-            promise._cursor = success._cursor;
+            promise = (success.plain) ? success.plain() : success ;
+            if (success._cursor) {
+              promise._cursor = success._cursor;
+            }
             deferred.resolve(promise);
             if (typeof callback === 'function') {
               callback(promise);
