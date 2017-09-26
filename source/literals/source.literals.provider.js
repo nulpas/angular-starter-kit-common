@@ -28,7 +28,7 @@
       /* Provider LITERALS tools */
       setSource: setProviderSource,
       /* API Factory */
-      $get: ['$api', $get]
+      $get: ['$q', '$api', $get]
     };
 
     /**
@@ -53,7 +53,7 @@
 
     /**
      * @name setProviderSource
-     * @memeberof source.literals.$literalsProvider
+     * @memberof source.literals.$literalsProvider
      *
      * @description
      * Provider public function to set JSON source files containing the application literals.
@@ -74,7 +74,7 @@
      * @description
      * Factory statement to manage literal variables for application.
      */
-    function $get($api) {
+    function $get($q, $api) {
       return {
         $: $,
         get: getLiterals
@@ -93,11 +93,27 @@
       }
 
       function _getLiterals() {
-
+        var _promisesToResolve = (_literalPromises) ? _literalPromises : _setLiteralsPromises() ;
+        var _itemObject = {};
+        var _defer = $q.defer();
+        _literals = {};
+        $q.all(_promisesToResolve).then(function(response) {
+          angular.forEach(response, function(item) {
+            if (item.hasOwnProperty('documentName')) {
+              _itemObject[item.documentName] = item;
+            } else {
+              _itemObject = item;
+            }
+            _literals = angular.extend({}, _literals, _itemObject);
+          });
+          _defer.resolve(_literals);
+        });
+        return _defer.promise;
       }
 
       function getLiterals() {
-        return (_literals) ? _literals : _getLiterals() ;
+        return _getLiterals();
+        // return (_literals) ? _literals : _getLiterals() ;
       }
     }
   }
