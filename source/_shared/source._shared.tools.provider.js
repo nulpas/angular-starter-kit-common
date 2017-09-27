@@ -137,7 +137,8 @@
           return array;
         }, array1);
       } else {
-        throw new TypeError('The "_arrayMerge" method expects two array arguments and at least one of them is not.');
+        var error = 'The "_arrayMerge" method expects two array arguments and at least one of them is not array.';
+        throw new TypeError(error);
       }
     }
 
