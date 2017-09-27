@@ -965,6 +965,11 @@
 (function() {
   'use strict';
 
+  /**
+   * @type Object
+   * @property {String} documentName
+   */
+
   angular
     .module('source.literals')
     /**
@@ -983,7 +988,6 @@
   function $literals(globalConstantsProvider) {
     var $ = globalConstantsProvider.get();
     var _source = null;
-    var _literalPromises = null;
     var _literals = null;
 
     return {
@@ -1044,8 +1048,18 @@
         get: getLiterals
       };
 
-      function _setLiteralsPromises() {
-        _literalPromises = [];
+      /**
+       * @name _getLiteralsPromises
+       * @memberof source.literals.$literalsProvider.$literals
+       *
+       * @description
+       * Build an array with promises of all sources of literals that are defined in the application.
+       *
+       * @returns {Array}
+       * @private
+       */
+      function _getLiteralsPromises() {
+        var _literalPromises = [];
         angular.forEach(_source, function(item) {
           var entityObject = $api.createEntityObject({
             entityName: item,
@@ -1056,8 +1070,19 @@
         return _literalPromises;
       }
 
+      /**
+       * @name _getLiterals
+       * @memberof source.literals.$literalsProvider.$literals
+       *
+       * @description
+       * Create a promise with all literals processed and merged into a single object.
+       * Set literals object.
+       *
+       * @returns {Promise}
+       * @private
+       */
       function _getLiterals() {
-        var _promisesToResolve = (_literalPromises) ? _literalPromises : _setLiteralsPromises() ;
+        var _promisesToResolve = _getLiteralsPromises() ;
         var _itemObject = {};
         var _defer = $q.defer();
         _literals = {};
@@ -1075,9 +1100,31 @@
         return _defer.promise;
       }
 
-      function getLiterals() {
-        return _getLiterals();
-        // return (_literals) ? _literals : _getLiterals() ;
+      /**
+       * @name getLiterals
+       * @memberof source.literals.$literalsProvider.$literals
+       *
+       * @description
+       * Returns literals object or its promise depending on whether the literals have been set.
+       *
+       * @param property
+       * @returns {Object|Promise}
+       */
+      function getLiterals(property) {
+        var _property = property || null;
+        var output = null;
+        if (_literals && _property) {
+          if (_literals.hasOwnProperty(property)) {
+            output = _literals[property];
+          } else {
+            throw new ReferenceError('Trying to get literals property that does not exist: ("' + property + '")');
+          }
+        } else if (_literals) {
+          output = _literals;
+        } else {
+          output = _getLiterals();
+        }
+        return output;
       }
     }
   }
