@@ -48,20 +48,6 @@
   'use strict';
 
   angular
-  /**
-   * @namespace literals
-   * @memberof source
-   *
-   * @description
-   * Module Literals definition.
-   */
-    .module('source.literals', []);
-})();
-
-(function() {
-  'use strict';
-
-  angular
     /**
      * @namespace router
      * @memberof source
@@ -73,6 +59,20 @@
       /* External Modules */
       'ui.router'
     ]);
+})();
+
+(function() {
+  'use strict';
+
+  angular
+  /**
+   * @namespace literals
+   * @memberof source
+   *
+   * @description
+   * Module Literals definition.
+   */
+    .module('source.literals', []);
 })();
 
 (function() {
@@ -965,6 +965,62 @@
 (function() {
   'use strict';
 
+  angular
+  .module('source.router')
+  /**
+   * @namespace $router
+   * @memberof source.router
+   *
+   * @requires $state
+   * @requires $timeout
+   *
+   * @description
+   * Provider statement manage routing of the application.
+   */
+  .factory('$router', $router);
+
+  $router.$inject = ['$state', '$timeout'];
+
+  function $router($state, $timeout) {
+
+    return {
+      $state: $state,
+      resolveStateGo: resolveStateGo
+    };
+
+    /**
+     * @name _resolveStateGo
+     * @memberof source.router.$router
+     *
+     * @description
+     * Executes $state.go function into $timeout for use into state resolve.
+     *
+     * @param {String} stateName
+     */
+    function _resolveStateGo(stateName) {
+      $timeout(function() {
+        $state.go(stateName);
+      });
+    }
+
+    /**
+     * @name resolveStateGo
+     * @memberof source.router.$router
+     *
+     * @description
+     * Executes _resolveStateGo function.
+     *
+     * @param {String} stateName
+     */
+    function resolveStateGo(stateName) {
+      _resolveStateGo(stateName);
+    }
+  }
+})();
+
+(function() {
+  'use strict';
+
   /**
    * @type Object
    * @property {String} documentName
@@ -988,6 +1044,7 @@
   function $literals(globalConstantsProvider) {
     var $ = globalConstantsProvider.get();
     var _source = null;
+    var _sourceTest = null;
     var _literals = null;
 
     return {
@@ -995,6 +1052,7 @@
       $: $,
       /* Provider LITERALS tools */
       setSource: setProviderSource,
+      setSourceTest: setProviderSourceTest,
       /* API Factory */
       $get: ['$q', '$api', $get]
     };
@@ -1020,6 +1078,22 @@
     }
 
     /**
+     * LOOK!!!!
+     * @param source
+     * @return {*}
+     * @private
+     */
+    function _setSourceTest(source) {
+      var _isStringSource = (typeof source === 'string');
+      if (_isStringSource || angular.isObject(source)) {
+        _sourceTest = (_isStringSource) ? [source] : source ;
+      } else {
+        throw new TypeError('Wrong type argument: Literals source must be string or array of strings.');
+      }
+      return _sourceTest;
+    }
+
+    /**
      * @name setProviderSource
      * @memberof source.literals.$literalsProvider
      *
@@ -1031,6 +1105,15 @@
      */
     function setProviderSource(source) {
       return _setSource(source);
+    }
+
+    /**
+     * LOOK!!!!
+     * @param source
+     * @return {*}
+     */
+    function setProviderSourceTest(source) {
+      return _setSourceTest(source);
     }
 
     /**
@@ -1047,6 +1130,35 @@
         $: $,
         get: getLiterals
       };
+
+      /**
+       * LOOK!!!!
+       * @return {{}}
+       * @private
+       */
+      // function _getLiteralsPromisesTest() {
+      //   var _isArraySource = (angular.isArray(_sourceTest));
+      //   var _literalPromises = (_isArraySource) ? [] : {} ;
+      //   angular.forEach(_sourceTest, function(itemDir, keyDir) {
+      //     if (_isArraySource) {
+      //       var entityObject = $api.createEntityObject({
+      //         entityName: itemDir,
+      //         forceToOne: true
+      //       });
+      //       _literalPromises.push($api.getLocalEntity(entityObject));
+      //     } else {
+      //       _literalPromises[keyDir] = [];
+      //       angular.forEach(itemDir, function(itemFile) {
+      //         var entityObject = $api.createEntityObject({
+      //           entityName: keyDir + '/' + itemFile,
+      //           forceToOne: true
+      //         });
+      //         _literalPromises[keyDir].push($api.getLocalEntity(entityObject));
+      //       });
+      //     }
+      //   });
+      //   return _literalPromises;
+      // }
 
       /**
        * @name _getLiteralsPromises
@@ -1126,62 +1238,6 @@
         }
         return output;
       }
-    }
-  }
-})();
-
-(function() {
-  'use strict';
-
-  angular
-  .module('source.router')
-  /**
-   * @namespace $router
-   * @memberof source.router
-   *
-   * @requires $state
-   * @requires $timeout
-   *
-   * @description
-   * Provider statement manage routing of the application.
-   */
-  .factory('$router', $router);
-
-  $router.$inject = ['$state', '$timeout'];
-
-  function $router($state, $timeout) {
-
-    return {
-      $state: $state,
-      resolveStateGo: resolveStateGo
-    };
-
-    /**
-     * @name _resolveStateGo
-     * @memberof source.router.$router
-     *
-     * @description
-     * Executes $state.go function into $timeout for use into state resolve.
-     *
-     * @param {String} stateName
-     */
-    function _resolveStateGo(stateName) {
-      $timeout(function() {
-        $state.go(stateName);
-      });
-    }
-
-    /**
-     * @name resolveStateGo
-     * @memberof source.router.$router
-     *
-     * @description
-     * Executes _resolveStateGo function.
-     *
-     * @param {String} stateName
-     */
-    function resolveStateGo(stateName) {
-      _resolveStateGo(stateName);
     }
   }
 })();
