@@ -16,6 +16,7 @@
       /* Source Core Modules */
       'source._shared',
       'source.api',
+      'source.date-time',
       'source.literals',
       'source.router',
       'source.toast',

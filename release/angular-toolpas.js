@@ -16,6 +16,7 @@
       /* Source Core Modules */
       'source._shared',
       'source.api',
+      'source.date-time',
       'source.literals',
       'source.router',
       'source.toast',
@@ -49,16 +50,13 @@
 
   angular
     /**
-     * @namespace router
+     * @namespace date-time
      * @memberof source
      *
      * @description
-     * Definition of module "router" for URL routing services.
+     * Definition of module "date time" for several tools and filters with datetime data.
      */
-    .module('source.router', [
-      /* External Modules */
-      'ui.router'
-    ]);
+    .module('source.date-time', []);
 })();
 
 (function() {
@@ -73,6 +71,23 @@
    * Module Literals definition.
    */
     .module('source.literals', []);
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    /**
+     * @namespace router
+     * @memberof source
+     *
+     * @description
+     * Definition of module "router" for URL routing services.
+     */
+    .module('source.router', [
+      /* External Modules */
+      'ui.router'
+    ]);
 })();
 
 (function() {
@@ -966,54 +981,33 @@
   'use strict';
 
   angular
-  .module('source.router')
-  /**
-   * @namespace $router
-   * @memberof source.router
-   *
-   * @requires $state
-   * @requires $timeout
-   *
-   * @description
-   * Provider statement manage routing of the application.
-   */
-  .factory('$router', $router);
-
-  $router.$inject = ['$state', '$timeout'];
-
-  function $router($state, $timeout) {
-
-    return {
-      $state: $state,
-      resolveStateGo: resolveStateGo
-    };
-
+    .module('source.date-time')
     /**
-     * @name _resolveStateGo
-     * @memberof source.router.$router
+     * @namespace onlyHour
+     * @memberof source.date-time
      *
      * @description
-     * Executes $state.go function into $timeout for use into state resolve.
-     *
-     * @param {String} stateName
+     * Filter that shows hour in format 0-24 for a complete date given.
      */
-    function _resolveStateGo(stateName) {
-      $timeout(function() {
-        $state.go(stateName);
-      });
-    }
+    .filter('onlyHour', onlyHour);
+
+  function onlyHour() {
+    return _onlyHour;
 
     /**
-     * @name resolveStateGo
-     * @memberof source.router.$router
+     * @name _onlyHour
+     * @memberof source.date-time.onlyHour
      *
      * @description
-     * Executes _resolveStateGo function.
+     * Private function for "onlyHour" filter.
+     * Returns date formatted if variable "date" is a valid date or the same input data.
      *
-     * @param {String} stateName
+     * @param {*} date
+     * @returns {string|*}
+     * @private
      */
-    function resolveStateGo(stateName) {
-      _resolveStateGo(stateName);
+    function _onlyHour(date) {
+      return (Date.parse(date)) ? moment.utc(date).format('HH:mm') : date ;
     }
   }
 })();
@@ -1238,6 +1232,62 @@
         }
         return output;
       }
+    }
+  }
+})();
+
+(function() {
+  'use strict';
+
+  angular
+  .module('source.router')
+  /**
+   * @namespace $router
+   * @memberof source.router
+   *
+   * @requires $state
+   * @requires $timeout
+   *
+   * @description
+   * Provider statement manage routing of the application.
+   */
+  .factory('$router', $router);
+
+  $router.$inject = ['$state', '$timeout'];
+
+  function $router($state, $timeout) {
+
+    return {
+      $state: $state,
+      resolveStateGo: resolveStateGo
+    };
+
+    /**
+     * @name _resolveStateGo
+     * @memberof source.router.$router
+     *
+     * @description
+     * Executes $state.go function into $timeout for use into state resolve.
+     *
+     * @param {String} stateName
+     */
+    function _resolveStateGo(stateName) {
+      $timeout(function() {
+        $state.go(stateName);
+      });
+    }
+
+    /**
+     * @name resolveStateGo
+     * @memberof source.router.$router
+     *
+     * @description
+     * Executes _resolveStateGo function.
+     *
+     * @param {String} stateName
+     */
+    function resolveStateGo(stateName) {
+      _resolveStateGo(stateName);
     }
   }
 })();
