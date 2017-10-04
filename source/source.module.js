@@ -20,6 +20,7 @@
       'source.literals',
       'source.router',
       'source.toast',
-      'source.translate'
+      'source.translate',
+      'source.view-logic'
     ]);
 })();

@@ -7,6 +7,8 @@
      * @namespace $toolsProvider
      * @memberof source._shared
      *
+     * @requires globalConstantsProvider
+     *
      * @description
      * Provider statement for several useful tools.
      */
@@ -22,6 +24,7 @@
       $: $,
       /* Object tools */
       setObjectUsingSchema: setObjectUsingSchemaProvider,
+      /* $tools factory */
       $get: [$get]
     };
 
