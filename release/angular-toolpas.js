@@ -34,23 +34,6 @@
 
   angular
     /**
-     * @namespace api
-     * @memberof source
-     *
-     * @description
-     * Definition of module "api" for API calling services.
-     */
-    .module('source.api', [
-      /* External Modules */
-      'restangular'
-    ]);
-})();
-
-(function() {
-  'use strict';
-
-  angular
-    /**
      * @namespace date-time
      * @memberof source
      *
@@ -96,6 +79,51 @@
 
   angular
     /**
+     * @namespace view-logic
+     * @memberof source
+     *
+     * @description
+     * Module View Logic definition: helper for application view presentations.
+     */
+    .module('source.view-logic', []);
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    /**
+     * @namespace _shared
+     * @memberof source
+     *
+     * @description
+     * Definition of module "_shared" for common minor services.
+     */
+    .module('source._shared', []);
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    /**
+     * @namespace api
+     * @memberof source
+     *
+     * @description
+     * Definition of module "api" for API calling services.
+     */
+    .module('source.api', [
+      /* External Modules */
+      'restangular'
+    ]);
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    /**
      * @namespace toast
      * @memberof source
      *
@@ -126,28 +154,12 @@
   'use strict';
 
   angular
-    /**
-     * @namespace view-logic
-     * @memberof source
-     *
-     * @description
-     * Module View Logic definition: helper for application view presentations.
-     */
-    .module('source.view-logic', []);
-})();
+    .module('source.date-time')
+    .config(dateTimeConfig);
 
-(function() {
-  'use strict';
-
-  angular
-    /**
-     * @namespace _shared
-     * @memberof source
-     *
-     * @description
-     * Definition of module "_shared" for common minor services.
-     */
-    .module('source._shared', []);
+  function dateTimeConfig() {
+    moment.tz.setDefault(moment.tz.guess());
+  }
 })();
 
 (function() {
@@ -219,6 +231,995 @@
       preventOpenDuplicates: false,
       target: 'body'
     });
+  }
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    .module('source.date-time')
+    /**
+     * @namespace onlyHour
+     * @memberof source.date-time
+     *
+     * @description
+     * Filter that shows hour in "0-24" format for a complete date given.
+     */
+    .filter('onlyHour', onlyHour)
+
+    /**
+     * @namespace untilNow
+     * @memberof source.date-time
+     *
+     * @description
+     * Filter that shows human string for elapsed time.
+     */
+    .filter('untilNow', untilNow)
+
+    /**
+     * @namespace dateReduceHour
+     * @memberof source.date-time
+     *
+     * @description
+     * Filter that shows hour in "0-24" format and date with string month but without year.
+     */
+    .filter('dateReduceHour', dateReduceHour);
+
+  function onlyHour() {
+    return _onlyHour;
+
+    /**
+     * @name _onlyHour
+     * @memberof source.date-time.onlyHour
+     *
+     * @description
+     * Private function for "onlyHour" filter.
+     * Returns date formatted if variable "date" is a valid date or the same input data.
+     *
+     * @param {*} date
+     * @returns {String|*}
+     * @private
+     */
+    function _onlyHour(date) {
+      return (Date.parse(date)) ? moment(date).format('HH:mm') : date ;
+    }
+  }
+
+  function untilNow() {
+    return _untilNow;
+
+    /**
+     * @name _untilNow
+     * @memberof source.date-time.untilNow
+     *
+     * @description
+     * Private function for "untilNow" filter.
+     * Returns locale string expressing elapsed time if variable "date" is a valid date or the same input data.
+     *
+     * @param {*} date
+     * @returns {String|*}
+     * @private
+     */
+    function _untilNow(date) {
+      return (Date.parse(date)) ? moment(date).calendar() : date ;
+    }
+  }
+
+  function dateReduceHour() {
+    return _dateReduceHour;
+
+    /**
+     * @name _dateReduceHour
+     * @memberof source.date-time.dateReduceHour
+     *
+     * @description
+     * Private function for "dateReduceHour" filter.
+     * Returns date formatted if variable "date" is a valid date or the same input data.
+     *
+     * @param {*} date
+     * @returns {String|*}
+     * @private
+     */
+    function _dateReduceHour(date) {
+      return (Date.parse(date)) ? moment(date).format('D MMMM - HH:mm') : date ;
+    }
+  }
+})();
+
+(function() {
+  'use strict';
+
+  /**
+   * @type Object
+   * @property {String} documentName
+   */
+
+  angular
+    .module('source.literals')
+    /**
+     * @namespace $literalsProvider
+     * @memberof source.literals
+     *
+     * @requires globalConstantsProvider
+     *
+     * @description
+     * Provider statement to manage literal variables for application.
+     */
+    .provider('$literals', $literals);
+
+  $literals.$inject = ['globalConstantsProvider'];
+
+  function $literals(globalConstantsProvider) {
+    var $ = globalConstantsProvider.get();
+    var _source = null;
+    var _sourceTest = null;
+    var _literals = null;
+
+    return {
+      /* Global Constants */
+      $: $,
+      /* Provider LITERALS tools */
+      setSource: setProviderSource,
+      setSourceTest: setProviderSourceTest,
+      /* API Factory */
+      $get: ['$q', '$api', $get]
+    };
+
+    /**
+     * @name _setSource
+     * @memberof source.literals.$literalsProvider
+     *
+     * @description
+     * Private method to set JSON source files containing the application literals.
+     *
+     * @param {String|Array} source
+     * @returns [Array]
+     * @private
+     */
+    function _setSource(source) {
+      if (typeof source === 'string' || Array.isArray(source)) {
+        _source = (typeof source === 'string') ? [source] : source ;
+      } else {
+        throw new TypeError('Wrong type argument: Literals source must be string or array of strings.');
+      }
+      return _source;
+    }
+
+    /**
+     * LOOK!!!!
+     * @param source
+     * @return {*}
+     * @private
+     */
+    function _setSourceTest(source) {
+      var _isStringSource = (typeof source === 'string');
+      if (_isStringSource || angular.isObject(source)) {
+        _sourceTest = (_isStringSource) ? [source] : source ;
+      } else {
+        throw new TypeError('Wrong type argument: Literals source must be string or array of strings.');
+      }
+      return _sourceTest;
+    }
+
+    /**
+     * @name setProviderSource
+     * @memberof source.literals.$literalsProvider
+     *
+     * @description
+     * Provider public function to set JSON source files containing the application literals.
+     *
+     * @param {String|Array} source
+     * @returns {Array}
+     */
+    function setProviderSource(source) {
+      return _setSource(source);
+    }
+
+    /**
+     * LOOK!!!!
+     * @param source
+     * @return {*}
+     */
+    function setProviderSourceTest(source) {
+      return _setSourceTest(source);
+    }
+
+    /**
+     * @namespace $literals
+     * @memberof source.literals.$literalsProvider
+     *
+     * @requires $api
+     *
+     * @description
+     * Factory statement to manage literal variables for application.
+     */
+    function $get($q, $api) {
+      return {
+        $: $,
+        get: getLiterals
+      };
+
+      /**
+       * LOOK!!!!
+       * @return {{}}
+       * @private
+       */
+      // function _getLiteralsPromisesTest() {
+      //   var _isArraySource = (angular.isArray(_sourceTest));
+      //   var _literalPromises = (_isArraySource) ? [] : {} ;
+      //   angular.forEach(_sourceTest, function(itemDir, keyDir) {
+      //     if (_isArraySource) {
+      //       var entityObject = $api.createEntityObject({
+      //         entityName: itemDir,
+      //         forceToOne: true
+      //       });
+      //       _literalPromises.push($api.getLocalEntity(entityObject));
+      //     } else {
+      //       _literalPromises[keyDir] = [];
+      //       angular.forEach(itemDir, function(itemFile) {
+      //         var entityObject = $api.createEntityObject({
+      //           entityName: keyDir + '/' + itemFile,
+      //           forceToOne: true
+      //         });
+      //         _literalPromises[keyDir].push($api.getLocalEntity(entityObject));
+      //       });
+      //     }
+      //   });
+      //   return _literalPromises;
+      // }
+
+      /**
+       * @name _getLiteralsPromises
+       * @memberof source.literals.$literalsProvider.$literals
+       *
+       * @description
+       * Build an array with promises of all sources of literals that are defined in the application.
+       *
+       * @returns {Array}
+       * @private
+       */
+      function _getLiteralsPromises() {
+        var _literalPromises = [];
+        angular.forEach(_source, function(item) {
+          var entityObject = $api.createEntityObject({
+            entityName: item,
+            forceToOne: true
+          });
+          _literalPromises.push($api.getLocalEntity(entityObject));
+        });
+        return _literalPromises;
+      }
+
+      /**
+       * @name _getLiterals
+       * @memberof source.literals.$literalsProvider.$literals
+       *
+       * @description
+       * Create a promise with all literals processed and merged into a single object.
+       * Set literals object.
+       *
+       * @returns {Promise}
+       * @private
+       */
+      function _getLiterals() {
+        var _promisesToResolve = _getLiteralsPromises() ;
+        var _itemObject = {};
+        var _defer = $q.defer();
+        _literals = {};
+        $q.all(_promisesToResolve).then(function(response) {
+          angular.forEach(response, function(item) {
+            if (item.hasOwnProperty('documentName')) {
+              _itemObject[item.documentName] = item;
+            } else {
+              _itemObject = item;
+            }
+            _literals = angular.extend({}, _literals, _itemObject);
+          });
+          _defer.resolve(_literals);
+        });
+        return _defer.promise;
+      }
+
+      /**
+       * @name getLiterals
+       * @memberof source.literals.$literalsProvider.$literals
+       *
+       * @description
+       * Returns literals object or its promise depending on whether the literals have been set.
+       *
+       * @param property
+       * @returns {Object|Promise}
+       */
+      function getLiterals(property) {
+        var _property = property || null;
+        var output = null;
+        if (_literals && _property) {
+          if (_literals.hasOwnProperty(property)) {
+            output = _literals[property];
+          } else {
+            throw new ReferenceError('Trying to get literals property that does not exist: ("' + property + '")');
+          }
+        } else if (_literals) {
+          output = _literals;
+        } else {
+          output = _getLiterals();
+        }
+        return output;
+      }
+    }
+  }
+})();
+
+(function() {
+  'use strict';
+
+  angular
+  .module('source.router')
+  /**
+   * @namespace $router
+   * @memberof source.router
+   *
+   * @requires $state
+   * @requires $timeout
+   *
+   * @description
+   * Provider statement manage routing of the application.
+   */
+  .factory('$router', $router);
+
+  $router.$inject = ['$state', '$timeout'];
+
+  function $router($state, $timeout) {
+
+    return {
+      $state: $state,
+      resolveStateGo: resolveStateGo
+    };
+
+    /**
+     * @name _resolveStateGo
+     * @memberof source.router.$router
+     *
+     * @description
+     * Executes $state.go function into $timeout for use into state resolve.
+     *
+     * @param {String} stateName
+     */
+    function _resolveStateGo(stateName) {
+      $timeout(function() {
+        $state.go(stateName);
+      });
+    }
+
+    /**
+     * @name resolveStateGo
+     * @memberof source.router.$router
+     *
+     * @description
+     * Executes _resolveStateGo function.
+     *
+     * @param {String} stateName
+     */
+    function resolveStateGo(stateName) {
+      _resolveStateGo(stateName);
+    }
+  }
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    .module('source.view-logic')
+    /**
+     * @namespace $appView
+     * @memberof source.view-logic
+     *
+     * @requires $filter
+     * @requires globalConstants
+     *
+     * @description
+     * Factory statement for some helper methods about view presentation logic.
+     */
+    .factory('$appView', $appView);
+
+  $appView.$inject = ['$filter', 'globalConstants'];
+
+  function $appView($filter, globalConstants) {
+    var $ = globalConstants.get();
+
+    return {
+      $: $,
+      applyFilter: applyFilter
+    };
+
+    /**
+     * @name _applyFilter
+     * @memberof source.view-logic.$appView
+     *
+     * @description
+     * Returns data with given filter applied.
+     *
+     * @param {*} data
+     * @param {String} filterName
+     * @returns {*}
+     * @private
+     */
+    function _applyFilter(data, filterName) {
+      return $filter(filterName)(data);
+    }
+
+    /**
+     * @name applyFilter
+     * @memberof source.view-logic.$appView
+     *
+     * @description
+     * Public method for _applyFilter.
+     *
+     * @param {*} data
+     * @param {String} filterName
+     * @returns {*}
+     */
+    function applyFilter(data, filterName) {
+      return _applyFilter(data, filterName);
+    }
+  }
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    .module('source._shared')
+    /**
+     * @namespace globalConstantsProvider
+     * @memberof source._shared
+     *
+     * @description
+     * Provider that gets the global constants of the application.
+     */
+    .provider('globalConstants', globalConstants);
+
+  function globalConstants() {
+    var _constants = {
+      NO_OBJECT: {},
+
+      FROM_CAMELCASE_TO_OTHER: true,
+      FROM_OTHER_TO_CAMELCASE: false,
+
+      MODE_KEY: true,
+      MODE_VALUE: false,
+
+      ENCODE: true,
+      DECODE: false,
+
+      TITLE: 1,
+      SUBTITLE: 2,
+
+      PROCESSES: 'processes',
+      MODULES: 'modules',
+      STATES: 'states',
+
+      PROVIDER: true,
+      SERVICE: false,
+
+      MERGE: true,
+      NO_MERGE: false,
+
+      KEY: {
+        ESCAPE: {
+          NAME: 'Escape',
+          CODE: 27
+        },
+        ENTER: {
+          NAME: 'Enter',
+          CODE: 13
+        },
+        ARROW_DOWN: {
+          NAME: 'ArrowDown',
+          CODE: 40
+        },
+        ARROW_UP: {
+          NAME: 'ArrowUp',
+          CODE: 38
+        }
+      }
+    };
+
+    return {
+      get: getProvider,
+      $get: [$get]
+    };
+
+    /**
+     * @name getProvider
+     * @memberof source._shared.globalConstantsProvider
+     *
+     * @description
+     * Get constants object for provider.
+     *
+     * @returns {Object}
+     */
+    function getProvider() {
+      return _constants;
+    }
+
+    /**
+     * @namespace globalConstants
+     * @memberof source._shared.globalConstantsProvider
+     *
+     * @description
+     * Factory that provides the global constants of the application.
+     */
+    function $get() {
+      return {
+        get: getFactory
+      };
+
+      /**
+       * @name getFactory
+       * @memberof source._shared.globalConstantsProvider.globalConstants
+       *
+       * @description
+       * Get constants object for factory.
+       *
+       * @returns {Object}
+       */
+      function getFactory() {
+        return _constants;
+      }
+    }
+  }
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    .module('source._shared')
+    /**
+     * @namespace $toolsProvider
+     * @memberof source._shared
+     *
+     * @requires globalConstantsProvider
+     *
+     * @description
+     * Provider statement for several useful tools.
+     */
+    .provider('$tools', $tools);
+
+  $tools.$inject = ['globalConstantsProvider'];
+
+  function $tools(globalConstantsProvider) {
+    var $ = globalConstantsProvider.get();
+
+    return {
+      /* Global constants */
+      $: $,
+      /* Object tools */
+      setObjectUsingSchema: setObjectUsingSchemaProvider,
+      /* $tools factory */
+      $get: [$get]
+    };
+
+    /**
+     * @name _convertString
+     * @memberof source._shared.$toolsProvider
+     *
+     * @description
+     * Function that encoding camelCase, or decoding camelCase, a given string.
+     *
+     * @param {String} string
+     * @param {String} char
+     * @param {Boolean} conversionType
+     * @returns {String}
+     * @private
+     */
+    function _convertString(string, char, conversionType) {
+      if (string !== undefined && conversionType !== undefined) {
+        var defaultChar = (char) ? char : '-' ;
+        if (conversionType === $.FROM_CAMELCASE_TO_OTHER) {
+          return string.replace(/([A-Z])/g, function($1) {
+            return defaultChar + $1.toLowerCase();
+          });
+        } else {
+          var output = string.split(defaultChar).map(function(item) {
+            return item.charAt(0).toUpperCase() + item.slice(1);
+          }).join('');
+          return output.charAt(0).toLowerCase() + output.slice(1);
+        }
+      } else {
+        throw new ReferenceError('Function parameters missing.');
+      }
+    }
+
+    /**
+     * @name _ucWords
+     * @memberof source._shared.$toolsProvider
+     *
+     * @description
+     * Returns given string with first letter in uppercase.
+     *
+     * @param {String} string
+     * @returns {string}
+     * @private
+     */
+    function _ucWords(string) {
+      return string.charAt(0).toUpperCase() + string.slice(1);
+    }
+
+    /**
+     * @name _getRandomString
+     * @memberof source._shared.$toolsProvider
+     *
+     * @description
+     * Returns random string with given number of chars.
+     *
+     * @param {Number} stringLength --> Number of chars for random string
+     * @returns {string}
+     * @private
+     */
+    function _getRandomString(stringLength) {
+      var output = '';
+      var possibilities = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+      for (var i = 0; i < stringLength; i++) {
+        output += possibilities.charAt(Math.floor(Math.random() * possibilities.length));
+      }
+      return output;
+    }
+
+    /**
+     * @name _removeFromArray
+     * @memberof source._shared.$toolsProvider
+     *
+     * @description
+     * Removes an element from an array from a given value or from a given key. Returns given array without the
+     * element we want to remove.
+     *
+     * @param {Array} arrayVar
+     * @param {Number|String|Object} givenVar
+     * @param {Boolean} mode
+     * @returns {Array}
+     * @private
+     */
+    function _removeFromArray(arrayVar, givenVar, mode) {
+      var key = givenVar;
+      if (mode === $.MODE_VALUE) {
+        key = arrayVar.indexOf(givenVar);
+      }
+      if ((key) && (key > -1)) {
+        arrayVar.splice(key, 1);
+      }
+      return arrayVar;
+    }
+
+    /**
+     * @name _arrayMerge
+     * @memberof source._shared.$toolsProvider
+     *
+     * @description
+     * Merges two arrays avoiding duplicate items.
+     *
+     * @param {Array} array1
+     * @param {Array} array2
+     * @returns {Array}
+     * @private
+     */
+    function _arrayMerge(array1, array2) {
+      if (angular.isArray(array1) && angular.isArray(array2)) {
+        return array2.reduce(function(array, key) {
+          if (array.indexOf(key) < 0) {
+            array.push(key);
+          }
+          return array;
+        }, array1);
+      } else {
+        var error = 'The "_arrayMerge" method expects two array arguments and at least one of them is not array.';
+        throw new TypeError(error);
+      }
+    }
+
+    /**
+     * @name _index
+     * @memberof source._shared.$toolsProvider
+     *
+     * @description
+     * Auxiliary function used for reduction in getValueFromDotedKey.
+     *
+     * @param {Object} object
+     * @param {String} index
+     * @returns {*}
+     * @private
+     */
+    function _index(object, index) {
+      return object[index];
+    }
+
+    /**
+     * @name _getValueFromDotedKey
+     * @memberof source._shared.$toolsProvider
+     *
+     * @description
+     * Allows dot notation traversing (Example: object["a.b.c"] in object["a"]["b"]["c"]).
+     * Returns undefined value instead of exception if no key in object.
+     *
+     * @param {Object} object
+     * @param {String} dotedKey
+     * @returns {*|Undefined}
+     * @private
+     */
+    function _getValueFromDotedKey(object, dotedKey) {
+      if (object[dotedKey] !== undefined) {
+        return object[dotedKey];
+      }
+      try {
+        return dotedKey.split('.').reduce(_index, object);
+      } catch (e) {
+        if (e instanceof TypeError) {
+          return undefined;
+        } else {
+          throw e;
+        }
+      }
+    }
+
+    /**
+     * @name _parseObjectValues
+     * @memberof source._shared.$toolsProvider
+     *
+     * @description
+     * Parses keysObject to assign correct values from collection valuesObject.
+     *
+     * @param {Object} keysObject
+     * @param {Object} valuesObject
+     * @returns {Object}
+     */
+    function _parseObjectValues(keysObject, valuesObject) {
+      var output = {};
+      if (typeof keysObject === 'object') {
+        output = angular.copy(keysObject);
+        for (var index in keysObject) {
+          if (keysObject.hasOwnProperty(index) && valuesObject.hasOwnProperty(keysObject[index])) {
+            output[index] = valuesObject[keysObject[index]];
+          }
+        }
+      }
+      return output;
+    }
+
+    /**
+     * @name _setObjectUsingSchema
+     * @memberof source._shared.$toolsProvider
+     *
+     * @description
+     * Returns an object with values given in "objectSettings" following the pattern given by "objectSchema".
+     * Throws an exception error if "objectSettings" does not fit "objectSchema".
+     * Settings Object will be merged depending on variable "mergeOption".
+     *
+     * @param {Object} objectSchema
+     * @param {Object} objectSettings
+     * @param {Boolean|Object} mergeOption --> If Boolean: true to merge with schema, false no merge with schema.
+     *                                     --> If Object, merge with given object.
+     * @returns {Object}
+     * @private
+     */
+    function _setObjectUsingSchema(objectSchema, objectSettings, mergeOption) {
+      var output = {};
+      angular.forEach(objectSettings, function(item, key) {
+        if (objectSchema.hasOwnProperty(key)) {
+          output[key] = item;
+        } else {
+          throw new Error('Trying to set an unknown property ("' + key + '") in target object.');
+        }
+      });
+      if (mergeOption) {
+        var mergeCondition = (typeof mergeOption === 'object');
+        return (mergeCondition) ? angular.extend({}, mergeOption, output) : angular.extend({}, objectSchema, output) ;
+      } else {
+        return output;
+      }
+    }
+
+    /**
+     * @name setObjectUsingSchemaProvider
+     * @memberof source._shared.$toolsProvider
+     *
+     * @description
+     * Returns an object with values given in "objectSettings" following the pattern given by "objectSchema".
+     * Settings Object will be merged depending on optional variable "mergeOption".
+     * Provider function.
+     *
+     * @param {Object} objectSchema
+     * @param {Object} objectSettings
+     * @param {Boolean|Object} [mergeOption = false] --> If Boolean: true to merge schema, false no merge with schema.
+     *                                               --> If Object, merge with given object.
+     * @returns {Object}
+     */
+    function setObjectUsingSchemaProvider(objectSchema, objectSettings, mergeOption) {
+      mergeOption = mergeOption || $.NO_MERGE;
+      return _setObjectUsingSchema(objectSchema, objectSettings, mergeOption);
+    }
+
+    /**
+     * @namespace $tools
+     * @memberof source._shared.$toolsProvider
+     *
+     * @description
+     * Factory statement for several useful tools.
+     */
+    function $get() {
+      return {
+        /* Global Constants */
+        $: $,
+        /* String tools */
+        camelCaseTo: camelCaseTo,
+        toCamelCase: toCamelCase,
+        ucWords: ucWords,
+        getRandomString: getRandomString,
+        /* Array tools */
+        removeArrayItem: removeArrayItem,
+        removeArrayKey: removeArrayKey,
+        arrayMerge: arrayMerge,
+        /* Object tools */
+        getValueFromDotedKey: getValueFromDotedKey,
+        parseObjectValues: parseObjectValues,
+        setObjectUsingSchema: setObjectUsingSchema
+      };
+
+      /**
+       * @name camelCaseTo
+       * @memberof source._shared.$toolsProvider.$tools
+       *
+       * @description
+       * Returns a string decoded from camelCase to a char separator way.
+       *
+       * @param {String} string
+       * @param {String} char
+       * @returns {String}
+       */
+      function camelCaseTo(string, char) {
+        return _convertString(string, char, $.FROM_CAMELCASE_TO_OTHER);
+      }
+
+      /**
+       * @name toCamelCase
+       * @memberof source._shared.$toolsProvider.$tools
+       *
+       * @description
+       * Returns a string encoded in camelCase way from any string with char separator.
+       *
+       * @param {String} string
+       * @param {String} char
+       * @returns {String}
+       */
+      function toCamelCase(string, char) {
+        return _convertString(string, char, $.FROM_OTHER_TO_CAMELCASE);
+      }
+
+      /**
+       * @name ucWords
+       * @memberof source._shared.$toolsProvider.$tools
+       *
+       * @description
+       * Public factory method for using _ucWords. Returns given string with first letter in uppercase.
+       *
+       * @param {String} string
+       * @returns {string}
+       */
+      function ucWords(string) {
+        return _ucWords(string);
+      }
+
+      /**
+       * @name getRandomString
+       * @memberof source._shared.$toolsProvider.$tools
+       *
+       * @description
+       * Returns random string with given number of chars.
+       *
+       * @param {Number} stringLength --> Number of chars for random string
+       * @returns {string}
+       */
+      function getRandomString(stringLength) {
+        return _getRandomString(stringLength);
+      }
+
+      /**
+       * @name removeArrayItem
+       * @memberof source._shared.$toolsProvider.$tools
+       *
+       * @description
+       * Removes a value given from an array. Returns modified array.
+       *
+       * @param {Array} arrayVar
+       * @param {String|Object} item
+       * @returns {Array}
+       */
+      function removeArrayItem(arrayVar, item) {
+        return _removeFromArray(arrayVar, item, $.MODE_VALUE);
+      }
+
+      /**
+       * @name removeArrayKey
+       * @memberof source._shared.$toolsProvider.$tools
+       *
+       * @description
+       * Removes a key given from an array. Returns modified array.
+       *
+       * @param {Array} arrayVar
+       * @param {Number} key
+       * @returns {Array}
+       */
+      function removeArrayKey(arrayVar, key) {
+        return _removeFromArray(arrayVar, key, $.MODE_KEY);
+      }
+
+      /**
+       * @name arrayMerge
+       * @memberof source._shared.$toolsProvider.$tools
+       *
+       * @description
+       * Public factory method for using _arrayMerge. Merges two arrays avoiding duplicate items.
+       *
+       * @param {Array} array1
+       * @param {Array} array2
+       * @returns {Array}
+       */
+      function arrayMerge(array1, array2) {
+        return _arrayMerge(array1, array2);
+      }
+
+      /**
+       * @name getValueFromDotedKey
+       * @memberof source._shared.$toolsProvider.$tools
+       *
+       * @description
+       * Allows dot notation traversing (Example: object["a.b.c"] in object["a"]["b"]["c"]).
+       * Returns undefined value instead of exception if no key in object.
+       *
+       * @param {Object} object
+       * @param {String} dotedKey
+       * @returns {*|Undefined}
+       */
+      function getValueFromDotedKey(object, dotedKey) {
+        return _getValueFromDotedKey(object, dotedKey);
+      }
+
+      /**
+       * @name parseObjectValues
+       * @memberof source._shared.$toolsProvider.$tools
+       *
+       * @description
+       * Parses keysObject to assign correct values from collection valuesObject.
+       *
+       * @param {Object} keysObject
+       * @param {Object} valuesObject
+       * @returns {Object}
+       */
+      function parseObjectValues(keysObject, valuesObject) {
+        return _parseObjectValues(keysObject, valuesObject);
+      }
+
+      /**
+       * @name setObjectUsingSchema
+       * @memberof source._shared.$toolsProvider.$tools
+       *
+       * @description
+       * Returns an object with values given in "objectSettings" following the pattern given by "objectSchema".
+       * Settings Object will be merged depending on optional variable "mergeOption".
+       *
+       * @param {Object} objectSchema
+       * @param {Object} objectSettings
+       * @param {Boolean|Object} [mergeOption = true] --> If Boolean: true to merge schema, false no merge with schema.
+       *                                              --> If Object, merge with given object.
+       * @returns {Object}
+       */
+      function setObjectUsingSchema(objectSchema, objectSettings, mergeOption) {
+        mergeOption = mergeOption || $.NO_MERGE;
+        return _setObjectUsingSchema(objectSchema, objectSettings, mergeOption);
+      }
+    }
   }
 })();
 
@@ -996,350 +1997,6 @@
   'use strict';
 
   angular
-    .module('source.date-time')
-    /**
-     * @namespace onlyHour
-     * @memberof source.date-time
-     *
-     * @description
-     * Filter that shows hour in format 0-24 for a complete date given.
-     */
-    .filter('onlyHour', onlyHour)
-
-    /**
-     * @namespace untilNow
-     * @memberof source.date-time
-     *
-     * @description
-     * Filter that shows human string for elapsed time.
-     */
-    .filter('untilNow', untilNow);
-
-  function onlyHour() {
-    return _onlyHour;
-
-    /**
-     * @name _onlyHour
-     * @memberof source.date-time.onlyHour
-     *
-     * @description
-     * Private function for "onlyHour" filter.
-     * Returns date formatted if variable "date" is a valid date or the same input data.
-     *
-     * @param {*} date
-     * @returns {string|*}
-     * @private
-     */
-    function _onlyHour(date) {
-      return (Date.parse(date)) ? moment.utc(date).format('HH:mm') : date ;
-    }
-  }
-
-  function untilNow() {
-    return _untilNow;
-
-    /**
-     * @name _untilNow
-     * @memberof source.date-time.untilNow
-     *
-     * @description
-     * Private function for "untilNow" filter.
-     * Returns locale string expressing elapsed time.
-     *
-     * @param {*} date
-     * @returns {string|*}
-     * @private
-     */
-    function _untilNow(date) {
-      return (Date.parse(date)) ? moment.utc(date).fromNow() : date ;
-    }
-  }
-})();
-
-(function() {
-  'use strict';
-
-  /**
-   * @type Object
-   * @property {String} documentName
-   */
-
-  angular
-    .module('source.literals')
-    /**
-     * @namespace $literalsProvider
-     * @memberof source.literals
-     *
-     * @requires globalConstantsProvider
-     *
-     * @description
-     * Provider statement to manage literal variables for application.
-     */
-    .provider('$literals', $literals);
-
-  $literals.$inject = ['globalConstantsProvider'];
-
-  function $literals(globalConstantsProvider) {
-    var $ = globalConstantsProvider.get();
-    var _source = null;
-    var _sourceTest = null;
-    var _literals = null;
-
-    return {
-      /* Global Constants */
-      $: $,
-      /* Provider LITERALS tools */
-      setSource: setProviderSource,
-      setSourceTest: setProviderSourceTest,
-      /* API Factory */
-      $get: ['$q', '$api', $get]
-    };
-
-    /**
-     * @name _setSource
-     * @memberof source.literals.$literalsProvider
-     *
-     * @description
-     * Private method to set JSON source files containing the application literals.
-     *
-     * @param {String|Array} source
-     * @returns [Array]
-     * @private
-     */
-    function _setSource(source) {
-      if (typeof source === 'string' || Array.isArray(source)) {
-        _source = (typeof source === 'string') ? [source] : source ;
-      } else {
-        throw new TypeError('Wrong type argument: Literals source must be string or array of strings.');
-      }
-      return _source;
-    }
-
-    /**
-     * LOOK!!!!
-     * @param source
-     * @return {*}
-     * @private
-     */
-    function _setSourceTest(source) {
-      var _isStringSource = (typeof source === 'string');
-      if (_isStringSource || angular.isObject(source)) {
-        _sourceTest = (_isStringSource) ? [source] : source ;
-      } else {
-        throw new TypeError('Wrong type argument: Literals source must be string or array of strings.');
-      }
-      return _sourceTest;
-    }
-
-    /**
-     * @name setProviderSource
-     * @memberof source.literals.$literalsProvider
-     *
-     * @description
-     * Provider public function to set JSON source files containing the application literals.
-     *
-     * @param {String|Array} source
-     * @returns {Array}
-     */
-    function setProviderSource(source) {
-      return _setSource(source);
-    }
-
-    /**
-     * LOOK!!!!
-     * @param source
-     * @return {*}
-     */
-    function setProviderSourceTest(source) {
-      return _setSourceTest(source);
-    }
-
-    /**
-     * @namespace $literals
-     * @memberof source.literals.$literalsProvider
-     *
-     * @requires $api
-     *
-     * @description
-     * Factory statement to manage literal variables for application.
-     */
-    function $get($q, $api) {
-      return {
-        $: $,
-        get: getLiterals
-      };
-
-      /**
-       * LOOK!!!!
-       * @return {{}}
-       * @private
-       */
-      // function _getLiteralsPromisesTest() {
-      //   var _isArraySource = (angular.isArray(_sourceTest));
-      //   var _literalPromises = (_isArraySource) ? [] : {} ;
-      //   angular.forEach(_sourceTest, function(itemDir, keyDir) {
-      //     if (_isArraySource) {
-      //       var entityObject = $api.createEntityObject({
-      //         entityName: itemDir,
-      //         forceToOne: true
-      //       });
-      //       _literalPromises.push($api.getLocalEntity(entityObject));
-      //     } else {
-      //       _literalPromises[keyDir] = [];
-      //       angular.forEach(itemDir, function(itemFile) {
-      //         var entityObject = $api.createEntityObject({
-      //           entityName: keyDir + '/' + itemFile,
-      //           forceToOne: true
-      //         });
-      //         _literalPromises[keyDir].push($api.getLocalEntity(entityObject));
-      //       });
-      //     }
-      //   });
-      //   return _literalPromises;
-      // }
-
-      /**
-       * @name _getLiteralsPromises
-       * @memberof source.literals.$literalsProvider.$literals
-       *
-       * @description
-       * Build an array with promises of all sources of literals that are defined in the application.
-       *
-       * @returns {Array}
-       * @private
-       */
-      function _getLiteralsPromises() {
-        var _literalPromises = [];
-        angular.forEach(_source, function(item) {
-          var entityObject = $api.createEntityObject({
-            entityName: item,
-            forceToOne: true
-          });
-          _literalPromises.push($api.getLocalEntity(entityObject));
-        });
-        return _literalPromises;
-      }
-
-      /**
-       * @name _getLiterals
-       * @memberof source.literals.$literalsProvider.$literals
-       *
-       * @description
-       * Create a promise with all literals processed and merged into a single object.
-       * Set literals object.
-       *
-       * @returns {Promise}
-       * @private
-       */
-      function _getLiterals() {
-        var _promisesToResolve = _getLiteralsPromises() ;
-        var _itemObject = {};
-        var _defer = $q.defer();
-        _literals = {};
-        $q.all(_promisesToResolve).then(function(response) {
-          angular.forEach(response, function(item) {
-            if (item.hasOwnProperty('documentName')) {
-              _itemObject[item.documentName] = item;
-            } else {
-              _itemObject = item;
-            }
-            _literals = angular.extend({}, _literals, _itemObject);
-          });
-          _defer.resolve(_literals);
-        });
-        return _defer.promise;
-      }
-
-      /**
-       * @name getLiterals
-       * @memberof source.literals.$literalsProvider.$literals
-       *
-       * @description
-       * Returns literals object or its promise depending on whether the literals have been set.
-       *
-       * @param property
-       * @returns {Object|Promise}
-       */
-      function getLiterals(property) {
-        var _property = property || null;
-        var output = null;
-        if (_literals && _property) {
-          if (_literals.hasOwnProperty(property)) {
-            output = _literals[property];
-          } else {
-            throw new ReferenceError('Trying to get literals property that does not exist: ("' + property + '")');
-          }
-        } else if (_literals) {
-          output = _literals;
-        } else {
-          output = _getLiterals();
-        }
-        return output;
-      }
-    }
-  }
-})();
-
-(function() {
-  'use strict';
-
-  angular
-  .module('source.router')
-  /**
-   * @namespace $router
-   * @memberof source.router
-   *
-   * @requires $state
-   * @requires $timeout
-   *
-   * @description
-   * Provider statement manage routing of the application.
-   */
-  .factory('$router', $router);
-
-  $router.$inject = ['$state', '$timeout'];
-
-  function $router($state, $timeout) {
-
-    return {
-      $state: $state,
-      resolveStateGo: resolveStateGo
-    };
-
-    /**
-     * @name _resolveStateGo
-     * @memberof source.router.$router
-     *
-     * @description
-     * Executes $state.go function into $timeout for use into state resolve.
-     *
-     * @param {String} stateName
-     */
-    function _resolveStateGo(stateName) {
-      $timeout(function() {
-        $state.go(stateName);
-      });
-    }
-
-    /**
-     * @name resolveStateGo
-     * @memberof source.router.$router
-     *
-     * @description
-     * Executes _resolveStateGo function.
-     *
-     * @param {String} stateName
-     */
-    function resolveStateGo(stateName) {
-      _resolveStateGo(stateName);
-    }
-  }
-})();
-
-(function() {
-  'use strict';
-
-  angular
     .module('source.toast')
     /**
      * @namespace toastModelProvider
@@ -1887,621 +2544,5 @@
     };
 
     this.default = this.languages.en;
-  }
-})();
-
-(function() {
-  'use strict';
-
-  angular
-    .module('source.view-logic')
-    /**
-     * @namespace $appView
-     * @memberof source.view-logic
-     *
-     * @requires $filter
-     * @requires globalConstants
-     *
-     * @description
-     * Factory statement for some helper methods about view presentation logic.
-     */
-    .factory('$appView', $appView);
-
-  $appView.$inject = ['$filter', 'globalConstants'];
-
-  function $appView($filter, globalConstants) {
-    var $ = globalConstants.get();
-
-    return {
-      $: $,
-      applyFilter: applyFilter
-    };
-
-    /**
-     * @name _applyFilter
-     * @memberof source.view-logic.$appView
-     *
-     * @description
-     * Returns data with given filter applied.
-     *
-     * @param {*} data
-     * @param {String} filterName
-     * @returns {*}
-     * @private
-     */
-    function _applyFilter(data, filterName) {
-      return $filter(filterName)(data);
-    }
-
-    /**
-     * @name applyFilter
-     * @memberof source.view-logic.$appView
-     *
-     * @description
-     * Public method for _applyFilter.
-     *
-     * @param {*} data
-     * @param {String} filterName
-     * @returns {*}
-     */
-    function applyFilter(data, filterName) {
-      return _applyFilter(data, filterName);
-    }
-  }
-})();
-
-(function() {
-  'use strict';
-
-  angular
-    .module('source._shared')
-    /**
-     * @namespace globalConstantsProvider
-     * @memberof source._shared
-     *
-     * @description
-     * Provider that gets the global constants of the application.
-     */
-    .provider('globalConstants', globalConstants);
-
-  function globalConstants() {
-    var _constants = {
-      NO_OBJECT: {},
-
-      FROM_CAMELCASE_TO_OTHER: true,
-      FROM_OTHER_TO_CAMELCASE: false,
-
-      MODE_KEY: true,
-      MODE_VALUE: false,
-
-      ENCODE: true,
-      DECODE: false,
-
-      TITLE: 1,
-      SUBTITLE: 2,
-
-      PROCESSES: 'processes',
-      MODULES: 'modules',
-      STATES: 'states',
-
-      PROVIDER: true,
-      SERVICE: false,
-
-      MERGE: true,
-      NO_MERGE: false,
-
-      KEY: {
-        ESCAPE: {
-          NAME: 'Escape',
-          CODE: 27
-        },
-        ENTER: {
-          NAME: 'Enter',
-          CODE: 13
-        },
-        ARROW_DOWN: {
-          NAME: 'ArrowDown',
-          CODE: 40
-        },
-        ARROW_UP: {
-          NAME: 'ArrowUp',
-          CODE: 38
-        }
-      }
-    };
-
-    return {
-      get: getProvider,
-      $get: [$get]
-    };
-
-    /**
-     * @name getProvider
-     * @memberof source._shared.globalConstantsProvider
-     *
-     * @description
-     * Get constants object for provider.
-     *
-     * @returns {Object}
-     */
-    function getProvider() {
-      return _constants;
-    }
-
-    /**
-     * @namespace globalConstants
-     * @memberof source._shared.globalConstantsProvider
-     *
-     * @description
-     * Factory that provides the global constants of the application.
-     */
-    function $get() {
-      return {
-        get: getFactory
-      };
-
-      /**
-       * @name getFactory
-       * @memberof source._shared.globalConstantsProvider.globalConstants
-       *
-       * @description
-       * Get constants object for factory.
-       *
-       * @returns {Object}
-       */
-      function getFactory() {
-        return _constants;
-      }
-    }
-  }
-})();
-
-(function() {
-  'use strict';
-
-  angular
-    .module('source._shared')
-    /**
-     * @namespace $toolsProvider
-     * @memberof source._shared
-     *
-     * @requires globalConstantsProvider
-     *
-     * @description
-     * Provider statement for several useful tools.
-     */
-    .provider('$tools', $tools);
-
-  $tools.$inject = ['globalConstantsProvider'];
-
-  function $tools(globalConstantsProvider) {
-    var $ = globalConstantsProvider.get();
-
-    return {
-      /* Global constants */
-      $: $,
-      /* Object tools */
-      setObjectUsingSchema: setObjectUsingSchemaProvider,
-      /* $tools factory */
-      $get: [$get]
-    };
-
-    /**
-     * @name _convertString
-     * @memberof source._shared.$toolsProvider
-     *
-     * @description
-     * Function that encoding camelCase, or decoding camelCase, a given string.
-     *
-     * @param {String} string
-     * @param {String} char
-     * @param {Boolean} conversionType
-     * @returns {String}
-     * @private
-     */
-    function _convertString(string, char, conversionType) {
-      if (string !== undefined && conversionType !== undefined) {
-        var defaultChar = (char) ? char : '-' ;
-        if (conversionType === $.FROM_CAMELCASE_TO_OTHER) {
-          return string.replace(/([A-Z])/g, function($1) {
-            return defaultChar + $1.toLowerCase();
-          });
-        } else {
-          var output = string.split(defaultChar).map(function(item) {
-            return item.charAt(0).toUpperCase() + item.slice(1);
-          }).join('');
-          return output.charAt(0).toLowerCase() + output.slice(1);
-        }
-      } else {
-        throw new ReferenceError('Function parameters missing.');
-      }
-    }
-
-    /**
-     * @name _ucWords
-     * @memberof source._shared.$toolsProvider
-     *
-     * @description
-     * Returns given string with first letter in uppercase.
-     *
-     * @param {String} string
-     * @returns {string}
-     * @private
-     */
-    function _ucWords(string) {
-      return string.charAt(0).toUpperCase() + string.slice(1);
-    }
-
-    /**
-     * @name _getRandomString
-     * @memberof source._shared.$toolsProvider
-     *
-     * @description
-     * Returns random string with given number of chars.
-     *
-     * @param {Number} stringLength --> Number of chars for random string
-     * @returns {string}
-     * @private
-     */
-    function _getRandomString(stringLength) {
-      var output = '';
-      var possibilities = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
-      for (var i = 0; i < stringLength; i++) {
-        output += possibilities.charAt(Math.floor(Math.random() * possibilities.length));
-      }
-      return output;
-    }
-
-    /**
-     * @name _removeFromArray
-     * @memberof source._shared.$toolsProvider
-     *
-     * @description
-     * Removes an element from an array from a given value or from a given key. Returns given array without the
-     * element we want to remove.
-     *
-     * @param {Array} arrayVar
-     * @param {Number|String|Object} givenVar
-     * @param {Boolean} mode
-     * @returns {Array}
-     * @private
-     */
-    function _removeFromArray(arrayVar, givenVar, mode) {
-      var key = givenVar;
-      if (mode === $.MODE_VALUE) {
-        key = arrayVar.indexOf(givenVar);
-      }
-      if ((key) && (key > -1)) {
-        arrayVar.splice(key, 1);
-      }
-      return arrayVar;
-    }
-
-    /**
-     * @name _arrayMerge
-     * @memberof source._shared.$toolsProvider
-     *
-     * @description
-     * Merges two arrays avoiding duplicate items.
-     *
-     * @param {Array} array1
-     * @param {Array} array2
-     * @returns {Array}
-     * @private
-     */
-    function _arrayMerge(array1, array2) {
-      if (angular.isArray(array1) && angular.isArray(array2)) {
-        return array2.reduce(function(array, key) {
-          if (array.indexOf(key) < 0) {
-            array.push(key);
-          }
-          return array;
-        }, array1);
-      } else {
-        var error = 'The "_arrayMerge" method expects two array arguments and at least one of them is not array.';
-        throw new TypeError(error);
-      }
-    }
-
-    /**
-     * @name _index
-     * @memberof source._shared.$toolsProvider
-     *
-     * @description
-     * Auxiliary function used for reduction in getValueFromDotedKey.
-     *
-     * @param {Object} object
-     * @param {String} index
-     * @returns {*}
-     * @private
-     */
-    function _index(object, index) {
-      return object[index];
-    }
-
-    /**
-     * @name _getValueFromDotedKey
-     * @memberof source._shared.$toolsProvider
-     *
-     * @description
-     * Allows dot notation traversing (Example: object["a.b.c"] in object["a"]["b"]["c"]).
-     * Returns undefined value instead of exception if no key in object.
-     *
-     * @param {Object} object
-     * @param {String} dotedKey
-     * @returns {*|Undefined}
-     * @private
-     */
-    function _getValueFromDotedKey(object, dotedKey) {
-      if (object[dotedKey] !== undefined) {
-        return object[dotedKey];
-      }
-      try {
-        return dotedKey.split('.').reduce(_index, object);
-      } catch (e) {
-        if (e instanceof TypeError) {
-          return undefined;
-        } else {
-          throw e;
-        }
-      }
-    }
-
-    /**
-     * @name _parseObjectValues
-     * @memberof source._shared.$toolsProvider
-     *
-     * @description
-     * Parses keysObject to assign correct values from collection valuesObject.
-     *
-     * @param {Object} keysObject
-     * @param {Object} valuesObject
-     * @returns {Object}
-     */
-    function _parseObjectValues(keysObject, valuesObject) {
-      var output = {};
-      if (typeof keysObject === 'object') {
-        output = angular.copy(keysObject);
-        for (var index in keysObject) {
-          if (keysObject.hasOwnProperty(index) && valuesObject.hasOwnProperty(keysObject[index])) {
-            output[index] = valuesObject[keysObject[index]];
-          }
-        }
-      }
-      return output;
-    }
-
-    /**
-     * @name _setObjectUsingSchema
-     * @memberof source._shared.$toolsProvider
-     *
-     * @description
-     * Returns an object with values given in "objectSettings" following the pattern given by "objectSchema".
-     * Throws an exception error if "objectSettings" does not fit "objectSchema".
-     * Settings Object will be merged depending on variable "mergeOption".
-     *
-     * @param {Object} objectSchema
-     * @param {Object} objectSettings
-     * @param {Boolean|Object} mergeOption --> If Boolean: true to merge with schema, false no merge with schema.
-     *                                     --> If Object, merge with given object.
-     * @returns {Object}
-     * @private
-     */
-    function _setObjectUsingSchema(objectSchema, objectSettings, mergeOption) {
-      var output = {};
-      angular.forEach(objectSettings, function(item, key) {
-        if (objectSchema.hasOwnProperty(key)) {
-          output[key] = item;
-        } else {
-          throw new Error('Trying to set an unknown property ("' + key + '") in target object.');
-        }
-      });
-      if (mergeOption) {
-        var mergeCondition = (typeof mergeOption === 'object');
-        return (mergeCondition) ? angular.extend({}, mergeOption, output) : angular.extend({}, objectSchema, output) ;
-      } else {
-        return output;
-      }
-    }
-
-    /**
-     * @name setObjectUsingSchemaProvider
-     * @memberof source._shared.$toolsProvider
-     *
-     * @description
-     * Returns an object with values given in "objectSettings" following the pattern given by "objectSchema".
-     * Settings Object will be merged depending on optional variable "mergeOption".
-     * Provider function.
-     *
-     * @param {Object} objectSchema
-     * @param {Object} objectSettings
-     * @param {Boolean|Object} [mergeOption = false] --> If Boolean: true to merge schema, false no merge with schema.
-     *                                               --> If Object, merge with given object.
-     * @returns {Object}
-     */
-    function setObjectUsingSchemaProvider(objectSchema, objectSettings, mergeOption) {
-      mergeOption = mergeOption || $.NO_MERGE;
-      return _setObjectUsingSchema(objectSchema, objectSettings, mergeOption);
-    }
-
-    /**
-     * @namespace $tools
-     * @memberof source._shared.$toolsProvider
-     *
-     * @description
-     * Factory statement for several useful tools.
-     */
-    function $get() {
-      return {
-        /* Global Constants */
-        $: $,
-        /* String tools */
-        camelCaseTo: camelCaseTo,
-        toCamelCase: toCamelCase,
-        ucWords: ucWords,
-        getRandomString: getRandomString,
-        /* Array tools */
-        removeArrayItem: removeArrayItem,
-        removeArrayKey: removeArrayKey,
-        arrayMerge: arrayMerge,
-        /* Object tools */
-        getValueFromDotedKey: getValueFromDotedKey,
-        parseObjectValues: parseObjectValues,
-        setObjectUsingSchema: setObjectUsingSchema
-      };
-
-      /**
-       * @name camelCaseTo
-       * @memberof source._shared.$toolsProvider.$tools
-       *
-       * @description
-       * Returns a string decoded from camelCase to a char separator way.
-       *
-       * @param {String} string
-       * @param {String} char
-       * @returns {String}
-       */
-      function camelCaseTo(string, char) {
-        return _convertString(string, char, $.FROM_CAMELCASE_TO_OTHER);
-      }
-
-      /**
-       * @name toCamelCase
-       * @memberof source._shared.$toolsProvider.$tools
-       *
-       * @description
-       * Returns a string encoded in camelCase way from any string with char separator.
-       *
-       * @param {String} string
-       * @param {String} char
-       * @returns {String}
-       */
-      function toCamelCase(string, char) {
-        return _convertString(string, char, $.FROM_OTHER_TO_CAMELCASE);
-      }
-
-      /**
-       * @name ucWords
-       * @memberof source._shared.$toolsProvider.$tools
-       *
-       * @description
-       * Public factory method for using _ucWords. Returns given string with first letter in uppercase.
-       *
-       * @param {String} string
-       * @returns {string}
-       */
-      function ucWords(string) {
-        return _ucWords(string);
-      }
-
-      /**
-       * @name getRandomString
-       * @memberof source._shared.$toolsProvider.$tools
-       *
-       * @description
-       * Returns random string with given number of chars.
-       *
-       * @param {Number} stringLength --> Number of chars for random string
-       * @returns {string}
-       */
-      function getRandomString(stringLength) {
-        return _getRandomString(stringLength);
-      }
-
-      /**
-       * @name removeArrayItem
-       * @memberof source._shared.$toolsProvider.$tools
-       *
-       * @description
-       * Removes a value given from an array. Returns modified array.
-       *
-       * @param {Array} arrayVar
-       * @param {String|Object} item
-       * @returns {Array}
-       */
-      function removeArrayItem(arrayVar, item) {
-        return _removeFromArray(arrayVar, item, $.MODE_VALUE);
-      }
-
-      /**
-       * @name removeArrayKey
-       * @memberof source._shared.$toolsProvider.$tools
-       *
-       * @description
-       * Removes a key given from an array. Returns modified array.
-       *
-       * @param {Array} arrayVar
-       * @param {Number} key
-       * @returns {Array}
-       */
-      function removeArrayKey(arrayVar, key) {
-        return _removeFromArray(arrayVar, key, $.MODE_KEY);
-      }
-
-      /**
-       * @name arrayMerge
-       * @memberof source._shared.$toolsProvider.$tools
-       *
-       * @description
-       * Public factory method for using _arrayMerge. Merges two arrays avoiding duplicate items.
-       *
-       * @param {Array} array1
-       * @param {Array} array2
-       * @returns {Array}
-       */
-      function arrayMerge(array1, array2) {
-        return _arrayMerge(array1, array2);
-      }
-
-      /**
-       * @name getValueFromDotedKey
-       * @memberof source._shared.$toolsProvider.$tools
-       *
-       * @description
-       * Allows dot notation traversing (Example: object["a.b.c"] in object["a"]["b"]["c"]).
-       * Returns undefined value instead of exception if no key in object.
-       *
-       * @param {Object} object
-       * @param {String} dotedKey
-       * @returns {*|Undefined}
-       */
-      function getValueFromDotedKey(object, dotedKey) {
-        return _getValueFromDotedKey(object, dotedKey);
-      }
-
-      /**
-       * @name parseObjectValues
-       * @memberof source._shared.$toolsProvider.$tools
-       *
-       * @description
-       * Parses keysObject to assign correct values from collection valuesObject.
-       *
-       * @param {Object} keysObject
-       * @param {Object} valuesObject
-       * @returns {Object}
-       */
-      function parseObjectValues(keysObject, valuesObject) {
-        return _parseObjectValues(keysObject, valuesObject);
-      }
-
-      /**
-       * @name setObjectUsingSchema
-       * @memberof source._shared.$toolsProvider.$tools
-       *
-       * @description
-       * Returns an object with values given in "objectSettings" following the pattern given by "objectSchema".
-       * Settings Object will be merged depending on optional variable "mergeOption".
-       *
-       * @param {Object} objectSchema
-       * @param {Object} objectSettings
-       * @param {Boolean|Object} [mergeOption = true] --> If Boolean: true to merge schema, false no merge with schema.
-       *                                              --> If Object, merge with given object.
-       * @returns {Object}
-       */
-      function setObjectUsingSchema(objectSchema, objectSettings, mergeOption) {
-        mergeOption = mergeOption || $.NO_MERGE;
-        return _setObjectUsingSchema(objectSchema, objectSettings, mergeOption);
-      }
-    }
   }
 })();
