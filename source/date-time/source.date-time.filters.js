@@ -16,6 +16,8 @@
      * @namespace untilNow
      * @memberof source.date-time
      *
+     * @requires dateTimeModel
+     *
      * @description
      * Filter that shows human string for elapsed time.
      */
@@ -50,7 +52,9 @@
     }
   }
 
-  function untilNow() {
+  untilNow.$inject = ['dateTimeModel'];
+
+  function untilNow(dateTimeModel) {
     return _untilNow;
 
     /**
@@ -66,7 +70,7 @@
      * @private
      */
     function _untilNow(date) {
-      return (Date.parse(date)) ? moment(date).calendar() : date ;
+      return (Date.parse(date)) ? moment(date).calendar(null, dateTimeModel.momentCalendarFormat) : date ;
     }
   }
 
