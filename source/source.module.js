@@ -17,8 +17,8 @@
       'source._shared',
       'source.api',
       'source.date-time',
-      'source.literals',
       'source.router',
+      'source.static',
       'source.toast',
       'source.translate',
       'source.view-logic'
