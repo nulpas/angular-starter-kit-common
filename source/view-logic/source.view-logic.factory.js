@@ -21,8 +21,12 @@
     var $ = globalConstants.get();
 
     return {
+      /* Global Constants */
       $: $,
-      applyFilter: applyFilter
+      /* View tools */
+      applyFilter: _applyFilter,
+      /* DOM tools */
+      checkElementByClass: _checkElementByClass
     };
 
     /**
@@ -42,18 +46,34 @@
     }
 
     /**
-     * @name applyFilter
+     * @name  _checkElementByClass
      * @memberof source.view-logic.$appView
      *
      * @description
-     * Public method for _applyFilter.
+     * Checks if the given "domElement" contains any of the classes received in parameter "classes".
+     * Parameter "classes" can be string or array of strings.
      *
-     * @param {*} data
-     * @param {String} filterName
-     * @returns {*}
+     * @param {Object} domElement
+     * @param {String|Array} classes
+     * @returns {String|Boolean}
+     * @private
      */
-    function applyFilter(data, filterName) {
-      return _applyFilter(data, filterName);
+    function _checkElementByClass(domElement, classes) {
+      var _output = false;
+      var _classes = classes || null;
+      var _isString = (typeof _classes === 'string');
+      var _isArray = angular.isArray(_classes);
+      if (_isString || _isArray) {
+        _classes = (_isString) ? [classes] : classes ;
+        angular.forEach(_classes, function(item) {
+          if (domElement.classList.contains(item)) {
+            _output = item;
+          }
+        });
+      } else {
+        throw new TypeError('Invalid type of parameter "classes". It must be string or array.');
+      }
+      return _output;
     }
   }
 })();
