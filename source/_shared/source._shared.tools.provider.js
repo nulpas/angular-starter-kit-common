@@ -133,12 +133,14 @@
      */
     function _arrayMerge(array1, array2) {
       if (angular.isArray(array1) && angular.isArray(array2)) {
-        return array2.reduce(function(array, key) {
-          if (array.indexOf(key) < 0) {
-            array.push(key);
+        var _mergedArray = angular.copy(array1);
+        array2.reduce(function(array, value) {
+          if (array.indexOf(value) < 0) {
+            array.push(value);
           }
           return array;
-        }, array1);
+        }, _mergedArray);
+        return _mergedArray;
       } else {
         var error = 'The "_arrayMerge" method expects two array arguments and at least one of them is not array.';
         throw new TypeError(error);

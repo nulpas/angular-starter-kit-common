@@ -51,6 +51,20 @@
 
   angular
     /**
+     * @namespace date-time
+     * @memberof source
+     *
+     * @description
+     * Definition of module "date time" for several tools and filters with datetime data.
+     */
+    .module('source.date-time', []);
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    /**
      * @namespace router
      * @memberof source
      *
@@ -61,20 +75,6 @@
       /* External Modules */
       'ui.router'
     ]);
-})();
-
-(function() {
-  'use strict';
-
-  angular
-    /**
-     * @namespace static
-     * @memberof source
-     *
-     * @description
-     * Module static definition for manage static data in application like literals or config variables.
-     */
-    .module('source.static', []);
 })();
 
 (function() {
@@ -110,6 +110,23 @@
 
   angular
     /**
+     * @namespace toast
+     * @memberof source
+     *
+     * @description
+     * Definition of module "toast" for alert messages services.
+     */
+    .module('source.toast', [
+      /* External Modules */
+      'toastr'
+    ]);
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    /**
      * @namespace translate
      * @memberof source
      *
@@ -124,30 +141,13 @@
 
   angular
     /**
-     * @namespace date-time
+     * @namespace static
      * @memberof source
      *
      * @description
-     * Definition of module "date time" for several tools and filters with datetime data.
+     * Module static definition for manage static data in application like literals or config variables.
      */
-    .module('source.date-time', []);
-})();
-
-(function() {
-  'use strict';
-
-  angular
-    /**
-     * @namespace toast
-     * @memberof source
-     *
-     * @description
-     * Definition of module "toast" for alert messages services.
-     */
-    .module('source.toast', [
-      /* External Modules */
-      'toastr'
-    ]);
+    .module('source.static', []);
 })();
 
 (function() {
@@ -1015,6 +1015,142 @@
   'use strict';
 
   angular
+    .module('source.date-time')
+    /**
+     * @namespace onlyHour
+     * @memberof source.date-time
+     *
+     * @description
+     * Filter that shows hour in "0-24" format for a complete date given.
+     */
+    .filter('onlyHour', onlyHour)
+
+    /**
+     * @namespace untilNow
+     * @memberof source.date-time
+     *
+     * @requires dateTimeModel
+     *
+     * @description
+     * Filter that shows human string for elapsed time.
+     */
+    .filter('untilNow', untilNow)
+
+    /**
+     * @namespace dateReduceHour
+     * @memberof source.date-time
+     *
+     * @description
+     * Filter that shows hour in "0-24" format and date with string month but without year.
+     */
+    .filter('dateReduceHour', dateReduceHour);
+
+  function onlyHour() {
+    return _onlyHour;
+
+    /**
+     * @name _onlyHour
+     * @memberof source.date-time.onlyHour
+     *
+     * @description
+     * Private function for "onlyHour" filter.
+     * Returns date formatted if variable "date" is a valid date or the same input data.
+     *
+     * @param {*} date
+     * @returns {String|*}
+     * @private
+     */
+    function _onlyHour(date) {
+      return (Date.parse(date)) ? moment(date).format('HH:mm') : date ;
+    }
+  }
+
+  untilNow.$inject = ['dateTimeModel'];
+
+  function untilNow(dateTimeModel) {
+    return _untilNow;
+
+    /**
+     * @name _untilNow
+     * @memberof source.date-time.untilNow
+     *
+     * @description
+     * Private function for "untilNow" filter.
+     * Returns locale string expressing elapsed time if variable "date" is a valid date or the same input data.
+     *
+     * @param {*} date
+     * @returns {String|*}
+     * @private
+     */
+    function _untilNow(date) {
+      return (Date.parse(date)) ? moment(date).calendar(null, dateTimeModel.momentCalendarFormat) : date ;
+    }
+  }
+
+  function dateReduceHour() {
+    return _dateReduceHour;
+
+    /**
+     * @name _dateReduceHour
+     * @memberof source.date-time.dateReduceHour
+     *
+     * @description
+     * Private function for "dateReduceHour" filter.
+     * Returns date formatted if variable "date" is a valid date or the same input data.
+     *
+     * @param {*} date
+     * @returns {String|*}
+     * @private
+     */
+    function _dateReduceHour(date) {
+      return (Date.parse(date)) ? moment(date).format('D MMMM - HH:mm') : date ;
+    }
+  }
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    .module('source.date-time')
+    /**
+     * @namespace dateTimeModel
+     * @memberof source.date-time
+     *
+     * @description
+     * Service that defines constants for date time module.
+     */
+    .service('dateTimeModel', dateTimeModel);
+
+  function dateTimeModel() {
+    /* jshint validthis: true */
+    /**
+     * @name momentCalendarFormat
+     * @memberof source.date-time.dateTimeModel
+     *
+     * @type {Object}
+     * @property {String} sameDay
+     * @property {String} nextDay
+     * @property {String} nextWeek
+     * @property {String} lastDay
+     * @property {String} lastWeek
+     * @property {String} sameElse
+     */
+    this.momentCalendarFormat = {
+      sameDay: '[hoy]',
+      nextDay: '[mañana]',
+      nextWeek: '[próximo] dddd',
+      lastDay: '[ayer]',
+      lastWeek: 'dddd [pasado]',
+      sameElse: 'DD/MM/YYYY'
+    };
+  }
+})();
+
+(function() {
+  'use strict';
+
+  angular
   .module('source.router')
   /**
    * @namespace $router
@@ -1063,192 +1199,6 @@
      */
     function resolveStateGo(stateName) {
       _resolveStateGo(stateName);
-    }
-  }
-})();
-
-(function() {
-  'use strict';
-
-  /**
-   * @type Object
-   * @property {String} documentName
-   * @property {String} documentType
-   */
-
-  angular
-    .module('source.static')
-    /**
-     * @namespace $staticProvider
-     * @memberof source.static
-     *
-     * @requires globalConstantsProvider
-     *
-     * @description
-     * Provider statement to manage static variables for application.
-     */
-    .provider('$static', $static);
-
-  $static.$inject = ['globalConstantsProvider'];
-
-  function $static(globalConstantsProvider) {
-    var $ = globalConstantsProvider.get();
-    var _source = null;
-    var _statics = null;
-
-    return {
-      /* Global Constants */
-      $: $,
-      /* Provider LITERALS tools */
-      setSource: setProviderSource,
-      /* API Factory */
-      $get: ['$q', '$api', $get]
-    };
-
-    /**
-     * @name _setSource
-     * @memberof source.static.$staticProvider
-     *
-     * @description
-     * Private method to set JSON source files containing the application static variables.
-     *
-     * @param {String|Array|Object} source
-     * @returns {Array|Object}
-     * @private
-     */
-    function _setSource(source) {
-      var _isStringSource = (typeof source === 'string');
-      if (_isStringSource || angular.isObject(source)) {
-        _source = (_isStringSource) ? [source] : source ;
-      } else {
-        throw new TypeError('Wrong type argument: Static source must be string or array or object.');
-      }
-      return _source;
-    }
-
-    /**
-     * @name setProviderSource
-     * @memberof source.static.$staticProvider
-     *
-     * @description
-     * Provider public function to set JSON source files containing the application static variables.
-     *
-     * @param {String|Array|Object} source
-     * @returns {Array|Object}
-     */
-    function setProviderSource(source) {
-      return _setSource(source);
-    }
-
-    /**
-     * @namespace $static
-     * @memberof source.static.$staticProvider
-     *
-     * @requires $q
-     * @requires $api
-     *
-     * @description
-     * Factory statement to manage static variables for application.
-     */
-    function $get($q, $api) {
-      return {
-        $: $,
-        get: getStatics
-      };
-
-      /**
-       * @name _getStaticPromises
-       * @memberof source.static.$staticProvider.$static
-       *
-       * @description
-       * Build an array with promises of all sources of static variables that are defined in the application.
-       *
-       * @returns {Array}
-       * @private
-       */
-      function _getStaticPromises() {
-        var _isArraySource = (angular.isArray(_source));
-        var _literalPromises = [];
-        angular.forEach(_source, function(itemDir, keyDir) {
-          if (_isArraySource) {
-            var entityObject = $api.createEntityObject({
-              entityName: itemDir,
-              forceToOne: true
-            });
-            _literalPromises.push($api.getLocalEntity(entityObject));
-          } else {
-            angular.forEach(itemDir, function(itemFile) {
-              var entityObject = $api.createEntityObject({
-                entityName: keyDir + '/' + itemFile,
-                forceToOne: true
-              });
-              _literalPromises.push($api.getLocalEntity(entityObject));
-            });
-          }
-        });
-        return _literalPromises;
-      }
-
-      /**
-       * @name _getStatics
-       * @memberof source.static.$staticProvider.$static
-       *
-       * @description
-       * Create a promise with all statics processed and merged into a single object.
-       * Set statics object.
-       *
-       * @returns {Promise}
-       * @private
-       */
-      function _getStatics() {
-        var _promisesToResolve = _getStaticPromises() ;
-        var _itemObject = {};
-        var _defer = $q.defer();
-        _statics = {};
-        $q.all(_promisesToResolve).then(function(success) {
-          angular.forEach(success, function(item) {
-            if (item.hasOwnProperty('documentName') && item.hasOwnProperty('documentType')) {
-              if (!angular.isObject(_itemObject[item.documentName])) {
-                _itemObject[item.documentName] = {};
-              }
-              _itemObject[item.documentName][item.documentType] = item;
-            } else {
-              var errorText = 'No required properties are found in static files';
-              throw new TypeError(errorText + ': "documentName" or "documentType"');
-            }
-            _statics = angular.extend({}, _statics, _itemObject);
-          });
-          _defer.resolve(_statics);
-        });
-        return _defer.promise;
-      }
-
-      /**
-       * @name getStatics
-       * @memberof source.static.$staticProvider.$static
-       *
-       * @description
-       * Returns literals object or its promise depending on whether the static variables have been set.
-       *
-       * @param {String} property
-       * @returns {Object|Promise}
-       */
-      function getStatics(property) {
-        var _property = property || null;
-        var output = null;
-        if (_statics && _property) {
-          if (_statics.hasOwnProperty(property)) {
-            output = _statics[property];
-          } else {
-            throw new ReferenceError('Trying to get statics property that does not exist: ("' + property + '")');
-          }
-        } else if (_statics) {
-          output = _statics;
-        } else {
-          output = _getStatics();
-        }
-        return output;
-      }
     }
   }
 })();
@@ -1834,12 +1784,14 @@
      */
     function _arrayMerge(array1, array2) {
       if (angular.isArray(array1) && angular.isArray(array2)) {
-        return array2.reduce(function(array, key) {
-          if (array.indexOf(key) < 0) {
-            array.push(key);
+        var _mergedArray = angular.copy(array1);
+        array2.reduce(function(array, value) {
+          if (array.indexOf(value) < 0) {
+            array.push(value);
           }
           return array;
-        }, array1);
+        }, _mergedArray);
+        return _mergedArray;
       } else {
         var error = 'The "_arrayMerge" method expects two array arguments and at least one of them is not array.';
         throw new TypeError(error);
@@ -2144,6 +2096,224 @@
       function setObjectUsingSchema(objectSchema, objectSettings, mergeOption) {
         mergeOption = mergeOption || $.NO_MERGE;
         return _setObjectUsingSchema(objectSchema, objectSettings, mergeOption);
+      }
+    }
+  }
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    .module('source.toast')
+    /**
+     * @namespace toastModelProvider
+     * @memberof source.toast
+     *
+     * @description
+     * Provider that gets constants for toast services.
+     */
+    .provider('toastModel', toastModel);
+
+  toastModel.$inject = ['$toolsProvider'];
+
+  function toastModel($toolsProvider) {
+    var _constants = {
+      SUCCESS: 'SUCCESS',
+      INFO: 'INFO',
+      WARNING: 'WARNING',
+      ERROR: 'ERROR'
+    };
+    var $ = angular.extend({}, _constants, $toolsProvider.$);
+
+    return {
+      $: $,
+      $get: ['toastr', $get]
+    };
+
+    /**
+     * @namespace toastModel
+     * @memberof source.toast.toastModelProvider
+     *
+     * @requires toastr
+     *
+     * @description
+     * Factory that gets constants for toast services.
+     */
+    function $get(toastr) {
+      var _serviceModel = {
+        SUCCESS: toastr.success,
+        INFO: toastr.info,
+        WARNING: toastr.warning,
+        ERROR: toastr.error
+      };
+
+      return {
+        $: $,
+        get: getFactory
+      };
+
+      /**
+       * @name getFactory
+       * @memberof source.toast.toastModelProvider.toastModel
+       *
+       * @description
+       * Returns API model for Factory service.
+       *
+       * @returns {Object}
+       */
+      function getFactory() {
+        return _serviceModel;
+      }
+    }
+  }
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    .module('source.toast')
+    /**
+     * @namespace $alertProvider
+     * @memberof source.toast
+     *
+     * @description
+     * Provider custom statement to use toast alert's messages.
+     */
+    .provider('$alert', $alert);
+
+  $alert.$inject = ['toastModelProvider'];
+
+  function $alert(toastModelProvider) {
+    var $ = toastModelProvider.$;
+    var _toastOptions = {
+      timeOut: 9999
+    };
+
+    return {
+      $: $,
+      setDuration: _setDuration,
+      $get: ['toastModel', $get]
+    };
+
+    /**
+     * @name _setDuration
+     * @memberof source.toast.$alertProvider
+     *
+     * @description
+     * Set duration of toast message for provider configuration.
+     *
+     * @param {Integer} time
+     * @private
+     */
+    function _setDuration(time) {
+      _toastOptions.timeOut = time;
+    }
+
+    /**
+     * @name _launchToast
+     * @memberof source.toast.$alertProvider
+     *
+     * @description
+     * Launch angular-toaster alert message.
+     *
+     * @param {Object} toastFactoryModel
+     * @param {String|Array} message
+     * @param {String} type
+     * @param {String|Undefined} title
+     * @param {Integer|Undefined} duration
+     * @private
+     */
+    function _launchToast(toastFactoryModel, message, type, title, duration) {
+      if (title !== undefined && typeof title !== 'string' && !duration) {
+        duration = title;
+        title = undefined;
+      }
+
+      var toastOptions = (duration) ? angular.extend({}, _toastOptions, { timeOut: duration }) : _toastOptions ;
+      message = (angular.isArray(message)) ? message.join('<br>') : message ;
+      toastFactoryModel[type](message, title, toastOptions);
+    }
+
+    /**
+     * @namespace $alert
+     * @memberof source.toast.$alertProvider
+     *
+     * @requires toastr
+     *
+     * @description
+     * Factory statement for toast alert's messages.
+     */
+    function $get(toastModel) {
+      var toastFactoryModel = toastModel.get();
+
+      return {
+        $: $,
+        success: success,
+        info: info,
+        warning: warning,
+        error: error
+      };
+
+      /**
+       * @name success
+       * @memberof source.toast.$alertProvider.$alert
+       *
+       * @description
+       * Displays success toast message.
+       *
+       * @param {String} message
+       * @param {String} title
+       * @param {Integer|Undefined} duration
+       */
+      function success(message, title, duration) {
+        _launchToast(toastFactoryModel, message, $.SUCCESS, title, duration);
+      }
+
+      /**
+       * @name info
+       * @memberof source.toast.$alertProvider.$alert
+       *
+       * @description
+       * Displays info toast message.
+       *
+       * @param {String} message
+       * @param {String} title
+       * @param {Integer|Undefined} duration
+       */
+      function info(message, title, duration) {
+        _launchToast(toastFactoryModel, message, $.INFO, title, duration);
+      }
+
+      /**
+       * @name warning
+       * @memberof source.toast.$alertProvider.$alert
+       *
+       * @description
+       * Displays warning toast message.
+       *
+       * @param {String} message
+       * @param {String} title
+       * @param {Integer|Undefined} duration
+       */
+      function warning(message, title, duration) {
+        _launchToast(toastFactoryModel, message, $.WARNING, title, duration);
+      }
+
+      /**
+       * @name error
+       * @memberof source.toast.$alertProvider.$alert
+       *
+       * @description
+       * Displays error toast message.
+       *
+       * @param {String} message
+       * @param {String} title
+       * @param {Integer|Undefined} duration
+       */
+      function error(message, title, duration) {
+        _launchToast(toastFactoryModel, message, $.ERROR, title, duration);
       }
     }
   }
@@ -2488,352 +2658,184 @@
 (function() {
   'use strict';
 
-  angular
-    .module('source.date-time')
-    /**
-     * @namespace onlyHour
-     * @memberof source.date-time
-     *
-     * @description
-     * Filter that shows hour in "0-24" format for a complete date given.
-     */
-    .filter('onlyHour', onlyHour)
-
-    /**
-     * @namespace untilNow
-     * @memberof source.date-time
-     *
-     * @requires dateTimeModel
-     *
-     * @description
-     * Filter that shows human string for elapsed time.
-     */
-    .filter('untilNow', untilNow)
-
-    /**
-     * @namespace dateReduceHour
-     * @memberof source.date-time
-     *
-     * @description
-     * Filter that shows hour in "0-24" format and date with string month but without year.
-     */
-    .filter('dateReduceHour', dateReduceHour);
-
-  function onlyHour() {
-    return _onlyHour;
-
-    /**
-     * @name _onlyHour
-     * @memberof source.date-time.onlyHour
-     *
-     * @description
-     * Private function for "onlyHour" filter.
-     * Returns date formatted if variable "date" is a valid date or the same input data.
-     *
-     * @param {*} date
-     * @returns {String|*}
-     * @private
-     */
-    function _onlyHour(date) {
-      return (Date.parse(date)) ? moment(date).format('HH:mm') : date ;
-    }
-  }
-
-  untilNow.$inject = ['dateTimeModel'];
-
-  function untilNow(dateTimeModel) {
-    return _untilNow;
-
-    /**
-     * @name _untilNow
-     * @memberof source.date-time.untilNow
-     *
-     * @description
-     * Private function for "untilNow" filter.
-     * Returns locale string expressing elapsed time if variable "date" is a valid date or the same input data.
-     *
-     * @param {*} date
-     * @returns {String|*}
-     * @private
-     */
-    function _untilNow(date) {
-      return (Date.parse(date)) ? moment(date).calendar(null, dateTimeModel.momentCalendarFormat) : date ;
-    }
-  }
-
-  function dateReduceHour() {
-    return _dateReduceHour;
-
-    /**
-     * @name _dateReduceHour
-     * @memberof source.date-time.dateReduceHour
-     *
-     * @description
-     * Private function for "dateReduceHour" filter.
-     * Returns date formatted if variable "date" is a valid date or the same input data.
-     *
-     * @param {*} date
-     * @returns {String|*}
-     * @private
-     */
-    function _dateReduceHour(date) {
-      return (Date.parse(date)) ? moment(date).format('D MMMM - HH:mm') : date ;
-    }
-  }
-})();
-
-(function() {
-  'use strict';
+  /**
+   * @type Object
+   * @property {String} documentName
+   * @property {String} documentType
+   */
 
   angular
-    .module('source.date-time')
+    .module('source.static')
     /**
-     * @namespace dateTimeModel
-     * @memberof source.date-time
+     * @namespace $staticProvider
+     * @memberof source.static
+     *
+     * @requires globalConstantsProvider
      *
      * @description
-     * Service that defines constants for date time module.
+     * Provider statement to manage static variables for application.
      */
-    .service('dateTimeModel', dateTimeModel);
+    .provider('$static', $static);
 
-  function dateTimeModel() {
-    /* jshint validthis: true */
-    /**
-     * @name momentCalendarFormat
-     * @memberof source.date-time.dateTimeModel
-     *
-     * @type {Object}
-     * @property {String} sameDay
-     * @property {String} nextDay
-     * @property {String} nextWeek
-     * @property {String} lastDay
-     * @property {String} lastWeek
-     * @property {String} sameElse
-     */
-    this.momentCalendarFormat = {
-      sameDay: '[hoy]',
-      nextDay: '[mañana]',
-      nextWeek: '[próximo] dddd',
-      lastDay: '[ayer]',
-      lastWeek: 'dddd [pasado]',
-      sameElse: 'DD/MM/YYYY'
-    };
-  }
-})();
+  $static.$inject = ['globalConstantsProvider'];
 
-(function() {
-  'use strict';
-
-  angular
-    .module('source.toast')
-    /**
-     * @namespace toastModelProvider
-     * @memberof source.toast
-     *
-     * @description
-     * Provider that gets constants for toast services.
-     */
-    .provider('toastModel', toastModel);
-
-  toastModel.$inject = ['$toolsProvider'];
-
-  function toastModel($toolsProvider) {
-    var _constants = {
-      SUCCESS: 'SUCCESS',
-      INFO: 'INFO',
-      WARNING: 'WARNING',
-      ERROR: 'ERROR'
-    };
-    var $ = angular.extend({}, _constants, $toolsProvider.$);
+  function $static(globalConstantsProvider) {
+    var $ = globalConstantsProvider.get();
+    var _source = null;
+    var _statics = null;
 
     return {
+      /* Global Constants */
       $: $,
-      $get: ['toastr', $get]
+      /* Provider LITERALS tools */
+      setSource: setProviderSource,
+      /* API Factory */
+      $get: ['$q', '$api', $get]
     };
 
     /**
-     * @namespace toastModel
-     * @memberof source.toast.toastModelProvider
-     *
-     * @requires toastr
+     * @name _setSource
+     * @memberof source.static.$staticProvider
      *
      * @description
-     * Factory that gets constants for toast services.
-     */
-    function $get(toastr) {
-      var _serviceModel = {
-        SUCCESS: toastr.success,
-        INFO: toastr.info,
-        WARNING: toastr.warning,
-        ERROR: toastr.error
-      };
-
-      return {
-        $: $,
-        get: getFactory
-      };
-
-      /**
-       * @name getFactory
-       * @memberof source.toast.toastModelProvider.toastModel
-       *
-       * @description
-       * Returns API model for Factory service.
-       *
-       * @returns {Object}
-       */
-      function getFactory() {
-        return _serviceModel;
-      }
-    }
-  }
-})();
-
-(function() {
-  'use strict';
-
-  angular
-    .module('source.toast')
-    /**
-     * @namespace $alertProvider
-     * @memberof source.toast
+     * Private method to set JSON source files containing the application static variables.
      *
-     * @description
-     * Provider custom statement to use toast alert's messages.
-     */
-    .provider('$alert', $alert);
-
-  $alert.$inject = ['toastModelProvider'];
-
-  function $alert(toastModelProvider) {
-    var $ = toastModelProvider.$;
-    var _toastOptions = {
-      timeOut: 9999
-    };
-
-    return {
-      $: $,
-      setDuration: _setDuration,
-      $get: ['toastModel', $get]
-    };
-
-    /**
-     * @name _setDuration
-     * @memberof source.toast.$alertProvider
-     *
-     * @description
-     * Set duration of toast message for provider configuration.
-     *
-     * @param {Integer} time
+     * @param {String|Array|Object} source
+     * @returns {Array|Object}
      * @private
      */
-    function _setDuration(time) {
-      _toastOptions.timeOut = time;
-    }
-
-    /**
-     * @name _launchToast
-     * @memberof source.toast.$alertProvider
-     *
-     * @description
-     * Launch angular-toaster alert message.
-     *
-     * @param {Object} toastFactoryModel
-     * @param {String|Array} message
-     * @param {String} type
-     * @param {String|Undefined} title
-     * @param {Integer|Undefined} duration
-     * @private
-     */
-    function _launchToast(toastFactoryModel, message, type, title, duration) {
-      if (title !== undefined && typeof title !== 'string' && !duration) {
-        duration = title;
-        title = undefined;
+    function _setSource(source) {
+      var _isStringSource = (typeof source === 'string');
+      if (_isStringSource || angular.isObject(source)) {
+        _source = (_isStringSource) ? [source] : source ;
+      } else {
+        throw new TypeError('Wrong type argument: Static source must be string or array or object.');
       }
-
-      var toastOptions = (duration) ? angular.extend({}, _toastOptions, { timeOut: duration }) : _toastOptions ;
-      message = (angular.isArray(message)) ? message.join('<br>') : message ;
-      toastFactoryModel[type](message, title, toastOptions);
+      return _source;
     }
 
     /**
-     * @namespace $alert
-     * @memberof source.toast.$alertProvider
-     *
-     * @requires toastr
+     * @name setProviderSource
+     * @memberof source.static.$staticProvider
      *
      * @description
-     * Factory statement for toast alert's messages.
+     * Provider public function to set JSON source files containing the application static variables.
+     *
+     * @param {String|Array|Object} source
+     * @returns {Array|Object}
      */
-    function $get(toastModel) {
-      var toastFactoryModel = toastModel.get();
+    function setProviderSource(source) {
+      return _setSource(source);
+    }
 
+    /**
+     * @namespace $static
+     * @memberof source.static.$staticProvider
+     *
+     * @requires $q
+     * @requires $api
+     *
+     * @description
+     * Factory statement to manage static variables for application.
+     */
+    function $get($q, $api) {
       return {
         $: $,
-        success: success,
-        info: info,
-        warning: warning,
-        error: error
+        get: getStatics
       };
 
       /**
-       * @name success
-       * @memberof source.toast.$alertProvider.$alert
+       * @name _getStaticPromises
+       * @memberof source.static.$staticProvider.$static
        *
        * @description
-       * Displays success toast message.
+       * Build an array with promises of all sources of static variables that are defined in the application.
        *
-       * @param {String} message
-       * @param {String} title
-       * @param {Integer|Undefined} duration
+       * @returns {Array}
+       * @private
        */
-      function success(message, title, duration) {
-        _launchToast(toastFactoryModel, message, $.SUCCESS, title, duration);
+      function _getStaticPromises() {
+        var _isArraySource = (angular.isArray(_source));
+        var _literalPromises = [];
+        angular.forEach(_source, function(itemDir, keyDir) {
+          if (_isArraySource) {
+            var entityObject = $api.createEntityObject({
+              entityName: itemDir,
+              forceToOne: true
+            });
+            _literalPromises.push($api.getLocalEntity(entityObject));
+          } else {
+            angular.forEach(itemDir, function(itemFile) {
+              var entityObject = $api.createEntityObject({
+                entityName: keyDir + '/' + itemFile,
+                forceToOne: true
+              });
+              _literalPromises.push($api.getLocalEntity(entityObject));
+            });
+          }
+        });
+        return _literalPromises;
       }
 
       /**
-       * @name info
-       * @memberof source.toast.$alertProvider.$alert
+       * @name _getStatics
+       * @memberof source.static.$staticProvider.$static
        *
        * @description
-       * Displays info toast message.
+       * Create a promise with all statics processed and merged into a single object.
+       * Set statics object.
        *
-       * @param {String} message
-       * @param {String} title
-       * @param {Integer|Undefined} duration
+       * @returns {Promise}
+       * @private
        */
-      function info(message, title, duration) {
-        _launchToast(toastFactoryModel, message, $.INFO, title, duration);
+      function _getStatics() {
+        var _promisesToResolve = _getStaticPromises() ;
+        var _itemObject = {};
+        var _defer = $q.defer();
+        _statics = {};
+        $q.all(_promisesToResolve).then(function(success) {
+          angular.forEach(success, function(item) {
+            if (item.hasOwnProperty('documentName') && item.hasOwnProperty('documentType')) {
+              if (!angular.isObject(_itemObject[item.documentName])) {
+                _itemObject[item.documentName] = {};
+              }
+              _itemObject[item.documentName][item.documentType] = item;
+            } else {
+              var errorText = 'No required properties are found in static files';
+              throw new TypeError(errorText + ': "documentName" or "documentType"');
+            }
+            _statics = angular.extend({}, _statics, _itemObject);
+          });
+          _defer.resolve(_statics);
+        });
+        return _defer.promise;
       }
 
       /**
-       * @name warning
-       * @memberof source.toast.$alertProvider.$alert
+       * @name getStatics
+       * @memberof source.static.$staticProvider.$static
        *
        * @description
-       * Displays warning toast message.
+       * Returns literals object or its promise depending on whether the static variables have been set.
        *
-       * @param {String} message
-       * @param {String} title
-       * @param {Integer|Undefined} duration
+       * @param {String} property
+       * @returns {Object|Promise}
        */
-      function warning(message, title, duration) {
-        _launchToast(toastFactoryModel, message, $.WARNING, title, duration);
-      }
-
-      /**
-       * @name error
-       * @memberof source.toast.$alertProvider.$alert
-       *
-       * @description
-       * Displays error toast message.
-       *
-       * @param {String} message
-       * @param {String} title
-       * @param {Integer|Undefined} duration
-       */
-      function error(message, title, duration) {
-        _launchToast(toastFactoryModel, message, $.ERROR, title, duration);
+      function getStatics(property) {
+        var _property = property || null;
+        var output = null;
+        if (_statics && _property) {
+          if (_statics.hasOwnProperty(property)) {
+            output = _statics[property];
+          } else {
+            throw new ReferenceError('Trying to get statics property that does not exist: ("' + property + '")');
+          }
+        } else if (_statics) {
+          output = _statics;
+        } else {
+          output = _getStatics();
+        }
+        return output;
       }
     }
   }

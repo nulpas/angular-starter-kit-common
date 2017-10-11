@@ -1,7 +1,7 @@
 {
   "name": "angular-toolpas",
   "description": "Angular Tool Box dependency",
-  "version": "0.9.28",
+  "version": "0.9.29",
   "main": "./release/angular-toolpas.js",
   "repository": {
     "type": "git",
