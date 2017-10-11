@@ -10,7 +10,7 @@
   angular
     .module('source.static')
     /**
-     * @namespace $static
+     * @namespace $staticProvider
      * @memberof source.static
      *
      * @requires globalConstantsProvider

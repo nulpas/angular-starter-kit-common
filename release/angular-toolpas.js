@@ -51,20 +51,6 @@
 
   angular
     /**
-     * @namespace date-time
-     * @memberof source
-     *
-     * @description
-     * Definition of module "date time" for several tools and filters with datetime data.
-     */
-    .module('source.date-time', []);
-})();
-
-(function() {
-  'use strict';
-
-  angular
-    /**
      * @namespace router
      * @memberof source
      *
@@ -96,37 +82,6 @@
 
   angular
     /**
-     * @namespace toast
-     * @memberof source
-     *
-     * @description
-     * Definition of module "toast" for alert messages services.
-     */
-    .module('source.toast', [
-      /* External Modules */
-      'toastr'
-    ]);
-})();
-
-(function() {
-  'use strict';
-
-  angular
-    /**
-     * @namespace translate
-     * @memberof source
-     *
-     * @description
-     * Definition of module "translate" for translation services.
-     */
-    .module('source.translate', []);
-})();
-
-(function() {
-  'use strict';
-
-  angular
-    /**
      * @namespace view-logic
      * @memberof source
      *
@@ -148,6 +103,51 @@
      * Definition of module "_shared" for common minor services.
      */
     .module('source._shared', []);
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    /**
+     * @namespace translate
+     * @memberof source
+     *
+     * @description
+     * Definition of module "translate" for translation services.
+     */
+    .module('source.translate', []);
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    /**
+     * @namespace date-time
+     * @memberof source
+     *
+     * @description
+     * Definition of module "date time" for several tools and filters with datetime data.
+     */
+    .module('source.date-time', []);
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    /**
+     * @namespace toast
+     * @memberof source
+     *
+     * @description
+     * Definition of module "toast" for alert messages services.
+     */
+    .module('source.toast', [
+      /* External Modules */
+      'toastr'
+    ]);
 })();
 
 (function() {
@@ -1015,142 +1015,6 @@
   'use strict';
 
   angular
-    .module('source.date-time')
-    /**
-     * @namespace onlyHour
-     * @memberof source.date-time
-     *
-     * @description
-     * Filter that shows hour in "0-24" format for a complete date given.
-     */
-    .filter('onlyHour', onlyHour)
-
-    /**
-     * @namespace untilNow
-     * @memberof source.date-time
-     *
-     * @requires dateTimeModel
-     *
-     * @description
-     * Filter that shows human string for elapsed time.
-     */
-    .filter('untilNow', untilNow)
-
-    /**
-     * @namespace dateReduceHour
-     * @memberof source.date-time
-     *
-     * @description
-     * Filter that shows hour in "0-24" format and date with string month but without year.
-     */
-    .filter('dateReduceHour', dateReduceHour);
-
-  function onlyHour() {
-    return _onlyHour;
-
-    /**
-     * @name _onlyHour
-     * @memberof source.date-time.onlyHour
-     *
-     * @description
-     * Private function for "onlyHour" filter.
-     * Returns date formatted if variable "date" is a valid date or the same input data.
-     *
-     * @param {*} date
-     * @returns {String|*}
-     * @private
-     */
-    function _onlyHour(date) {
-      return (Date.parse(date)) ? moment(date).format('HH:mm') : date ;
-    }
-  }
-
-  untilNow.$inject = ['dateTimeModel'];
-
-  function untilNow(dateTimeModel) {
-    return _untilNow;
-
-    /**
-     * @name _untilNow
-     * @memberof source.date-time.untilNow
-     *
-     * @description
-     * Private function for "untilNow" filter.
-     * Returns locale string expressing elapsed time if variable "date" is a valid date or the same input data.
-     *
-     * @param {*} date
-     * @returns {String|*}
-     * @private
-     */
-    function _untilNow(date) {
-      return (Date.parse(date)) ? moment(date).calendar(null, dateTimeModel.momentCalendarFormat) : date ;
-    }
-  }
-
-  function dateReduceHour() {
-    return _dateReduceHour;
-
-    /**
-     * @name _dateReduceHour
-     * @memberof source.date-time.dateReduceHour
-     *
-     * @description
-     * Private function for "dateReduceHour" filter.
-     * Returns date formatted if variable "date" is a valid date or the same input data.
-     *
-     * @param {*} date
-     * @returns {String|*}
-     * @private
-     */
-    function _dateReduceHour(date) {
-      return (Date.parse(date)) ? moment(date).format('D MMMM - HH:mm') : date ;
-    }
-  }
-})();
-
-(function() {
-  'use strict';
-
-  angular
-    .module('source.date-time')
-    /**
-     * @namespace dateTimeModel
-     * @memberof source.date-time
-     *
-     * @description
-     * Service that defines constants for date time module.
-     */
-    .service('dateTimeModel', dateTimeModel);
-
-  function dateTimeModel() {
-    /* jshint validthis: true */
-    /**
-     * @name momentCalendarFormat
-     * @memberof source.date-time.dateTimeModel
-     *
-     * @type {Object}
-     * @property {String} sameDay
-     * @property {String} nextDay
-     * @property {String} nextWeek
-     * @property {String} lastDay
-     * @property {String} lastWeek
-     * @property {String} sameElse
-     */
-    this.momentCalendarFormat = {
-      sameDay: '[hoy]',
-      nextDay: '[mañana]',
-      nextWeek: '[próximo] dddd',
-      lastDay: '[ayer]',
-      lastWeek: 'dddd [pasado]',
-      sameElse: 'DD/MM/YYYY'
-    };
-  }
-})();
-
-(function() {
-  'use strict';
-
-  angular
   .module('source.router')
   /**
    * @namespace $router
@@ -1215,7 +1079,7 @@
   angular
     .module('source.static')
     /**
-     * @namespace $static
+     * @namespace $staticProvider
      * @memberof source.static
      *
      * @requires globalConstantsProvider
@@ -1393,553 +1257,100 @@
   'use strict';
 
   angular
-    .module('source.toast')
+    .module('source.view-logic')
     /**
-     * @namespace toastModelProvider
-     * @memberof source.toast
+     * @namespace appViewModelProvider
+     * @memberof source.view-logic
+     *
+     * @requires $toolsProvider
      *
      * @description
-     * Provider that gets constants for toast services.
+     * Provider that gets constants and models for appView services.
      */
-    .provider('toastModel', toastModel);
+    .provider('appViewModel', appViewModel);
 
-  toastModel.$inject = ['$toolsProvider'];
+  appViewModel.$inject = ['$toolsProvider'];
 
-  function toastModel($toolsProvider) {
+  function appViewModel($toolsProvider) {
     var _constants = {
-      SUCCESS: 'SUCCESS',
-      INFO: 'INFO',
-      WARNING: 'WARNING',
-      ERROR: 'ERROR'
+      SHOW: 1,
+      HIDE: 2
     };
     var $ = angular.extend({}, _constants, $toolsProvider.$);
 
+    var _providerModel = {
+      schemas: {
+        domHandler: {
+          classToShow: null,
+          classToHide: null
+        }
+      }
+    };
+
     return {
       $: $,
-      $get: ['toastr', $get]
+      get: _getProvider,
+      $get: [$get]
     };
 
     /**
-     * @namespace toastModel
-     * @memberof source.toast.toastModelProvider
-     *
-     * @requires toastr
+     * @name _getModelSource
+     * @memberof source.view-logic.appViewProvider
      *
      * @description
-     * Factory that gets constants for toast services.
+     * Returns appView model depending on the applicant: Provider or Service.
+     *
+     * @param {Boolean} source
+     * @param {Object} [factoryModel = null]
+     * @returns {Object}
+     * @private
      */
-    function $get(toastr) {
-      var _serviceModel = {
-        SUCCESS: toastr.success,
-        INFO: toastr.info,
-        WARNING: toastr.warning,
-        ERROR: toastr.error
-      };
+    function _getModelSource(source, factoryModel) {
+      factoryModel = factoryModel || null;
+      return (source === $.PROVIDER) ? _providerModel : angular.extend({}, _providerModel, factoryModel) ;
+    }
 
+    /**
+     * @name _getProvider
+     * @memberof source.view-logic.appViewProvider
+     *
+     * @description
+     * Returns appView model for Provider.
+     *
+     * @returns {Object}
+     * @private
+     */
+    function _getProvider() {
+      return _getModelSource($.PROVIDER);
+    }
+
+    /**
+     * @namespace appView
+     * @memberof source.view-logic.appViewProvider
+     *
+     * @description
+     * Factory that gets constants and models for appView services.
+     */
+    function $get() {
       return {
         $: $,
-        get: getFactory
+        get: _getFactory
       };
 
       /**
-       * @name getFactory
-       * @memberof source.toast.toastModelProvider.toastModel
+       * @name _getFactory
+       * @memberof source.view-logic.appViewProvider.appView
        *
        * @description
-       * Returns API model for Factory service.
+       * Returns appView model for Provider.
        *
        * @returns {Object}
-       */
-      function getFactory() {
-        return _serviceModel;
-      }
-    }
-  }
-})();
-
-(function() {
-  'use strict';
-
-  angular
-    .module('source.toast')
-    /**
-     * @namespace $alertProvider
-     * @memberof source.toast
-     *
-     * @description
-     * Provider custom statement to use toast alert's messages.
-     */
-    .provider('$alert', $alert);
-
-  $alert.$inject = ['toastModelProvider'];
-
-  function $alert(toastModelProvider) {
-    var $ = toastModelProvider.$;
-    var _toastOptions = {
-      timeOut: 9999
-    };
-
-    return {
-      $: $,
-      setDuration: _setDuration,
-      $get: ['toastModel', $get]
-    };
-
-    /**
-     * @name _setDuration
-     * @memberof source.toast.$alertProvider
-     *
-     * @description
-     * Set duration of toast message for provider configuration.
-     *
-     * @param {Integer} time
-     * @private
-     */
-    function _setDuration(time) {
-      _toastOptions.timeOut = time;
-    }
-
-    /**
-     * @name _launchToast
-     * @memberof source.toast.$alertProvider
-     *
-     * @description
-     * Launch angular-toaster alert message.
-     *
-     * @param {Object} toastFactoryModel
-     * @param {String|Array} message
-     * @param {String} type
-     * @param {String|Undefined} title
-     * @param {Integer|Undefined} duration
-     * @private
-     */
-    function _launchToast(toastFactoryModel, message, type, title, duration) {
-      if (title !== undefined && typeof title !== 'string' && !duration) {
-        duration = title;
-        title = undefined;
-      }
-
-      var toastOptions = (duration) ? angular.extend({}, _toastOptions, { timeOut: duration }) : _toastOptions ;
-      message = (angular.isArray(message)) ? message.join('<br>') : message ;
-      toastFactoryModel[type](message, title, toastOptions);
-    }
-
-    /**
-     * @namespace $alert
-     * @memberof source.toast.$alertProvider
-     *
-     * @requires toastr
-     *
-     * @description
-     * Factory statement for toast alert's messages.
-     */
-    function $get(toastModel) {
-      var toastFactoryModel = toastModel.get();
-
-      return {
-        $: $,
-        success: success,
-        info: info,
-        warning: warning,
-        error: error
-      };
-
-      /**
-       * @name success
-       * @memberof source.toast.$alertProvider.$alert
-       *
-       * @description
-       * Displays success toast message.
-       *
-       * @param {String} message
-       * @param {String} title
-       * @param {Integer|Undefined} duration
-       */
-      function success(message, title, duration) {
-        _launchToast(toastFactoryModel, message, $.SUCCESS, title, duration);
-      }
-
-      /**
-       * @name info
-       * @memberof source.toast.$alertProvider.$alert
-       *
-       * @description
-       * Displays info toast message.
-       *
-       * @param {String} message
-       * @param {String} title
-       * @param {Integer|Undefined} duration
-       */
-      function info(message, title, duration) {
-        _launchToast(toastFactoryModel, message, $.INFO, title, duration);
-      }
-
-      /**
-       * @name warning
-       * @memberof source.toast.$alertProvider.$alert
-       *
-       * @description
-       * Displays warning toast message.
-       *
-       * @param {String} message
-       * @param {String} title
-       * @param {Integer|Undefined} duration
-       */
-      function warning(message, title, duration) {
-        _launchToast(toastFactoryModel, message, $.WARNING, title, duration);
-      }
-
-      /**
-       * @name error
-       * @memberof source.toast.$alertProvider.$alert
-       *
-       * @description
-       * Displays error toast message.
-       *
-       * @param {String} message
-       * @param {String} title
-       * @param {Integer|Undefined} duration
-       */
-      function error(message, title, duration) {
-        _launchToast(toastFactoryModel, message, $.ERROR, title, duration);
-      }
-    }
-  }
-})();
-
-(function() {
-  'use strict';
-
-  angular
-    .module('source.translate', [])
-    /**
-     * @namespace translate
-     * @memberof source.translate
-     *
-     * @requires $translate
-     *
-     * @description
-     * Filter for translating labels.
-     */
-    .filter('translate', translate);
-
-  translate.$inject = ['$translate'];
-
-  function translate($translate) {
-    return function(input) {
-      return $translate.getTranslations()[input] !== undefined ? $translate.getTranslations()[input] : input;
-    };
-  }
-})();
-
-(function() {
-  'use strict';
-
-  angular
-    .module('source.translate')
-    /**
-     * @namespace $translateProvider
-     * @memberof source.translate
-     *
-     * @requires $apiProvider
-     *
-     * @description
-     * Provider definition for translation labels.
-     */
-    .provider('$translate', $translate);
-
-  $translate.$inject = ['$apiProvider'];
-
-  function $translate($apiProvider) {
-    var _translateConfig = {
-      apiTranslationSource: null,
-      apiTranslationSections: null,
-      localTranslationSource: null,
-      localTranslationSections: null,
-      preferredDefaultLanguage: null
-    };
-
-    return {
-      setApiTranslationSource: setApiTranslationSource,
-      setApiTranslationSections: setApiTranslationSections,
-      setLocalTranslationSource: setLocalTranslationSource,
-      setLocalTranslationSections: setLocalTranslationSections,
-      setPreferredLanguage: setPreferredLanguage,
-      $get: ['$api', 'availableLanguages', $get]
-    };
-
-    /**
-     * @name _setTranslationConfigProperty
-     * @memberof source.translate.$translateProvider
-     *
-     * @description
-     * Set configurations for _translateConfig object.
-     *
-     * @param {String} configKey
-     * @param {String|Object} value
-     * @returns {Object}
-     * @private
-     */
-    function _setTranslationConfigProperty(configKey, value) {
-      value = (typeof value === 'string') ? $apiProvider.createEntityObject({ entityName: value }) : value ;
-      if (value && typeof value === 'object') {
-        _translateConfig[configKey] = value;
-        return _translateConfig;
-      } else {
-        throw new Error('Lost parameter or type parameter wrong');
-      }
-    }
-
-    /**
-     * @name setApiTranslationSource
-     * @memberof source.translate.$translateProvider
-     *
-     * @description
-     * Set entity name for calling API to return translation labels.
-     *
-     * @param {String} entityName
-     * @returns {Object}
-     */
-    function setApiTranslationSource(entityName) {
-      return _setTranslationConfigProperty('apiTranslationSource', entityName);
-    }
-
-    /**
-     * @name setApiTranslationSections
-     * @memberof source.translate.$translateProvider
-     *
-     * @description
-     * Set sections from API response where will be found translations labels.
-     *
-     * @param {Object} sections
-     * @returns {Object}
-     */
-    function setApiTranslationSections(sections) {
-      return _setTranslationConfigProperty('apiTranslationSections', sections);
-    }
-
-    /**
-     * @name setLocalTranslationSource
-     * @memberof source.translate.$translateProvider
-     *
-     * @description
-     * Set file name for local JSON file where we will be found translation labels.
-     *
-     * @param {String} jsonFileName
-     * @returns {Object}
-     */
-    function setLocalTranslationSource(jsonFileName) {
-      return _setTranslationConfigProperty('localTranslationSource', jsonFileName);
-    }
-
-    /**
-     * @name setLocalTranslationSections
-     * @memberof source.translate.$translateProvider
-     *
-     * @description
-     * Set sections from local JSON file where will be found translations labels.
-     *
-     * @param {Object} sections
-     * @returns {Object}
-     */
-    function setLocalTranslationSections(sections) {
-      return _setTranslationConfigProperty('localTranslationSections', sections);
-    }
-
-    /**
-     * @name setPreferredLanguage
-     * @memberof source.translate.$translateProvider
-     *
-     * @description
-     * Set chosen language for application, defined by a locale code.
-     *
-     * @param {String} preferredLocale --> Locale code
-     * @returns {Object}
-     */
-    function setPreferredLanguage(preferredLocale) {
-      _translateConfig.preferredDefaultLanguage = preferredLocale;
-      return _translateConfig;
-    }
-
-    /**
-     * @namespace $translate
-     * @memberof source.translate.$translateProvider
-     *
-     * @requires $api
-     * @requires availableLanguages
-     *
-     * @description
-     * Factory definition for translation labels.
-     */
-    function $get($api, availableLanguages) {
-      var _translations = {};
-      var _appLanguage = null;
-
-      var $apiConstants = $api.$;
-
-      return {
-        initTranslationModule: initTranslationModule,
-        getTranslations: getTranslations,
-        getActualLanguage: getActualLanguage,
-        getAvailableLanguages: getAvailableLanguages
-      };
-
-      /**
-       * @name _initTranslationModule
-       * @memberof source.translate.$translateProvider.$translate
-       *
-       * @description
-       * Search for translation labels in source given by "source" parameter.
-       *
-       * @param {String} source --> Can be LOCAL or SERVER
-       * @returns {Promise|Null}
        * @private
        */
-      function _initTranslationModule(source) {
-        var config = {
-          source: _translateConfig.apiTranslationSource,
-          sections: _translateConfig.apiTranslationSections,
-          process: $api.getEntity
-        };
-        if (source === $apiConstants.API_LOCAL) {
-          config.source = _translateConfig.localTranslationSource;
-          config.sections = _translateConfig.localTranslationSections;
-          config.process = $api.getLocalEntity;
-        }
-        if (config.source) {
-          return config.process(config.source, function(success) {
-            var localTranslations = success.data;
-            if (config.sections) {
-              angular.forEach(config.sections, function(item) {
-                if (localTranslations.hasOwnProperty(item) && typeof localTranslations[item] === 'object') {
-                  _translations = angular.extend({}, _translations, localTranslations[item]);
-                }
-              });
-            } else {
-              _translations = angular.extend({}, _translations, localTranslations);
-            }
-          });
-        }
-
-        return null;
-      }
-
-      /**
-       * @name initTranslationModule
-       * @memberof source.translate.$translateProvider.$translate
-       *
-       * @description
-       * Search for translation labels in both sources: LOCAL and SERVER.
-       *
-       * @returns {Array}
-       */
-      function initTranslationModule() {
-        var translationsModules = [
-          _initTranslationModule($apiConstants.API_LOCAL),
-          _initTranslationModule($apiConstants.API_SERVER)
-        ];
-        var terms = {
-          one: _translateConfig.preferredDefaultLanguage,
-          two: typeof _translateConfig.preferredDefaultLanguage === 'string',
-          three: availableLanguages.languages.hasOwnProperty(_translateConfig.preferredDefaultLanguage)
-        };
-        if (terms.one && terms.two && terms.three) {
-          _appLanguage = availableLanguages.languages[_translateConfig.preferredDefaultLanguage];
-        } else {
-          _appLanguage = availableLanguages.default;
-          throw new Error('Locale code not found. Setting "en" automatically. Please, revise config statement.');
-        }
-
-        return translationsModules;
-      }
-
-      /**
-       * @name getTranslations
-       * @memberof source.translate.$translateProvider.$translate
-       *
-       * @description
-       * Catch general translation object: "_translations"
-       *
-       * @returns {Object}
-       */
-      function getTranslations() {
-        return _translations;
-      }
-
-      /**
-       * @name getActualLanguage
-       * @memberof source.translate.$translateProvider.$translate
-       *
-       * @description
-       * Catch actual defined language variable: "_appLanguage"
-       *
-       * @returns {Object}
-       */
-      function getActualLanguage() {
-        return _appLanguage;
-      }
-
-      /**
-       * @name getAvailableLanguages
-       * @memberof source.translate.$translateProvider.$translate
-       *
-       * @description
-       * Returns all application available languages, defined in "availableLanguages" service.
-       *
-       * @returns {Object}
-       */
-      function getAvailableLanguages() {
-        return availableLanguages.languages;
+      function _getFactory() {
+        return _getModelSource($.SERVICE);
       }
     }
-  }
-})();
-
-(function() {
-  'use strict';
-
-  angular
-    .module('source.translate')
-    /**
-     * @namespace availableLanguages
-     * @memberof source.translate
-     *
-     * @description
-     * Service to setting all available languages into app. Languages are defined by its locale codes.
-     */
-    .service('availableLanguages', availableLanguages);
-
-  function availableLanguages() {
-    /* jshint validthis: true */
-    this.languages = {
-      en: {
-        locale: 'en',
-        name: 'English',
-        sourceName: 'English'
-      },
-      es: {
-        locale: 'es',
-        name: 'Spanish',
-        sourceName: 'Español'
-      },
-      fr: {
-        locale: 'fr',
-        name: 'French',
-        sourceName: 'Français'
-      },
-      de: {
-        locale: 'de',
-        name: 'German',
-        sourceName: 'Deutsch'
-      },
-      pt: {
-        locale: 'pt',
-        name: 'Portuguese',
-        sourceName: 'Português'
-      }
-    };
-
-    this.default = this.languages.en;
   }
 })();
 
@@ -1949,76 +1360,235 @@
   angular
     .module('source.view-logic')
     /**
-     * @namespace $appView
+     * @namespace $appViewProvider
      * @memberof source.view-logic
      *
-     * @requires $filter
-     * @requires globalConstants
+     * @requires $toolsProvider
+     * @requires appViewModelProvider
      *
      * @description
-     * Factory statement for some helper methods about view presentation logic.
+     * Provider statement for some helper methods about view presentation logic.
      */
-    .factory('$appView', $appView);
+    .provider('$appView', $appView);
 
-  $appView.$inject = ['$filter', 'globalConstants'];
+  $appView.$inject = ['$toolsProvider', 'appViewModelProvider'];
 
-  function $appView($filter, globalConstants) {
-    var $ = globalConstants.get();
+  function $appView($toolsProvider, appViewModelProvider) {
+    var $ = appViewModelProvider.$;
+    var $c = appViewModelProvider.get();
+    var _domHandler = $c.schemas.domHandler;
 
     return {
-      /* Global Constants */
       $: $,
-      /* View tools */
-      applyFilter: _applyFilter,
-      /* DOM tools */
-      checkElementByClass: _checkElementByClass
+      setDomHandler: setDomHandlerProvider,
+      createDomHandlerObject: createDomHandlerObjectProvider,
+      $get: ['$filter', $get]
     };
 
     /**
-     * @name _applyFilter
-     * @memberof source.view-logic.$appView
+     * @name _setDomHandler
+     * @memberof source.view-logic.$appViewProvider
      *
      * @description
-     * Returns data with given filter applied.
+     * Private function to setting DOM handler configuration object (_domHandler).
      *
-     * @param {*} data
-     * @param {String} filterName
-     * @returns {*}
+     * @param {Object} config
+     * @returns {Object}
      * @private
      */
-    function _applyFilter(data, filterName) {
-      return $filter(filterName)(data);
+    function _setDomHandler(config) {
+      _domHandler = $toolsProvider.setObjectUsingSchema($c.schemas.domHandler, config, _domHandler);
+      return _domHandler;
     }
 
     /**
-     * @name  _checkElementByClass
-     * @memberof source.view-logic.$appView
+     * @name _createDomHandlerObject
+     * @memberof source.view-logic.$appViewProvider
      *
      * @description
-     * Checks if the given "domElement" contains any of the classes received in parameter "classes".
-     * Parameter "classes" can be string or array of strings.
+     * Returns an object with the same structure of DOM handler schema through given DOM handler object.
      *
-     * @param {Object} domElement
-     * @param {String|Array} classes
-     * @returns {String|Boolean}
+     * @param {Object} domHandlerObject
+     * @returns {Object}
      * @private
      */
-    function _checkElementByClass(domElement, classes) {
-      var _output = false;
-      var _classes = classes || null;
-      var _isString = (typeof _classes === 'string');
-      var _isArray = angular.isArray(_classes);
-      if (_isString || _isArray) {
-        _classes = (_isString) ? [classes] : classes ;
-        angular.forEach(_classes, function(item) {
-          if (domElement.classList.contains(item)) {
-            _output = item;
-          }
-        });
-      } else {
-        throw new TypeError('Invalid type of parameter "classes". It must be string or array.');
+    function _createDomHandlerObject(domHandlerObject) {
+      return $toolsProvider.setObjectUsingSchema($c.schemas.domHandler, domHandlerObject);
+    }
+
+    /**
+     * @name _setDomHandlerProvider
+     * @memberof source.view-logic.$appViewProvider
+     *
+     * @description
+     * Provider function to setting DOM handler configuration object (_domHandler).
+     *
+     * @param {Object} config --> Given DOM handler configuration object.
+     * @returns {Object}
+     */
+    function setDomHandlerProvider(config) {
+      return _setDomHandler(config);
+    }
+
+    /**
+     * @name createDomHandlerObjectProvider
+     * @memberof source.view-logic.$appViewProvider
+     *
+     * @description
+     * Provider function exposed for _createDomHandlerObject.
+     *
+     * @param {Object} domHandlerObject
+     * @returns {Object}
+     */
+    function createDomHandlerObjectProvider(domHandlerObject) {
+      return _createDomHandlerObject(domHandlerObject);
+    }
+
+    /**
+     * @namespace $appView
+     * @memberof source.view-logic.$appViewProvider
+     *
+     * @requires $filter
+     *
+     * @description
+     * Factory statement for application view provider.
+     */
+    function $get($filter) {
+      return {
+        /* Global Constants */
+        $: $,
+        /* Config methods */
+        setDomHandler: setDomHandlerService,
+        createDomHandlerObject: createDomHandlerObjectService,
+        /* View tools */
+        applyFilter: applyFilter,
+        /* DOM tools */
+        checkElementByClass: checkElementByClass,
+        show: showElement,
+        hide: hideElement
+      };
+
+      /**
+       * @name _displayWayElement
+       * @memberof source.view-logic.$appViewProvider.$appView
+       *
+       * @description
+       * Apply display mode to DOM element given.
+       *
+       * @param {Object} domElement
+       * @param {Number} way
+       * @private
+       */
+      function _displayWayElement(domElement, way) {
+        way = way || $.SHOW;
+        switch (way) {
+          case $.SHOW:
+            domElement.removeClass(_domHandler.classToHide).addClass(_domHandler.classToShow);
+            break;
+          case $.HIDE:
+            domElement.removeClass(_domHandler.classToShow).addClass(_domHandler.classToHide);
+            break;
+        }
       }
-      return _output;
+
+      /**
+       * @name _setDomHandlerService
+       * @memberof source.view-logic.$appViewProvider.$appView
+       *
+       * @description
+       * Factory function to setting DOM handler configuration object (_domHandler).
+       *
+       * @param {Object} config --> Given DOM handler configuration object.
+       * @returns {Object}
+       */
+      function setDomHandlerService(config) {
+        return _setDomHandler(config);
+      }
+
+      /**
+       * @name createDomHandlerObjectService
+       * @memberof source.view-logic.$appViewProvider.$appView
+       *
+       * @description
+       * Factory function exposed for _createDomHandlerObject.
+       *
+       * @param {Object} domHandlerObject
+       * @returns {Object}
+       */
+      function createDomHandlerObjectService(domHandlerObject) {
+        return _createDomHandlerObject(domHandlerObject);
+      }
+
+      /**
+       * @name _applyFilter
+       * @memberof source.view-logic.$appViewProvider.$appView
+       *
+       * @description
+       * Returns data with given filter applied.
+       *
+       * @param {*} data
+       * @param {String} filterName
+       * @returns {*}
+       */
+      function applyFilter(data, filterName) {
+        return $filter(filterName)(data);
+      }
+
+      /**
+       * @name  _checkElementByClass
+       * @memberof source.view-logic.$appViewProvider.$appView
+       *
+       * @description
+       * Checks if the given "domElement" contains any of the classes received in parameter "classes".
+       * Parameter "classes" can be string or array of strings.
+       *
+       * @param {Object} domElement
+       * @param {String|Array} classes
+       * @returns {String|Boolean}
+       */
+      function checkElementByClass(domElement, classes) {
+        var _output = false;
+        var _classes = classes || null;
+        var _isString = (typeof _classes === 'string');
+        var _isArray = angular.isArray(_classes);
+        if (_isString || _isArray) {
+          _classes = (_isString) ? [classes] : classes ;
+          angular.forEach(_classes, function(item) {
+            if (domElement.classList.contains(item)) {
+              _output = item;
+            }
+          });
+        } else {
+          throw new TypeError('Invalid type of parameter "classes". It must be string or array.');
+        }
+        return _output;
+      }
+
+      /**
+       * @name showElement
+       * @memberof source.view-logic.$appViewProvider.$appView
+       *
+       * @description
+       * Applies CSS classes to show given DOM element.
+       *
+       * @param {Object} domElement
+       */
+      function showElement(domElement) {
+        return _displayWayElement(domElement, $.SHOW);
+      }
+
+      /**
+       * @name hideElement
+       * @memberof source.view-logic.$appViewProvider.$appView
+       *
+       * @description
+       * Applies CSS classes to hide given DOM element.
+       *
+       * @param {Object} domElement
+       */
+      function hideElement(domElement) {
+        return _displayWayElement(domElement, $.HIDE);
+      }
     }
   }
 })();
@@ -2574,6 +2144,696 @@
       function setObjectUsingSchema(objectSchema, objectSettings, mergeOption) {
         mergeOption = mergeOption || $.NO_MERGE;
         return _setObjectUsingSchema(objectSchema, objectSettings, mergeOption);
+      }
+    }
+  }
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    .module('source.translate', [])
+    /**
+     * @namespace translate
+     * @memberof source.translate
+     *
+     * @requires $translate
+     *
+     * @description
+     * Filter for translating labels.
+     */
+    .filter('translate', translate);
+
+  translate.$inject = ['$translate'];
+
+  function translate($translate) {
+    return function(input) {
+      return $translate.getTranslations()[input] !== undefined ? $translate.getTranslations()[input] : input;
+    };
+  }
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    .module('source.translate')
+    /**
+     * @namespace $translateProvider
+     * @memberof source.translate
+     *
+     * @requires $apiProvider
+     *
+     * @description
+     * Provider definition for translation labels.
+     */
+    .provider('$translate', $translate);
+
+  $translate.$inject = ['$apiProvider'];
+
+  function $translate($apiProvider) {
+    var _translateConfig = {
+      apiTranslationSource: null,
+      apiTranslationSections: null,
+      localTranslationSource: null,
+      localTranslationSections: null,
+      preferredDefaultLanguage: null
+    };
+
+    return {
+      setApiTranslationSource: setApiTranslationSource,
+      setApiTranslationSections: setApiTranslationSections,
+      setLocalTranslationSource: setLocalTranslationSource,
+      setLocalTranslationSections: setLocalTranslationSections,
+      setPreferredLanguage: setPreferredLanguage,
+      $get: ['$api', 'availableLanguages', $get]
+    };
+
+    /**
+     * @name _setTranslationConfigProperty
+     * @memberof source.translate.$translateProvider
+     *
+     * @description
+     * Set configurations for _translateConfig object.
+     *
+     * @param {String} configKey
+     * @param {String|Object} value
+     * @returns {Object}
+     * @private
+     */
+    function _setTranslationConfigProperty(configKey, value) {
+      value = (typeof value === 'string') ? $apiProvider.createEntityObject({ entityName: value }) : value ;
+      if (value && typeof value === 'object') {
+        _translateConfig[configKey] = value;
+        return _translateConfig;
+      } else {
+        throw new Error('Lost parameter or type parameter wrong');
+      }
+    }
+
+    /**
+     * @name setApiTranslationSource
+     * @memberof source.translate.$translateProvider
+     *
+     * @description
+     * Set entity name for calling API to return translation labels.
+     *
+     * @param {String} entityName
+     * @returns {Object}
+     */
+    function setApiTranslationSource(entityName) {
+      return _setTranslationConfigProperty('apiTranslationSource', entityName);
+    }
+
+    /**
+     * @name setApiTranslationSections
+     * @memberof source.translate.$translateProvider
+     *
+     * @description
+     * Set sections from API response where will be found translations labels.
+     *
+     * @param {Object} sections
+     * @returns {Object}
+     */
+    function setApiTranslationSections(sections) {
+      return _setTranslationConfigProperty('apiTranslationSections', sections);
+    }
+
+    /**
+     * @name setLocalTranslationSource
+     * @memberof source.translate.$translateProvider
+     *
+     * @description
+     * Set file name for local JSON file where we will be found translation labels.
+     *
+     * @param {String} jsonFileName
+     * @returns {Object}
+     */
+    function setLocalTranslationSource(jsonFileName) {
+      return _setTranslationConfigProperty('localTranslationSource', jsonFileName);
+    }
+
+    /**
+     * @name setLocalTranslationSections
+     * @memberof source.translate.$translateProvider
+     *
+     * @description
+     * Set sections from local JSON file where will be found translations labels.
+     *
+     * @param {Object} sections
+     * @returns {Object}
+     */
+    function setLocalTranslationSections(sections) {
+      return _setTranslationConfigProperty('localTranslationSections', sections);
+    }
+
+    /**
+     * @name setPreferredLanguage
+     * @memberof source.translate.$translateProvider
+     *
+     * @description
+     * Set chosen language for application, defined by a locale code.
+     *
+     * @param {String} preferredLocale --> Locale code
+     * @returns {Object}
+     */
+    function setPreferredLanguage(preferredLocale) {
+      _translateConfig.preferredDefaultLanguage = preferredLocale;
+      return _translateConfig;
+    }
+
+    /**
+     * @namespace $translate
+     * @memberof source.translate.$translateProvider
+     *
+     * @requires $api
+     * @requires availableLanguages
+     *
+     * @description
+     * Factory definition for translation labels.
+     */
+    function $get($api, availableLanguages) {
+      var _translations = {};
+      var _appLanguage = null;
+
+      var $apiConstants = $api.$;
+
+      return {
+        initTranslationModule: initTranslationModule,
+        getTranslations: getTranslations,
+        getActualLanguage: getActualLanguage,
+        getAvailableLanguages: getAvailableLanguages
+      };
+
+      /**
+       * @name _initTranslationModule
+       * @memberof source.translate.$translateProvider.$translate
+       *
+       * @description
+       * Search for translation labels in source given by "source" parameter.
+       *
+       * @param {String} source --> Can be LOCAL or SERVER
+       * @returns {Promise|Null}
+       * @private
+       */
+      function _initTranslationModule(source) {
+        var config = {
+          source: _translateConfig.apiTranslationSource,
+          sections: _translateConfig.apiTranslationSections,
+          process: $api.getEntity
+        };
+        if (source === $apiConstants.API_LOCAL) {
+          config.source = _translateConfig.localTranslationSource;
+          config.sections = _translateConfig.localTranslationSections;
+          config.process = $api.getLocalEntity;
+        }
+        if (config.source) {
+          return config.process(config.source, function(success) {
+            var localTranslations = success.data;
+            if (config.sections) {
+              angular.forEach(config.sections, function(item) {
+                if (localTranslations.hasOwnProperty(item) && typeof localTranslations[item] === 'object') {
+                  _translations = angular.extend({}, _translations, localTranslations[item]);
+                }
+              });
+            } else {
+              _translations = angular.extend({}, _translations, localTranslations);
+            }
+          });
+        }
+
+        return null;
+      }
+
+      /**
+       * @name initTranslationModule
+       * @memberof source.translate.$translateProvider.$translate
+       *
+       * @description
+       * Search for translation labels in both sources: LOCAL and SERVER.
+       *
+       * @returns {Array}
+       */
+      function initTranslationModule() {
+        var translationsModules = [
+          _initTranslationModule($apiConstants.API_LOCAL),
+          _initTranslationModule($apiConstants.API_SERVER)
+        ];
+        var terms = {
+          one: _translateConfig.preferredDefaultLanguage,
+          two: typeof _translateConfig.preferredDefaultLanguage === 'string',
+          three: availableLanguages.languages.hasOwnProperty(_translateConfig.preferredDefaultLanguage)
+        };
+        if (terms.one && terms.two && terms.three) {
+          _appLanguage = availableLanguages.languages[_translateConfig.preferredDefaultLanguage];
+        } else {
+          _appLanguage = availableLanguages.default;
+          throw new Error('Locale code not found. Setting "en" automatically. Please, revise config statement.');
+        }
+
+        return translationsModules;
+      }
+
+      /**
+       * @name getTranslations
+       * @memberof source.translate.$translateProvider.$translate
+       *
+       * @description
+       * Catch general translation object: "_translations"
+       *
+       * @returns {Object}
+       */
+      function getTranslations() {
+        return _translations;
+      }
+
+      /**
+       * @name getActualLanguage
+       * @memberof source.translate.$translateProvider.$translate
+       *
+       * @description
+       * Catch actual defined language variable: "_appLanguage"
+       *
+       * @returns {Object}
+       */
+      function getActualLanguage() {
+        return _appLanguage;
+      }
+
+      /**
+       * @name getAvailableLanguages
+       * @memberof source.translate.$translateProvider.$translate
+       *
+       * @description
+       * Returns all application available languages, defined in "availableLanguages" service.
+       *
+       * @returns {Object}
+       */
+      function getAvailableLanguages() {
+        return availableLanguages.languages;
+      }
+    }
+  }
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    .module('source.translate')
+    /**
+     * @namespace availableLanguages
+     * @memberof source.translate
+     *
+     * @description
+     * Service to setting all available languages into app. Languages are defined by its locale codes.
+     */
+    .service('availableLanguages', availableLanguages);
+
+  function availableLanguages() {
+    /* jshint validthis: true */
+    this.languages = {
+      en: {
+        locale: 'en',
+        name: 'English',
+        sourceName: 'English'
+      },
+      es: {
+        locale: 'es',
+        name: 'Spanish',
+        sourceName: 'Español'
+      },
+      fr: {
+        locale: 'fr',
+        name: 'French',
+        sourceName: 'Français'
+      },
+      de: {
+        locale: 'de',
+        name: 'German',
+        sourceName: 'Deutsch'
+      },
+      pt: {
+        locale: 'pt',
+        name: 'Portuguese',
+        sourceName: 'Português'
+      }
+    };
+
+    this.default = this.languages.en;
+  }
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    .module('source.date-time')
+    /**
+     * @namespace onlyHour
+     * @memberof source.date-time
+     *
+     * @description
+     * Filter that shows hour in "0-24" format for a complete date given.
+     */
+    .filter('onlyHour', onlyHour)
+
+    /**
+     * @namespace untilNow
+     * @memberof source.date-time
+     *
+     * @requires dateTimeModel
+     *
+     * @description
+     * Filter that shows human string for elapsed time.
+     */
+    .filter('untilNow', untilNow)
+
+    /**
+     * @namespace dateReduceHour
+     * @memberof source.date-time
+     *
+     * @description
+     * Filter that shows hour in "0-24" format and date with string month but without year.
+     */
+    .filter('dateReduceHour', dateReduceHour);
+
+  function onlyHour() {
+    return _onlyHour;
+
+    /**
+     * @name _onlyHour
+     * @memberof source.date-time.onlyHour
+     *
+     * @description
+     * Private function for "onlyHour" filter.
+     * Returns date formatted if variable "date" is a valid date or the same input data.
+     *
+     * @param {*} date
+     * @returns {String|*}
+     * @private
+     */
+    function _onlyHour(date) {
+      return (Date.parse(date)) ? moment(date).format('HH:mm') : date ;
+    }
+  }
+
+  untilNow.$inject = ['dateTimeModel'];
+
+  function untilNow(dateTimeModel) {
+    return _untilNow;
+
+    /**
+     * @name _untilNow
+     * @memberof source.date-time.untilNow
+     *
+     * @description
+     * Private function for "untilNow" filter.
+     * Returns locale string expressing elapsed time if variable "date" is a valid date or the same input data.
+     *
+     * @param {*} date
+     * @returns {String|*}
+     * @private
+     */
+    function _untilNow(date) {
+      return (Date.parse(date)) ? moment(date).calendar(null, dateTimeModel.momentCalendarFormat) : date ;
+    }
+  }
+
+  function dateReduceHour() {
+    return _dateReduceHour;
+
+    /**
+     * @name _dateReduceHour
+     * @memberof source.date-time.dateReduceHour
+     *
+     * @description
+     * Private function for "dateReduceHour" filter.
+     * Returns date formatted if variable "date" is a valid date or the same input data.
+     *
+     * @param {*} date
+     * @returns {String|*}
+     * @private
+     */
+    function _dateReduceHour(date) {
+      return (Date.parse(date)) ? moment(date).format('D MMMM - HH:mm') : date ;
+    }
+  }
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    .module('source.date-time')
+    /**
+     * @namespace dateTimeModel
+     * @memberof source.date-time
+     *
+     * @description
+     * Service that defines constants for date time module.
+     */
+    .service('dateTimeModel', dateTimeModel);
+
+  function dateTimeModel() {
+    /* jshint validthis: true */
+    /**
+     * @name momentCalendarFormat
+     * @memberof source.date-time.dateTimeModel
+     *
+     * @type {Object}
+     * @property {String} sameDay
+     * @property {String} nextDay
+     * @property {String} nextWeek
+     * @property {String} lastDay
+     * @property {String} lastWeek
+     * @property {String} sameElse
+     */
+    this.momentCalendarFormat = {
+      sameDay: '[hoy]',
+      nextDay: '[mañana]',
+      nextWeek: '[próximo] dddd',
+      lastDay: '[ayer]',
+      lastWeek: 'dddd [pasado]',
+      sameElse: 'DD/MM/YYYY'
+    };
+  }
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    .module('source.toast')
+    /**
+     * @namespace toastModelProvider
+     * @memberof source.toast
+     *
+     * @description
+     * Provider that gets constants for toast services.
+     */
+    .provider('toastModel', toastModel);
+
+  toastModel.$inject = ['$toolsProvider'];
+
+  function toastModel($toolsProvider) {
+    var _constants = {
+      SUCCESS: 'SUCCESS',
+      INFO: 'INFO',
+      WARNING: 'WARNING',
+      ERROR: 'ERROR'
+    };
+    var $ = angular.extend({}, _constants, $toolsProvider.$);
+
+    return {
+      $: $,
+      $get: ['toastr', $get]
+    };
+
+    /**
+     * @namespace toastModel
+     * @memberof source.toast.toastModelProvider
+     *
+     * @requires toastr
+     *
+     * @description
+     * Factory that gets constants for toast services.
+     */
+    function $get(toastr) {
+      var _serviceModel = {
+        SUCCESS: toastr.success,
+        INFO: toastr.info,
+        WARNING: toastr.warning,
+        ERROR: toastr.error
+      };
+
+      return {
+        $: $,
+        get: getFactory
+      };
+
+      /**
+       * @name getFactory
+       * @memberof source.toast.toastModelProvider.toastModel
+       *
+       * @description
+       * Returns API model for Factory service.
+       *
+       * @returns {Object}
+       */
+      function getFactory() {
+        return _serviceModel;
+      }
+    }
+  }
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    .module('source.toast')
+    /**
+     * @namespace $alertProvider
+     * @memberof source.toast
+     *
+     * @description
+     * Provider custom statement to use toast alert's messages.
+     */
+    .provider('$alert', $alert);
+
+  $alert.$inject = ['toastModelProvider'];
+
+  function $alert(toastModelProvider) {
+    var $ = toastModelProvider.$;
+    var _toastOptions = {
+      timeOut: 9999
+    };
+
+    return {
+      $: $,
+      setDuration: _setDuration,
+      $get: ['toastModel', $get]
+    };
+
+    /**
+     * @name _setDuration
+     * @memberof source.toast.$alertProvider
+     *
+     * @description
+     * Set duration of toast message for provider configuration.
+     *
+     * @param {Integer} time
+     * @private
+     */
+    function _setDuration(time) {
+      _toastOptions.timeOut = time;
+    }
+
+    /**
+     * @name _launchToast
+     * @memberof source.toast.$alertProvider
+     *
+     * @description
+     * Launch angular-toaster alert message.
+     *
+     * @param {Object} toastFactoryModel
+     * @param {String|Array} message
+     * @param {String} type
+     * @param {String|Undefined} title
+     * @param {Integer|Undefined} duration
+     * @private
+     */
+    function _launchToast(toastFactoryModel, message, type, title, duration) {
+      if (title !== undefined && typeof title !== 'string' && !duration) {
+        duration = title;
+        title = undefined;
+      }
+
+      var toastOptions = (duration) ? angular.extend({}, _toastOptions, { timeOut: duration }) : _toastOptions ;
+      message = (angular.isArray(message)) ? message.join('<br>') : message ;
+      toastFactoryModel[type](message, title, toastOptions);
+    }
+
+    /**
+     * @namespace $alert
+     * @memberof source.toast.$alertProvider
+     *
+     * @requires toastr
+     *
+     * @description
+     * Factory statement for toast alert's messages.
+     */
+    function $get(toastModel) {
+      var toastFactoryModel = toastModel.get();
+
+      return {
+        $: $,
+        success: success,
+        info: info,
+        warning: warning,
+        error: error
+      };
+
+      /**
+       * @name success
+       * @memberof source.toast.$alertProvider.$alert
+       *
+       * @description
+       * Displays success toast message.
+       *
+       * @param {String} message
+       * @param {String} title
+       * @param {Integer|Undefined} duration
+       */
+      function success(message, title, duration) {
+        _launchToast(toastFactoryModel, message, $.SUCCESS, title, duration);
+      }
+
+      /**
+       * @name info
+       * @memberof source.toast.$alertProvider.$alert
+       *
+       * @description
+       * Displays info toast message.
+       *
+       * @param {String} message
+       * @param {String} title
+       * @param {Integer|Undefined} duration
+       */
+      function info(message, title, duration) {
+        _launchToast(toastFactoryModel, message, $.INFO, title, duration);
+      }
+
+      /**
+       * @name warning
+       * @memberof source.toast.$alertProvider.$alert
+       *
+       * @description
+       * Displays warning toast message.
+       *
+       * @param {String} message
+       * @param {String} title
+       * @param {Integer|Undefined} duration
+       */
+      function warning(message, title, duration) {
+        _launchToast(toastFactoryModel, message, $.WARNING, title, duration);
+      }
+
+      /**
+       * @name error
+       * @memberof source.toast.$alertProvider.$alert
+       *
+       * @description
+       * Displays error toast message.
+       *
+       * @param {String} message
+       * @param {String} title
+       * @param {Integer|Undefined} duration
+       */
+      function error(message, title, duration) {
+        _launchToast(toastFactoryModel, message, $.ERROR, title, duration);
       }
     }
   }
