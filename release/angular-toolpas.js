@@ -82,27 +82,13 @@
 
   angular
     /**
-     * @namespace view-logic
+     * @namespace static
      * @memberof source
      *
      * @description
-     * Module View Logic definition: helper for application view presentations.
+     * Module static definition for manage static data in application like literals or config variables.
      */
-    .module('source.view-logic', []);
-})();
-
-(function() {
-  'use strict';
-
-  angular
-    /**
-     * @namespace _shared
-     * @memberof source
-     *
-     * @description
-     * Definition of module "_shared" for common minor services.
-     */
-    .module('source._shared', []);
+    .module('source.static', []);
 })();
 
 (function() {
@@ -141,13 +127,27 @@
 
   angular
     /**
-     * @namespace static
+     * @namespace view-logic
      * @memberof source
      *
      * @description
-     * Module static definition for manage static data in application like literals or config variables.
+     * Module View Logic definition: helper for application view presentations.
      */
-    .module('source.static', []);
+    .module('source.view-logic', []);
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    /**
+     * @namespace _shared
+     * @memberof source
+     *
+     * @description
+     * Definition of module "_shared" for common minor services.
+     */
+    .module('source._shared', []);
 })();
 
 (function() {
@@ -1206,896 +1206,184 @@
 (function() {
   'use strict';
 
-  angular
-    .module('source.view-logic')
-    /**
-     * @namespace appViewModelProvider
-     * @memberof source.view-logic
-     *
-     * @requires $toolsProvider
-     *
-     * @description
-     * Provider that gets constants and models for appView services.
-     */
-    .provider('appViewModel', appViewModel);
-
-  appViewModel.$inject = ['$toolsProvider'];
-
-  function appViewModel($toolsProvider) {
-    var _constants = {
-      SHOW: 1,
-      HIDE: 2
-    };
-    var $ = angular.extend({}, _constants, $toolsProvider.$);
-
-    var _providerModel = {
-      schemas: {
-        domHandler: {
-          classToShow: null,
-          classToHide: null
-        }
-      }
-    };
-
-    return {
-      $: $,
-      get: _getProvider,
-      $get: [$get]
-    };
-
-    /**
-     * @name _getModelSource
-     * @memberof source.view-logic.appViewProvider
-     *
-     * @description
-     * Returns appView model depending on the applicant: Provider or Service.
-     *
-     * @param {Boolean} source
-     * @param {Object} [factoryModel = null]
-     * @returns {Object}
-     * @private
-     */
-    function _getModelSource(source, factoryModel) {
-      factoryModel = factoryModel || null;
-      return (source === $.PROVIDER) ? _providerModel : angular.extend({}, _providerModel, factoryModel) ;
-    }
-
-    /**
-     * @name _getProvider
-     * @memberof source.view-logic.appViewProvider
-     *
-     * @description
-     * Returns appView model for Provider.
-     *
-     * @returns {Object}
-     * @private
-     */
-    function _getProvider() {
-      return _getModelSource($.PROVIDER);
-    }
-
-    /**
-     * @namespace appView
-     * @memberof source.view-logic.appViewProvider
-     *
-     * @description
-     * Factory that gets constants and models for appView services.
-     */
-    function $get() {
-      return {
-        $: $,
-        get: _getFactory
-      };
-
-      /**
-       * @name _getFactory
-       * @memberof source.view-logic.appViewProvider.appView
-       *
-       * @description
-       * Returns appView model for Provider.
-       *
-       * @returns {Object}
-       * @private
-       */
-      function _getFactory() {
-        return _getModelSource($.SERVICE);
-      }
-    }
-  }
-})();
-
-(function() {
-  'use strict';
+  /**
+   * @type Object
+   * @property {String} documentName
+   * @property {String} documentType
+   */
 
   angular
-    .module('source.view-logic')
+    .module('source.static')
     /**
-     * @namespace $appViewProvider
-     * @memberof source.view-logic
-     *
-     * @requires $toolsProvider
-     * @requires appViewModelProvider
-     *
-     * @description
-     * Provider statement for some helper methods about view presentation logic.
-     */
-    .provider('$appView', $appView);
-
-  $appView.$inject = ['$toolsProvider', 'appViewModelProvider'];
-
-  function $appView($toolsProvider, appViewModelProvider) {
-    var $ = appViewModelProvider.$;
-    var $c = appViewModelProvider.get();
-    var _domHandler = $c.schemas.domHandler;
-
-    return {
-      $: $,
-      setDomHandler: setDomHandlerProvider,
-      createDomHandlerObject: createDomHandlerObjectProvider,
-      $get: ['$filter', $get]
-    };
-
-    /**
-     * @name _setDomHandler
-     * @memberof source.view-logic.$appViewProvider
-     *
-     * @description
-     * Private function to setting DOM handler configuration object (_domHandler).
-     *
-     * @param {Object} config
-     * @returns {Object}
-     * @private
-     */
-    function _setDomHandler(config) {
-      _domHandler = $toolsProvider.setObjectUsingSchema($c.schemas.domHandler, config, _domHandler);
-      return _domHandler;
-    }
-
-    /**
-     * @name _createDomHandlerObject
-     * @memberof source.view-logic.$appViewProvider
-     *
-     * @description
-     * Returns an object with the same structure of DOM handler schema through given DOM handler object.
-     *
-     * @param {Object} domHandlerObject
-     * @returns {Object}
-     * @private
-     */
-    function _createDomHandlerObject(domHandlerObject) {
-      return $toolsProvider.setObjectUsingSchema($c.schemas.domHandler, domHandlerObject);
-    }
-
-    /**
-     * @name _setDomHandlerProvider
-     * @memberof source.view-logic.$appViewProvider
-     *
-     * @description
-     * Provider function to setting DOM handler configuration object (_domHandler).
-     *
-     * @param {Object} config --> Given DOM handler configuration object.
-     * @returns {Object}
-     */
-    function setDomHandlerProvider(config) {
-      return _setDomHandler(config);
-    }
-
-    /**
-     * @name createDomHandlerObjectProvider
-     * @memberof source.view-logic.$appViewProvider
-     *
-     * @description
-     * Provider function exposed for _createDomHandlerObject.
-     *
-     * @param {Object} domHandlerObject
-     * @returns {Object}
-     */
-    function createDomHandlerObjectProvider(domHandlerObject) {
-      return _createDomHandlerObject(domHandlerObject);
-    }
-
-    /**
-     * @namespace $appView
-     * @memberof source.view-logic.$appViewProvider
-     *
-     * @requires $filter
-     *
-     * @description
-     * Factory statement for application view provider.
-     */
-    function $get($filter) {
-      return {
-        /* Global Constants */
-        $: $,
-        /* Config methods */
-        setDomHandler: setDomHandlerService,
-        createDomHandlerObject: createDomHandlerObjectService,
-        /* View tools */
-        applyFilter: applyFilter,
-        /* DOM tools */
-        checkElementByClass: checkElementByClass,
-        show: showElement,
-        hide: hideElement
-      };
-
-      /**
-       * @name _displayWayElement
-       * @memberof source.view-logic.$appViewProvider.$appView
-       *
-       * @description
-       * Apply display mode to DOM element given.
-       *
-       * @param {Object} domElement
-       * @param {Number} way
-       * @private
-       */
-      function _displayWayElement(domElement, way) {
-        way = way || $.SHOW;
-        switch (way) {
-          case $.SHOW:
-            domElement.removeClass(_domHandler.classToHide).addClass(_domHandler.classToShow);
-            break;
-          case $.HIDE:
-            domElement.removeClass(_domHandler.classToShow).addClass(_domHandler.classToHide);
-            break;
-        }
-      }
-
-      /**
-       * @name _setDomHandlerService
-       * @memberof source.view-logic.$appViewProvider.$appView
-       *
-       * @description
-       * Factory function to setting DOM handler configuration object (_domHandler).
-       *
-       * @param {Object} config --> Given DOM handler configuration object.
-       * @returns {Object}
-       */
-      function setDomHandlerService(config) {
-        return _setDomHandler(config);
-      }
-
-      /**
-       * @name createDomHandlerObjectService
-       * @memberof source.view-logic.$appViewProvider.$appView
-       *
-       * @description
-       * Factory function exposed for _createDomHandlerObject.
-       *
-       * @param {Object} domHandlerObject
-       * @returns {Object}
-       */
-      function createDomHandlerObjectService(domHandlerObject) {
-        return _createDomHandlerObject(domHandlerObject);
-      }
-
-      /**
-       * @name _applyFilter
-       * @memberof source.view-logic.$appViewProvider.$appView
-       *
-       * @description
-       * Returns data with given filter applied.
-       *
-       * @param {*} data
-       * @param {String} filterName
-       * @returns {*}
-       */
-      function applyFilter(data, filterName) {
-        return $filter(filterName)(data);
-      }
-
-      /**
-       * @name  _checkElementByClass
-       * @memberof source.view-logic.$appViewProvider.$appView
-       *
-       * @description
-       * Checks if the given "domElement" contains any of the classes received in parameter "classes".
-       * Parameter "classes" can be string or array of strings.
-       *
-       * @param {Object} domElement
-       * @param {String|Array} classes
-       * @returns {String|Boolean}
-       */
-      function checkElementByClass(domElement, classes) {
-        var _output = false;
-        var _classes = classes || null;
-        var _isString = (typeof _classes === 'string');
-        var _isArray = angular.isArray(_classes);
-        if (_isString || _isArray) {
-          _classes = (_isString) ? [classes] : classes ;
-          angular.forEach(_classes, function(item) {
-            if (domElement.classList.contains(item)) {
-              _output = item;
-            }
-          });
-        } else {
-          throw new TypeError('Invalid type of parameter "classes". It must be string or array.');
-        }
-        return _output;
-      }
-
-      /**
-       * @name showElement
-       * @memberof source.view-logic.$appViewProvider.$appView
-       *
-       * @description
-       * Applies CSS classes to show given DOM element.
-       *
-       * @param {Object} domElement
-       */
-      function showElement(domElement) {
-        return _displayWayElement(domElement, $.SHOW);
-      }
-
-      /**
-       * @name hideElement
-       * @memberof source.view-logic.$appViewProvider.$appView
-       *
-       * @description
-       * Applies CSS classes to hide given DOM element.
-       *
-       * @param {Object} domElement
-       */
-      function hideElement(domElement) {
-        return _displayWayElement(domElement, $.HIDE);
-      }
-    }
-  }
-})();
-
-(function() {
-  'use strict';
-
-  angular
-    .module('source._shared')
-    /**
-     * @namespace globalConstantsProvider
-     * @memberof source._shared
-     *
-     * @description
-     * Provider that gets the global constants of the application.
-     */
-    .provider('globalConstants', globalConstants);
-
-  function globalConstants() {
-    var _constants = {
-      NO_OBJECT: {},
-
-      FROM_CAMELCASE_TO_OTHER: true,
-      FROM_OTHER_TO_CAMELCASE: false,
-
-      MODE_KEY: true,
-      MODE_VALUE: false,
-
-      ENCODE: true,
-      DECODE: false,
-
-      TITLE: 1,
-      SUBTITLE: 2,
-
-      PROCESSES: 'processes',
-      MODULES: 'modules',
-      STATES: 'states',
-
-      PROVIDER: true,
-      SERVICE: false,
-
-      MERGE: true,
-      NO_MERGE: false,
-
-      KEY: {
-        ESCAPE: {
-          NAME: 'Escape',
-          CODE: 27
-        },
-        ENTER: {
-          NAME: 'Enter',
-          CODE: 13
-        },
-        ARROW_DOWN: {
-          NAME: 'ArrowDown',
-          CODE: 40
-        },
-        ARROW_UP: {
-          NAME: 'ArrowUp',
-          CODE: 38
-        }
-      }
-    };
-
-    return {
-      get: getProvider,
-      $get: [$get]
-    };
-
-    /**
-     * @name getProvider
-     * @memberof source._shared.globalConstantsProvider
-     *
-     * @description
-     * Get constants object for provider.
-     *
-     * @returns {Object}
-     */
-    function getProvider() {
-      return _constants;
-    }
-
-    /**
-     * @namespace globalConstants
-     * @memberof source._shared.globalConstantsProvider
-     *
-     * @description
-     * Factory that provides the global constants of the application.
-     */
-    function $get() {
-      return {
-        get: getFactory
-      };
-
-      /**
-       * @name getFactory
-       * @memberof source._shared.globalConstantsProvider.globalConstants
-       *
-       * @description
-       * Get constants object for factory.
-       *
-       * @returns {Object}
-       */
-      function getFactory() {
-        return _constants;
-      }
-    }
-  }
-})();
-
-(function() {
-  'use strict';
-
-  angular
-    .module('source._shared')
-    /**
-     * @namespace $toolsProvider
-     * @memberof source._shared
+     * @namespace $staticProvider
+     * @memberof source.static
      *
      * @requires globalConstantsProvider
      *
      * @description
-     * Provider statement for several useful tools.
+     * Provider statement to manage static variables for application.
      */
-    .provider('$tools', $tools);
+    .provider('$static', $static);
 
-  $tools.$inject = ['globalConstantsProvider'];
+  $static.$inject = ['globalConstantsProvider'];
 
-  function $tools(globalConstantsProvider) {
+  function $static(globalConstantsProvider) {
     var $ = globalConstantsProvider.get();
+    var _source = null;
+    var _statics = null;
 
     return {
-      /* Global constants */
+      /* Global Constants */
       $: $,
-      /* Object tools */
-      setObjectUsingSchema: setObjectUsingSchemaProvider,
-      /* $tools factory */
-      $get: [$get]
+      /* Provider LITERALS tools */
+      setSource: setProviderSource,
+      /* API Factory */
+      $get: ['$q', '$api', $get]
     };
 
     /**
-     * @name _convertString
-     * @memberof source._shared.$toolsProvider
+     * @name _setSource
+     * @memberof source.static.$staticProvider
      *
      * @description
-     * Function that encoding camelCase, or decoding camelCase, a given string.
+     * Private method to set JSON source files containing the application static variables.
      *
-     * @param {String} string
-     * @param {String} char
-     * @param {Boolean} conversionType
-     * @returns {String}
+     * @param {String|Array|Object} source
+     * @returns {Array|Object}
      * @private
      */
-    function _convertString(string, char, conversionType) {
-      if (string !== undefined && conversionType !== undefined) {
-        var defaultChar = (char) ? char : '-' ;
-        if (conversionType === $.FROM_CAMELCASE_TO_OTHER) {
-          return string.replace(/([A-Z])/g, function($1) {
-            return defaultChar + $1.toLowerCase();
-          });
-        } else {
-          var output = string.split(defaultChar).map(function(item) {
-            return item.charAt(0).toUpperCase() + item.slice(1);
-          }).join('');
-          return output.charAt(0).toLowerCase() + output.slice(1);
-        }
+    function _setSource(source) {
+      var _isStringSource = (typeof source === 'string');
+      if (_isStringSource || angular.isObject(source)) {
+        _source = (_isStringSource) ? [source] : source ;
       } else {
-        throw new ReferenceError('Function parameters missing.');
+        throw new TypeError('Wrong type argument: Static source must be string or array or object.');
       }
+      return _source;
     }
 
     /**
-     * @name _ucWords
-     * @memberof source._shared.$toolsProvider
+     * @name setProviderSource
+     * @memberof source.static.$staticProvider
      *
      * @description
-     * Returns given string with first letter in uppercase.
+     * Provider public function to set JSON source files containing the application static variables.
      *
-     * @param {String} string
-     * @returns {string}
-     * @private
+     * @param {String|Array|Object} source
+     * @returns {Array|Object}
      */
-    function _ucWords(string) {
-      return string.charAt(0).toUpperCase() + string.slice(1);
+    function setProviderSource(source) {
+      return _setSource(source);
     }
 
     /**
-     * @name _getRandomString
-     * @memberof source._shared.$toolsProvider
+     * @namespace $static
+     * @memberof source.static.$staticProvider
+     *
+     * @requires $q
+     * @requires $api
      *
      * @description
-     * Returns random string with given number of chars.
-     *
-     * @param {Number} stringLength --> Number of chars for random string
-     * @returns {string}
-     * @private
+     * Factory statement to manage static variables for application.
      */
-    function _getRandomString(stringLength) {
-      var output = '';
-      var possibilities = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
-      for (var i = 0; i < stringLength; i++) {
-        output += possibilities.charAt(Math.floor(Math.random() * possibilities.length));
-      }
-      return output;
-    }
-
-    /**
-     * @name _removeFromArray
-     * @memberof source._shared.$toolsProvider
-     *
-     * @description
-     * Removes an element from an array from a given value or from a given key. Returns given array without the
-     * element we want to remove.
-     *
-     * @param {Array} arrayVar
-     * @param {Number|String|Object} givenVar
-     * @param {Boolean} mode
-     * @returns {Array}
-     * @private
-     */
-    function _removeFromArray(arrayVar, givenVar, mode) {
-      var key = givenVar;
-      if (mode === $.MODE_VALUE) {
-        key = arrayVar.indexOf(givenVar);
-      }
-      if ((key) && (key > -1)) {
-        arrayVar.splice(key, 1);
-      }
-      return arrayVar;
-    }
-
-    /**
-     * @name _arrayMerge
-     * @memberof source._shared.$toolsProvider
-     *
-     * @description
-     * Merges two arrays avoiding duplicate items.
-     *
-     * @param {Array} array1
-     * @param {Array} array2
-     * @returns {Array}
-     * @private
-     */
-    function _arrayMerge(array1, array2) {
-      if (angular.isArray(array1) && angular.isArray(array2)) {
-        var _mergedArray = angular.copy(array1);
-        array2.reduce(function(array, value) {
-          if (array.indexOf(value) < 0) {
-            array.push(value);
-          }
-          return array;
-        }, _mergedArray);
-        return _mergedArray;
-      } else {
-        var error = 'The "_arrayMerge" method expects two array arguments and at least one of them is not array.';
-        throw new TypeError(error);
-      }
-    }
-
-    /**
-     * @name _index
-     * @memberof source._shared.$toolsProvider
-     *
-     * @description
-     * Auxiliary function used for reduction in getValueFromDotedKey.
-     *
-     * @param {Object} object
-     * @param {String} index
-     * @returns {*}
-     * @private
-     */
-    function _index(object, index) {
-      return object[index];
-    }
-
-    /**
-     * @name _getValueFromDotedKey
-     * @memberof source._shared.$toolsProvider
-     *
-     * @description
-     * Allows dot notation traversing (Example: object["a.b.c"] in object["a"]["b"]["c"]).
-     * Returns undefined value instead of exception if no key in object.
-     *
-     * @param {Object} object
-     * @param {String} dotedKey
-     * @returns {*|Undefined}
-     * @private
-     */
-    function _getValueFromDotedKey(object, dotedKey) {
-      if (object[dotedKey] !== undefined) {
-        return object[dotedKey];
-      }
-      try {
-        return dotedKey.split('.').reduce(_index, object);
-      } catch (e) {
-        if (e instanceof TypeError) {
-          return undefined;
-        } else {
-          throw e;
-        }
-      }
-    }
-
-    /**
-     * @name _parseObjectValues
-     * @memberof source._shared.$toolsProvider
-     *
-     * @description
-     * Parses keysObject to assign correct values from collection valuesObject.
-     *
-     * @param {Object} keysObject
-     * @param {Object} valuesObject
-     * @returns {Object}
-     */
-    function _parseObjectValues(keysObject, valuesObject) {
-      var output = {};
-      if (typeof keysObject === 'object') {
-        output = angular.copy(keysObject);
-        for (var index in keysObject) {
-          if (keysObject.hasOwnProperty(index) && valuesObject.hasOwnProperty(keysObject[index])) {
-            output[index] = valuesObject[keysObject[index]];
-          }
-        }
-      }
-      return output;
-    }
-
-    /**
-     * @name _setObjectUsingSchema
-     * @memberof source._shared.$toolsProvider
-     *
-     * @description
-     * Returns an object with values given in "objectSettings" following the pattern given by "objectSchema".
-     * Throws an exception error if "objectSettings" does not fit "objectSchema".
-     * Settings Object will be merged depending on variable "mergeOption".
-     *
-     * @param {Object} objectSchema
-     * @param {Object} objectSettings
-     * @param {Boolean|Object} mergeOption --> If Boolean: true to merge with schema, false no merge with schema.
-     *                                     --> If Object, merge with given object.
-     * @returns {Object}
-     * @private
-     */
-    function _setObjectUsingSchema(objectSchema, objectSettings, mergeOption) {
-      var output = {};
-      angular.forEach(objectSettings, function(item, key) {
-        if (objectSchema.hasOwnProperty(key)) {
-          output[key] = item;
-        } else {
-          throw new Error('Trying to set an unknown property ("' + key + '") in target object.');
-        }
-      });
-      if (mergeOption) {
-        var mergeCondition = (typeof mergeOption === 'object');
-        return (mergeCondition) ? angular.extend({}, mergeOption, output) : angular.extend({}, objectSchema, output) ;
-      } else {
-        return output;
-      }
-    }
-
-    /**
-     * @name setObjectUsingSchemaProvider
-     * @memberof source._shared.$toolsProvider
-     *
-     * @description
-     * Returns an object with values given in "objectSettings" following the pattern given by "objectSchema".
-     * Settings Object will be merged depending on optional variable "mergeOption".
-     * Provider function.
-     *
-     * @param {Object} objectSchema
-     * @param {Object} objectSettings
-     * @param {Boolean|Object} [mergeOption = false] --> If Boolean: true to merge schema, false no merge with schema.
-     *                                               --> If Object, merge with given object.
-     * @returns {Object}
-     */
-    function setObjectUsingSchemaProvider(objectSchema, objectSettings, mergeOption) {
-      mergeOption = mergeOption || $.NO_MERGE;
-      return _setObjectUsingSchema(objectSchema, objectSettings, mergeOption);
-    }
-
-    /**
-     * @namespace $tools
-     * @memberof source._shared.$toolsProvider
-     *
-     * @description
-     * Factory statement for several useful tools.
-     */
-    function $get() {
+    function $get($q, $api) {
       return {
-        /* Global Constants */
         $: $,
-        /* String tools */
-        camelCaseTo: camelCaseTo,
-        toCamelCase: toCamelCase,
-        ucWords: ucWords,
-        getRandomString: getRandomString,
-        /* Array tools */
-        removeArrayItem: removeArrayItem,
-        removeArrayKey: removeArrayKey,
-        arrayMerge: arrayMerge,
-        /* Object tools */
-        getValueFromDotedKey: getValueFromDotedKey,
-        parseObjectValues: parseObjectValues,
-        setObjectUsingSchema: setObjectUsingSchema
+        get: getStatics
       };
 
       /**
-       * @name camelCaseTo
-       * @memberof source._shared.$toolsProvider.$tools
+       * @name _getStaticPromises
+       * @memberof source.static.$staticProvider.$static
        *
        * @description
-       * Returns a string decoded from camelCase to a char separator way.
+       * Build an array with promises of all sources of static variables that are defined in the application.
        *
-       * @param {String} string
-       * @param {String} char
-       * @returns {String}
-       */
-      function camelCaseTo(string, char) {
-        return _convertString(string, char, $.FROM_CAMELCASE_TO_OTHER);
-      }
-
-      /**
-       * @name toCamelCase
-       * @memberof source._shared.$toolsProvider.$tools
-       *
-       * @description
-       * Returns a string encoded in camelCase way from any string with char separator.
-       *
-       * @param {String} string
-       * @param {String} char
-       * @returns {String}
-       */
-      function toCamelCase(string, char) {
-        return _convertString(string, char, $.FROM_OTHER_TO_CAMELCASE);
-      }
-
-      /**
-       * @name ucWords
-       * @memberof source._shared.$toolsProvider.$tools
-       *
-       * @description
-       * Public factory method for using _ucWords. Returns given string with first letter in uppercase.
-       *
-       * @param {String} string
-       * @returns {string}
-       */
-      function ucWords(string) {
-        return _ucWords(string);
-      }
-
-      /**
-       * @name getRandomString
-       * @memberof source._shared.$toolsProvider.$tools
-       *
-       * @description
-       * Returns random string with given number of chars.
-       *
-       * @param {Number} stringLength --> Number of chars for random string
-       * @returns {string}
-       */
-      function getRandomString(stringLength) {
-        return _getRandomString(stringLength);
-      }
-
-      /**
-       * @name removeArrayItem
-       * @memberof source._shared.$toolsProvider.$tools
-       *
-       * @description
-       * Removes a value given from an array. Returns modified array.
-       *
-       * @param {Array} arrayVar
-       * @param {String|Object} item
        * @returns {Array}
+       * @private
        */
-      function removeArrayItem(arrayVar, item) {
-        return _removeFromArray(arrayVar, item, $.MODE_VALUE);
+      function _getStaticPromises() {
+        var _isArraySource = (angular.isArray(_source));
+        var _literalPromises = [];
+        angular.forEach(_source, function(itemDir, keyDir) {
+          if (_isArraySource) {
+            var entityObject = $api.createEntityObject({
+              entityName: itemDir,
+              forceToOne: true
+            });
+            _literalPromises.push($api.getLocalEntity(entityObject));
+          } else {
+            angular.forEach(itemDir, function(itemFile) {
+              var entityObject = $api.createEntityObject({
+                entityName: keyDir + '/' + itemFile,
+                forceToOne: true
+              });
+              _literalPromises.push($api.getLocalEntity(entityObject));
+            });
+          }
+        });
+        return _literalPromises;
       }
 
       /**
-       * @name removeArrayKey
-       * @memberof source._shared.$toolsProvider.$tools
+       * @name _getStatics
+       * @memberof source.static.$staticProvider.$static
        *
        * @description
-       * Removes a key given from an array. Returns modified array.
+       * Create a promise with all statics processed and merged into a single object.
+       * Set statics object.
        *
-       * @param {Array} arrayVar
-       * @param {Number} key
-       * @returns {Array}
+       * @returns {Promise}
+       * @private
        */
-      function removeArrayKey(arrayVar, key) {
-        return _removeFromArray(arrayVar, key, $.MODE_KEY);
+      function _getStatics() {
+        var _promisesToResolve = _getStaticPromises() ;
+        var _itemObject = {};
+        var _defer = $q.defer();
+        _statics = {};
+        $q.all(_promisesToResolve).then(function(success) {
+          angular.forEach(success, function(item) {
+            if (item.hasOwnProperty('documentName') && item.hasOwnProperty('documentType')) {
+              if (!angular.isObject(_itemObject[item.documentName])) {
+                _itemObject[item.documentName] = {};
+              }
+              _itemObject[item.documentName][item.documentType] = item;
+            } else {
+              var errorText = 'No required properties are found in static files';
+              throw new TypeError(errorText + ': "documentName" or "documentType"');
+            }
+            _statics = angular.extend({}, _statics, _itemObject);
+          });
+          _defer.resolve(_statics);
+        });
+        return _defer.promise;
       }
 
       /**
-       * @name arrayMerge
-       * @memberof source._shared.$toolsProvider.$tools
+       * @name getStatics
+       * @memberof source.static.$staticProvider.$static
        *
        * @description
-       * Public factory method for using _arrayMerge. Merges two arrays avoiding duplicate items.
+       * Returns literals object or its promise depending on whether the static variables have been set.
        *
-       * @param {Array} array1
-       * @param {Array} array2
-       * @returns {Array}
+       * @param {String} property
+       * @returns {Object|Promise}
        */
-      function arrayMerge(array1, array2) {
-        return _arrayMerge(array1, array2);
-      }
-
-      /**
-       * @name getValueFromDotedKey
-       * @memberof source._shared.$toolsProvider.$tools
-       *
-       * @description
-       * Allows dot notation traversing (Example: object["a.b.c"] in object["a"]["b"]["c"]).
-       * Returns undefined value instead of exception if no key in object.
-       *
-       * @param {Object} object
-       * @param {String} dotedKey
-       * @returns {*|Undefined}
-       */
-      function getValueFromDotedKey(object, dotedKey) {
-        return _getValueFromDotedKey(object, dotedKey);
-      }
-
-      /**
-       * @name parseObjectValues
-       * @memberof source._shared.$toolsProvider.$tools
-       *
-       * @description
-       * Parses keysObject to assign correct values from collection valuesObject.
-       *
-       * @param {Object} keysObject
-       * @param {Object} valuesObject
-       * @returns {Object}
-       */
-      function parseObjectValues(keysObject, valuesObject) {
-        return _parseObjectValues(keysObject, valuesObject);
-      }
-
-      /**
-       * @name setObjectUsingSchema
-       * @memberof source._shared.$toolsProvider.$tools
-       *
-       * @description
-       * Returns an object with values given in "objectSettings" following the pattern given by "objectSchema".
-       * Settings Object will be merged depending on optional variable "mergeOption".
-       *
-       * @param {Object} objectSchema
-       * @param {Object} objectSettings
-       * @param {Boolean|Object} [mergeOption = true] --> If Boolean: true to merge schema, false no merge with schema.
-       *                                              --> If Object, merge with given object.
-       * @returns {Object}
-       */
-      function setObjectUsingSchema(objectSchema, objectSettings, mergeOption) {
-        mergeOption = mergeOption || $.NO_MERGE;
-        return _setObjectUsingSchema(objectSchema, objectSettings, mergeOption);
+      function getStatics(property) {
+        var _property = property || null;
+        var output = null;
+        if (_statics && _property) {
+          if (_statics.hasOwnProperty(property)) {
+            output = _statics[property];
+          } else {
+            throw new ReferenceError('Trying to get statics property that does not exist: ("' + property + '")');
+          }
+        } else if (_statics) {
+          output = _statics;
+        } else {
+          output = _getStatics();
+        }
+        return output;
       }
     }
   }
@@ -2658,184 +1946,1095 @@
 (function() {
   'use strict';
 
-  /**
-   * @type Object
-   * @property {String} documentName
-   * @property {String} documentType
-   */
+  angular
+    .module('source.view-logic')
+    /**
+     * @namespace appViewModelProvider
+     * @memberof source.view-logic
+     *
+     * @requires $toolsProvider
+     *
+     * @description
+     * Provider that gets constants and models for appView services.
+     */
+    .provider('appViewModel', appViewModel);
+
+  appViewModel.$inject = ['$toolsProvider'];
+
+  function appViewModel($toolsProvider) {
+    var _constants = {
+      SCHEMA_DOM_HANDLER: 'domHandler',
+      SCHEMA_ANIMATION: 'animation',
+      SCHEMA_REGISTERED_EXTERNAL_ANIMATIONS: 'registeredExternalAnimations',
+
+      SHOW: 1,
+      HIDE: 2,
+      SHOW_ANIMATION: 3,
+      HIDE_ANIMATION: 4,
+
+      ANIMATION: true,
+      NO_ANIMATION: false,
+
+      MODE_ANIMATION_IN: true,
+      MODE_ANIMATION_OUT: false,
+
+      ACTIVATE_ANIMATION_CLASS: 'animated'
+    };
+    var $ = angular.extend({}, _constants, $toolsProvider.$);
+
+    /**
+     * @name _providerModel
+     * @memberof source.view-logic.appViewProvider
+     *
+     * @type {Object}
+     * @property {Object} schemas
+     *
+     * @property {Object} schemas.domHandler
+     * @property {String} schemas.domHandler.classToShow
+     * @property {String} schemas.domHandler.classToHide
+     * @property {String} schemas.domHandler.classDefaultAnimationShow
+     * @property {String} schemas.domHandler.classDefaultAnimationHide
+     *
+     * @property {Object} animation
+     * @property {String} animation.classAnimationShow
+     * @property {String} animation.classAnimationHide
+     *
+     * @property {Object} registeredAnimations
+     * @property {Array} registeredAnimations.in
+     * @property {Array} registeredAnimations.out
+     * @private
+     */
+    var _providerModel = {
+      schemas: {
+        domHandler: {
+          classToShow: null,
+          classToHide: null,
+          classDefaultAnimationShow: null,
+          classDefaultAnimationHide: null
+        },
+        animation: {
+          classAnimationShow: null,
+          classAnimationHide: null
+        },
+        registeredAnimations: {
+          in: [],
+          out: []
+        }
+      }
+    };
+
+    return {
+      $: $,
+      get: _getProvider,
+      $get: [$get]
+    };
+
+    /**
+     * @name _getModelSource
+     * @memberof source.view-logic.appViewProvider
+     *
+     * @description
+     * Returns appView model depending on the applicant: Provider or Service.
+     *
+     * @param {Boolean} source
+     * @param {Object} [factoryModel = null]
+     * @returns {Object}
+     * @private
+     */
+    function _getModelSource(source, factoryModel) {
+      factoryModel = factoryModel || null;
+      return (source === $.PROVIDER) ? _providerModel : angular.extend({}, _providerModel, factoryModel) ;
+    }
+
+    /**
+     * @name _getProvider
+     * @memberof source.view-logic.appViewProvider
+     *
+     * @description
+     * Returns appView model for Provider.
+     *
+     * @returns {Object}
+     * @private
+     */
+    function _getProvider() {
+      return _getModelSource($.PROVIDER);
+    }
+
+    /**
+     * @namespace appView
+     * @memberof source.view-logic.appViewProvider
+     *
+     * @description
+     * Factory that gets constants and models for appView services.
+     */
+    function $get() {
+      return {
+        $: $,
+        get: _getFactory
+      };
+
+      /**
+       * @name _getFactory
+       * @memberof source.view-logic.appViewProvider.appView
+       *
+       * @description
+       * Returns appView model for Provider.
+       *
+       * @returns {Object}
+       * @private
+       */
+      function _getFactory() {
+        return _getModelSource($.SERVICE);
+      }
+    }
+  }
+})();
+
+(function() {
+  'use strict';
 
   angular
-    .module('source.static')
+    .module('source.view-logic')
     /**
-     * @namespace $staticProvider
-     * @memberof source.static
+     * @namespace $appViewProvider
+     * @memberof source.view-logic
+     *
+     * @requires $toolsProvider
+     * @requires appViewModelProvider
+     *
+     * @description
+     * Provider statement for some helper methods about view presentation logic.
+     */
+    .provider('$appView', $appView);
+
+  $appView.$inject = ['$toolsProvider', 'appViewModelProvider'];
+
+  function $appView($toolsProvider, appViewModelProvider) {
+    var $ = appViewModelProvider.$;
+    var $c = appViewModelProvider.get();
+    var _domHandler = $c.schemas.domHandler;
+    var _registeredAnimations = $c.schemas.registeredAnimations;
+
+    return {
+      $: $,
+      setDomHandler: setDomHandlerProvider,
+      createDomHandlerObject: createDomHandlerObjectProvider,
+      createAnimationObject: createAnimationObjectProvider,
+      $get: ['$filter', $get]
+    };
+
+    /**
+     * @name _registerExternalAnimation
+     * @memberof source.view-logic.$appViewProvider
+     *
+     * @description
+     * Stores all animations different from defaults.
+     *
+     * @param animationData --> It can be an Object or String.
+     * @param {Boolean} animationMode
+     * @return {Object}
+     * @throws TypeError
+     * @private
+     */
+    function _registerExternalAnimation(animationData, animationMode) {
+      var _in = null;
+      var _out = null;
+      if (typeof animationData === 'string') {
+        if (animationMode === $.MODE_ANIMATION_IN) {
+          _in = animationData;
+        } else {
+          _out = animationData;
+        }
+      } else if (angular.isObject(animationData)) {
+        _in = animationData.classAnimationShow || _in;
+        _out = animationData.classAnimationHide || _out;
+      } else {
+        throw new TypeError('Wrong type of animation data: (' + typeof animationData + ')');
+      }
+      if (_in) {
+        _registeredAnimations.in = $toolsProvider.arrayMerge(_registeredAnimations.in, [_in]);
+      }
+      if (_out) {
+        _registeredAnimations.out = $toolsProvider.arrayMerge(_registeredAnimations.out, [_out]);
+      }
+      return _registeredAnimations;
+    }
+
+    /**
+     * @name _getClassList
+     * @memberof source.view-logic.$appViewProvider
+     *
+     * @description
+     * Returns string list space separated of animation classes to apply to removeClass method.
+     *
+     * @param {Boolean} animationMode
+     * @return {String}
+     * @private
+     */
+    function _getClassList(animationMode) {
+      var _animationObject = angular.copy(_registeredAnimations);
+      var _animationList = null;
+      if (animationMode === $.MODE_ANIMATION_IN) {
+        _animationList = _animationObject.in;
+        _animationList.push(_domHandler.classToShow);
+        _animationList.push(_domHandler.classDefaultAnimationShow);
+      } else {
+        _animationList = _animationObject.out;
+        _animationList.push(_domHandler.classToHide);
+        _animationList.push(_domHandler.classDefaultAnimationHide);
+      }
+      _animationList.push($.ACTIVATE_ANIMATION_CLASS);
+      return _animationList.join(' ');
+    }
+
+    /**
+     * @name _setDomHandler
+     * @memberof source.view-logic.$appViewProvider
+     *
+     * @description
+     * Private function to setting DOM handler configuration object (_domHandler).
+     *
+     * @param {Object} config
+     * @returns {Object}
+     * @private
+     */
+    function _setDomHandler(config) {
+      _domHandler = $toolsProvider.setObjectUsingSchema($c.schemas.domHandler, config, _domHandler);
+      return _domHandler;
+    }
+
+    /**
+     * @name _createSchemaObject
+     * @memberof source.view-logic.$appViewProvider
+     *
+     * @description
+     * Returns an object with the same structure of given schema through given object.
+     *
+     * @param {Object} object
+     * @param {String} schema
+     * @return {Object}
+     * @throws ReferenceError
+     * @private
+     */
+    function _createSchemaObject(object, schema) {
+      if ($c.schemas.hasOwnProperty(schema)) {
+        return $toolsProvider.setObjectUsingSchema($c.schemas[schema], object);
+      } else {
+        throw new ReferenceError('Unknown given schema: (' + schema + ')');
+      }
+    }
+
+    /**
+     * @name _setDomHandlerProvider
+     * @memberof source.view-logic.$appViewProvider
+     *
+     * @description
+     * Provider function to setting DOM handler configuration object (_domHandler).
+     *
+     * @param {Object} config --> Given DOM handler configuration object.
+     * @returns {Object}
+     */
+    function setDomHandlerProvider(config) {
+      return _setDomHandler(config);
+    }
+
+    /**
+     * @name createDomHandlerObjectProvider
+     * @memberof source.view-logic.$appViewProvider
+     *
+     * @description
+     * Provider function exposed that create DOM handler object.
+     *
+     * @param {Object} domHandlerObject
+     * @returns {Object}
+     */
+    function createDomHandlerObjectProvider(domHandlerObject) {
+      return _createSchemaObject(domHandlerObject, $.SCHEMA_DOM_HANDLER);
+    }
+
+    /**
+     * @name createAnimationObjectProvider
+     * @memberof source.view-logic.$appViewProvider
+     *
+     * @description
+     * Provider function exposed that create animation object.
+     *
+     * @param {Object} animationObject
+     * @return {Object}
+     */
+    function createAnimationObjectProvider(animationObject) {
+      return _createSchemaObject(animationObject, $.SCHEMA_ANIMATION);
+    }
+
+    /**
+     * @namespace $appView
+     * @memberof source.view-logic.$appViewProvider
+     *
+     * @requires $filter
+     *
+     * @description
+     * Factory statement for application view provider.
+     */
+    function $get($filter) {
+      return {
+        /* Global Constants */
+        $: $,
+        /* Config methods */
+        setDomHandler: setDomHandlerService,
+        createDomHandlerObject: createDomHandlerObjectService,
+        createAnimationObject: createAnimationObjectService,
+        /* View tools */
+        applyFilter: applyFilter,
+        /* DOM tools */
+        checkElementByClass: checkElementByClass,
+        show: showElement,
+        hide: hideElement
+      };
+
+      /**
+       * @name _displayWayElement
+       * @memberof source.view-logic.$appViewProvider.$appView
+       *
+       * @description
+       * Apply display mode to DOM element given.
+       *
+       * @param {Object} domElement
+       * @param {Number} way
+       * @param animationData --> It can be an Object or String.
+       * @private
+       */
+      function _displayWayElement(domElement, way, animationData) {
+        way = way || $.SHOW;
+        var _animationIn = _domHandler.classDefaultAnimationShow;
+        var _animationOut = _domHandler.classDefaultAnimationHide;
+        if (animationData && (typeof animationData === 'string')) {
+          if (way === $.SHOW_ANIMATION) {
+            _animationIn = animationData;
+          } else if (way === $.HIDE_ANIMATION) {
+            _animationOut = animationData;
+          }
+        } else if (angular.isObject(animationData)) {
+          _animationIn = (animationData.classAnimationShow) ? animationData.classAnimationShow : _animationIn ;
+          _animationOut = (animationData.classAnimationHide) ? animationData.classAnimationHide : _animationOut ;
+        }
+        var _removeClassesShow = _getClassList($.MODE_ANIMATION_IN);
+        var _removeClassesHide = _getClassList($.MODE_ANIMATION_OUT);
+        switch (way) {
+          case $.SHOW:
+            domElement.removeClass(_removeClassesHide).addClass(_domHandler.classToShow);
+            break;
+          case $.HIDE:
+            domElement.removeClass(_removeClassesShow).addClass(_domHandler.classToHide);
+            break;
+          case $.SHOW_ANIMATION:
+            domElement.removeClass(_removeClassesHide).addClass($.ACTIVATE_ANIMATION_CLASS + ' ' + _animationIn);
+            break;
+          case $.HIDE_ANIMATION:
+            domElement.removeClass(_removeClassesShow).addClass($.ACTIVATE_ANIMATION_CLASS + ' ' + _animationOut);
+            break;
+        }
+      }
+
+      /**
+       * @name _setDomHandlerService
+       * @memberof source.view-logic.$appViewProvider.$appView
+       *
+       * @description
+       * Factory function to setting DOM handler configuration object (_domHandler).
+       *
+       * @param {Object} config --> Given DOM handler configuration object.
+       * @returns {Object}
+       */
+      function setDomHandlerService(config) {
+        return _setDomHandler(config);
+      }
+
+      /**
+       * @name createDomHandlerObjectService
+       * @memberof source.view-logic.$appViewProvider.$appView
+       *
+       * @description
+       * Factory function exposed that create DOM handler object.
+       *
+       * @param {Object} domHandlerObject
+       * @returns {Object}
+       */
+      function createDomHandlerObjectService(domHandlerObject) {
+        return _createSchemaObject(domHandlerObject, $.SCHEMA_DOM_HANDLER);
+      }
+
+      /**
+       * @name createAnimationObjectService
+       * @memberof source.view-logic.$appViewProvider.$appView
+       *
+       * @description
+       * Factory function exposed that create animation object.
+       *
+       * @param {Object} animationObject
+       * @return {Object}
+       */
+      function createAnimationObjectService(animationObject) {
+        return _createSchemaObject(animationObject, $.SCHEMA_ANIMATION);
+      }
+
+      /**
+       * @name _applyFilter
+       * @memberof source.view-logic.$appViewProvider.$appView
+       *
+       * @description
+       * Returns data with given filter applied.
+       *
+       * @param {*} data
+       * @param {String} filterName
+       * @returns {*}
+       */
+      function applyFilter(data, filterName) {
+        return $filter(filterName)(data);
+      }
+
+      /**
+       * @name  _checkElementByClass
+       * @memberof source.view-logic.$appViewProvider.$appView
+       *
+       * @description
+       * Checks if the given "domElement" contains any of the classes received in parameter "classes".
+       * Parameter "classes" can be string or array of strings.
+       *
+       * @param {Object} domElement
+       * @param {String|Array} classes
+       * @returns {String|Boolean}
+       */
+      function checkElementByClass(domElement, classes) {
+        var _output = false;
+        var _classes = classes || null;
+        var _isString = (typeof _classes === 'string');
+        var _isArray = angular.isArray(_classes);
+        if (_isString || _isArray) {
+          _classes = (_isString) ? [classes] : classes ;
+          angular.forEach(_classes, function(item) {
+            if (domElement.classList.contains(item)) {
+              _output = item;
+            }
+          });
+        } else {
+          throw new TypeError('Invalid type of parameter "classes". It must be string or array.');
+        }
+        return _output;
+      }
+
+      /**
+       * @name showElement
+       * @memberof source.view-logic.$appViewProvider.$appView
+       *
+       * @description
+       * Applies CSS classes to show given DOM element.
+       *
+       * @param {Object} domElement
+       * @param {Boolean} [activateAnimation]
+       * @param {String|Object} [animationData]
+       */
+      function showElement(domElement, activateAnimation, animationData) {
+        activateAnimation = activateAnimation || false;
+        var _showWay = (activateAnimation) ? $.SHOW_ANIMATION : $.SHOW ;
+        if (animationData) {
+          _registerExternalAnimation(animationData, $.MODE_ANIMATION_IN);
+        }
+        return _displayWayElement(domElement, _showWay, animationData);
+      }
+
+      /**
+       * @name hideElement
+       * @memberof source.view-logic.$appViewProvider.$appView
+       *
+       * @description
+       * Applies CSS classes to hide given DOM element.
+       *
+       * @param {Object} domElement
+       * @param {Boolean} [activateAnimation]
+       * @param {String|Object} [animationData]
+       */
+      function hideElement(domElement, activateAnimation, animationData) {
+        activateAnimation = activateAnimation || false;
+        var _hideWay = (activateAnimation) ? $.HIDE_ANIMATION : $.HIDE ;
+        if (animationData) {
+          _registerExternalAnimation(animationData, $.MODE_ANIMATION_OUT);
+        }
+        return _displayWayElement(domElement, _hideWay, animationData);
+      }
+    }
+  }
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    .module('source._shared')
+    /**
+     * @namespace globalConstantsProvider
+     * @memberof source._shared
+     *
+     * @description
+     * Provider that gets the global constants of the application.
+     */
+    .provider('globalConstants', globalConstants);
+
+  function globalConstants() {
+    var _constants = {
+      NO_OBJECT: {},
+
+      FROM_CAMELCASE_TO_OTHER: true,
+      FROM_OTHER_TO_CAMELCASE: false,
+
+      MODE_KEY: true,
+      MODE_VALUE: false,
+
+      ENCODE: true,
+      DECODE: false,
+
+      TITLE: 1,
+      SUBTITLE: 2,
+
+      PROCESSES: 'processes',
+      MODULES: 'modules',
+      STATES: 'states',
+
+      PROVIDER: true,
+      SERVICE: false,
+
+      MERGE: true,
+      NO_MERGE: false,
+
+      KEY: {
+        ESCAPE: {
+          NAME: 'Escape',
+          CODE: 27
+        },
+        ENTER: {
+          NAME: 'Enter',
+          CODE: 13
+        },
+        ARROW_DOWN: {
+          NAME: 'ArrowDown',
+          CODE: 40
+        },
+        ARROW_UP: {
+          NAME: 'ArrowUp',
+          CODE: 38
+        }
+      }
+    };
+
+    return {
+      get: getProvider,
+      $get: [$get]
+    };
+
+    /**
+     * @name getProvider
+     * @memberof source._shared.globalConstantsProvider
+     *
+     * @description
+     * Get constants object for provider.
+     *
+     * @returns {Object}
+     */
+    function getProvider() {
+      return _constants;
+    }
+
+    /**
+     * @namespace globalConstants
+     * @memberof source._shared.globalConstantsProvider
+     *
+     * @description
+     * Factory that provides the global constants of the application.
+     */
+    function $get() {
+      return {
+        get: getFactory
+      };
+
+      /**
+       * @name getFactory
+       * @memberof source._shared.globalConstantsProvider.globalConstants
+       *
+       * @description
+       * Get constants object for factory.
+       *
+       * @returns {Object}
+       */
+      function getFactory() {
+        return _constants;
+      }
+    }
+  }
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    .module('source._shared')
+    /**
+     * @namespace $toolsProvider
+     * @memberof source._shared
      *
      * @requires globalConstantsProvider
      *
      * @description
-     * Provider statement to manage static variables for application.
+     * Provider statement for several useful tools.
      */
-    .provider('$static', $static);
+    .provider('$tools', $tools);
 
-  $static.$inject = ['globalConstantsProvider'];
+  $tools.$inject = ['globalConstantsProvider'];
 
-  function $static(globalConstantsProvider) {
+  function $tools(globalConstantsProvider) {
     var $ = globalConstantsProvider.get();
-    var _source = null;
-    var _statics = null;
 
     return {
-      /* Global Constants */
+      /* Global constants */
       $: $,
-      /* Provider LITERALS tools */
-      setSource: setProviderSource,
-      /* API Factory */
-      $get: ['$q', '$api', $get]
+      /* Array tools */
+      arrayMerge: arrayMergeProvider,
+      /* Object tools */
+      setObjectUsingSchema: setObjectUsingSchemaProvider,
+      /* $tools factory */
+      $get: [$get]
     };
 
     /**
-     * @name _setSource
-     * @memberof source.static.$staticProvider
+     * @name _convertString
+     * @memberof source._shared.$toolsProvider
      *
      * @description
-     * Private method to set JSON source files containing the application static variables.
+     * Function that encoding camelCase, or decoding camelCase, a given string.
      *
-     * @param {String|Array|Object} source
-     * @returns {Array|Object}
+     * @param {String} string
+     * @param {String} char
+     * @param {Boolean} conversionType
+     * @returns {String}
      * @private
      */
-    function _setSource(source) {
-      var _isStringSource = (typeof source === 'string');
-      if (_isStringSource || angular.isObject(source)) {
-        _source = (_isStringSource) ? [source] : source ;
+    function _convertString(string, char, conversionType) {
+      if (string !== undefined && conversionType !== undefined) {
+        var defaultChar = (char) ? char : '-' ;
+        if (conversionType === $.FROM_CAMELCASE_TO_OTHER) {
+          return string.replace(/([A-Z])/g, function($1) {
+            return defaultChar + $1.toLowerCase();
+          });
+        } else {
+          var output = string.split(defaultChar).map(function(item) {
+            return item.charAt(0).toUpperCase() + item.slice(1);
+          }).join('');
+          return output.charAt(0).toLowerCase() + output.slice(1);
+        }
       } else {
-        throw new TypeError('Wrong type argument: Static source must be string or array or object.');
+        throw new ReferenceError('Function parameters missing.');
       }
-      return _source;
     }
 
     /**
-     * @name setProviderSource
-     * @memberof source.static.$staticProvider
+     * @name _ucWords
+     * @memberof source._shared.$toolsProvider
      *
      * @description
-     * Provider public function to set JSON source files containing the application static variables.
+     * Returns given string with first letter in uppercase.
      *
-     * @param {String|Array|Object} source
-     * @returns {Array|Object}
+     * @param {String} string
+     * @returns {string}
+     * @private
      */
-    function setProviderSource(source) {
-      return _setSource(source);
+    function _ucWords(string) {
+      return string.charAt(0).toUpperCase() + string.slice(1);
     }
 
     /**
-     * @namespace $static
-     * @memberof source.static.$staticProvider
-     *
-     * @requires $q
-     * @requires $api
+     * @name _getRandomString
+     * @memberof source._shared.$toolsProvider
      *
      * @description
-     * Factory statement to manage static variables for application.
+     * Returns random string with given number of chars.
+     *
+     * @param {Number} stringLength --> Number of chars for random string
+     * @returns {string}
+     * @private
      */
-    function $get($q, $api) {
+    function _getRandomString(stringLength) {
+      var output = '';
+      var possibilities = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+      for (var i = 0; i < stringLength; i++) {
+        output += possibilities.charAt(Math.floor(Math.random() * possibilities.length));
+      }
+      return output;
+    }
+
+    /**
+     * @name _removeFromArray
+     * @memberof source._shared.$toolsProvider
+     *
+     * @description
+     * Removes an element from an array from a given value or from a given key. Returns given array without the
+     * element we want to remove.
+     *
+     * @param {Array} arrayVar
+     * @param {Number|String|Object} givenVar
+     * @param {Boolean} mode
+     * @returns {Array}
+     * @private
+     */
+    function _removeFromArray(arrayVar, givenVar, mode) {
+      var key = givenVar;
+      if (mode === $.MODE_VALUE) {
+        key = arrayVar.indexOf(givenVar);
+      }
+      if ((key) && (key > -1)) {
+        arrayVar.splice(key, 1);
+      }
+      return arrayVar;
+    }
+
+    /**
+     * @name _arrayMerge
+     * @memberof source._shared.$toolsProvider
+     *
+     * @description
+     * Merges two arrays avoiding duplicate items.
+     *
+     * @param {Array} array1
+     * @param {Array} array2
+     * @returns {Array}
+     * @private
+     */
+    function _arrayMerge(array1, array2) {
+      if (angular.isArray(array1) && angular.isArray(array2)) {
+        var _mergedArray = angular.copy(array1);
+        array2.reduce(function(array, value) {
+          if (array.indexOf(value) < 0) {
+            array.push(value);
+          }
+          return array;
+        }, _mergedArray);
+        return _mergedArray;
+      } else {
+        var error = 'The "_arrayMerge" method expects two array arguments and at least one of them is not array.';
+        throw new TypeError(error);
+      }
+    }
+
+    /**
+     * @name _index
+     * @memberof source._shared.$toolsProvider
+     *
+     * @description
+     * Auxiliary function used for reduction in getValueFromDotedKey.
+     *
+     * @param {Object} object
+     * @param {String} index
+     * @returns {*}
+     * @private
+     */
+    function _index(object, index) {
+      return object[index];
+    }
+
+    /**
+     * @name _getValueFromDotedKey
+     * @memberof source._shared.$toolsProvider
+     *
+     * @description
+     * Allows dot notation traversing (Example: object["a.b.c"] in object["a"]["b"]["c"]).
+     * Returns undefined value instead of exception if no key in object.
+     *
+     * @param {Object} object
+     * @param {String} dotedKey
+     * @returns {*|Undefined}
+     * @private
+     */
+    function _getValueFromDotedKey(object, dotedKey) {
+      if (object[dotedKey] !== undefined) {
+        return object[dotedKey];
+      }
+      try {
+        return dotedKey.split('.').reduce(_index, object);
+      } catch (e) {
+        if (e instanceof TypeError) {
+          return undefined;
+        } else {
+          throw e;
+        }
+      }
+    }
+
+    /**
+     * @name _parseObjectValues
+     * @memberof source._shared.$toolsProvider
+     *
+     * @description
+     * Parses keysObject to assign correct values from collection valuesObject.
+     *
+     * @param {Object} keysObject
+     * @param {Object} valuesObject
+     * @returns {Object}
+     */
+    function _parseObjectValues(keysObject, valuesObject) {
+      var output = {};
+      if (typeof keysObject === 'object') {
+        output = angular.copy(keysObject);
+        for (var index in keysObject) {
+          if (keysObject.hasOwnProperty(index) && valuesObject.hasOwnProperty(keysObject[index])) {
+            output[index] = valuesObject[keysObject[index]];
+          }
+        }
+      }
+      return output;
+    }
+
+    /**
+     * @name _setObjectUsingSchema
+     * @memberof source._shared.$toolsProvider
+     *
+     * @description
+     * Returns an object with values given in "objectSettings" following the pattern given by "objectSchema".
+     * Throws an exception error if "objectSettings" does not fit "objectSchema".
+     * Settings Object will be merged depending on variable "mergeOption".
+     *
+     * @param {Object} objectSchema
+     * @param {Object} objectSettings
+     * @param {Boolean|Object} mergeOption --> If Boolean: true to merge with schema, false no merge with schema.
+     *                                     --> If Object, merge with given object.
+     * @returns {Object}
+     * @private
+     */
+    function _setObjectUsingSchema(objectSchema, objectSettings, mergeOption) {
+      var output = {};
+      angular.forEach(objectSettings, function(item, key) {
+        if (objectSchema.hasOwnProperty(key)) {
+          output[key] = item;
+        } else {
+          throw new Error('Trying to set an unknown property ("' + key + '") in target object.');
+        }
+      });
+      if (mergeOption) {
+        var mergeCondition = (typeof mergeOption === 'object');
+        return (mergeCondition) ? angular.extend({}, mergeOption, output) : angular.extend({}, objectSchema, output) ;
+      } else {
+        return output;
+      }
+    }
+
+    /**
+     * @name arrayMergeProvider
+     * @memberof source._shared.$toolsProvider.$tools
+     *
+     * @description
+     * Exposed provider method for using _arrayMerge. Merges two arrays avoiding duplicate items.
+     *
+     * @param {Array} array1
+     * @param {Array} array2
+     * @returns {Array}
+     */
+    function arrayMergeProvider(array1, array2) {
+      return _arrayMerge(array1, array2);
+    }
+
+    /**
+     * @name setObjectUsingSchemaProvider
+     * @memberof source._shared.$toolsProvider
+     *
+     * @description
+     * Returns an object with values given in "objectSettings" following the pattern given by "objectSchema".
+     * Settings Object will be merged depending on optional variable "mergeOption".
+     * Provider function.
+     *
+     * @param {Object} objectSchema
+     * @param {Object} objectSettings
+     * @param {Boolean|Object} [mergeOption = false] --> If Boolean: true to merge schema, false no merge with schema.
+     *                                               --> If Object, merge with given object.
+     * @returns {Object}
+     */
+    function setObjectUsingSchemaProvider(objectSchema, objectSettings, mergeOption) {
+      mergeOption = mergeOption || $.NO_MERGE;
+      return _setObjectUsingSchema(objectSchema, objectSettings, mergeOption);
+    }
+
+    /**
+     * @namespace $tools
+     * @memberof source._shared.$toolsProvider
+     *
+     * @description
+     * Factory statement for several useful tools.
+     */
+    function $get() {
       return {
+        /* Global Constants */
         $: $,
-        get: getStatics
+        /* String tools */
+        camelCaseTo: camelCaseTo,
+        toCamelCase: toCamelCase,
+        ucWords: ucWords,
+        getRandomString: getRandomString,
+        /* Array tools */
+        removeArrayItem: removeArrayItem,
+        removeArrayKey: removeArrayKey,
+        arrayMerge: arrayMerge,
+        /* Object tools */
+        getValueFromDotedKey: getValueFromDotedKey,
+        parseObjectValues: parseObjectValues,
+        setObjectUsingSchema: setObjectUsingSchema
       };
 
       /**
-       * @name _getStaticPromises
-       * @memberof source.static.$staticProvider.$static
+       * @name camelCaseTo
+       * @memberof source._shared.$toolsProvider.$tools
        *
        * @description
-       * Build an array with promises of all sources of static variables that are defined in the application.
+       * Returns a string decoded from camelCase to a char separator way.
        *
+       * @param {String} string
+       * @param {String} char
+       * @returns {String}
+       */
+      function camelCaseTo(string, char) {
+        return _convertString(string, char, $.FROM_CAMELCASE_TO_OTHER);
+      }
+
+      /**
+       * @name toCamelCase
+       * @memberof source._shared.$toolsProvider.$tools
+       *
+       * @description
+       * Returns a string encoded in camelCase way from any string with char separator.
+       *
+       * @param {String} string
+       * @param {String} char
+       * @returns {String}
+       */
+      function toCamelCase(string, char) {
+        return _convertString(string, char, $.FROM_OTHER_TO_CAMELCASE);
+      }
+
+      /**
+       * @name ucWords
+       * @memberof source._shared.$toolsProvider.$tools
+       *
+       * @description
+       * Public factory method for using _ucWords. Returns given string with first letter in uppercase.
+       *
+       * @param {String} string
+       * @returns {string}
+       */
+      function ucWords(string) {
+        return _ucWords(string);
+      }
+
+      /**
+       * @name getRandomString
+       * @memberof source._shared.$toolsProvider.$tools
+       *
+       * @description
+       * Returns random string with given number of chars.
+       *
+       * @param {Number} stringLength --> Number of chars for random string
+       * @returns {string}
+       */
+      function getRandomString(stringLength) {
+        return _getRandomString(stringLength);
+      }
+
+      /**
+       * @name removeArrayItem
+       * @memberof source._shared.$toolsProvider.$tools
+       *
+       * @description
+       * Removes a value given from an array. Returns modified array.
+       *
+       * @param {Array} arrayVar
+       * @param {String|Object} item
        * @returns {Array}
-       * @private
        */
-      function _getStaticPromises() {
-        var _isArraySource = (angular.isArray(_source));
-        var _literalPromises = [];
-        angular.forEach(_source, function(itemDir, keyDir) {
-          if (_isArraySource) {
-            var entityObject = $api.createEntityObject({
-              entityName: itemDir,
-              forceToOne: true
-            });
-            _literalPromises.push($api.getLocalEntity(entityObject));
-          } else {
-            angular.forEach(itemDir, function(itemFile) {
-              var entityObject = $api.createEntityObject({
-                entityName: keyDir + '/' + itemFile,
-                forceToOne: true
-              });
-              _literalPromises.push($api.getLocalEntity(entityObject));
-            });
-          }
-        });
-        return _literalPromises;
+      function removeArrayItem(arrayVar, item) {
+        return _removeFromArray(arrayVar, item, $.MODE_VALUE);
       }
 
       /**
-       * @name _getStatics
-       * @memberof source.static.$staticProvider.$static
+       * @name removeArrayKey
+       * @memberof source._shared.$toolsProvider.$tools
        *
        * @description
-       * Create a promise with all statics processed and merged into a single object.
-       * Set statics object.
+       * Removes a key given from an array. Returns modified array.
        *
-       * @returns {Promise}
-       * @private
+       * @param {Array} arrayVar
+       * @param {Number} key
+       * @returns {Array}
        */
-      function _getStatics() {
-        var _promisesToResolve = _getStaticPromises() ;
-        var _itemObject = {};
-        var _defer = $q.defer();
-        _statics = {};
-        $q.all(_promisesToResolve).then(function(success) {
-          angular.forEach(success, function(item) {
-            if (item.hasOwnProperty('documentName') && item.hasOwnProperty('documentType')) {
-              if (!angular.isObject(_itemObject[item.documentName])) {
-                _itemObject[item.documentName] = {};
-              }
-              _itemObject[item.documentName][item.documentType] = item;
-            } else {
-              var errorText = 'No required properties are found in static files';
-              throw new TypeError(errorText + ': "documentName" or "documentType"');
-            }
-            _statics = angular.extend({}, _statics, _itemObject);
-          });
-          _defer.resolve(_statics);
-        });
-        return _defer.promise;
+      function removeArrayKey(arrayVar, key) {
+        return _removeFromArray(arrayVar, key, $.MODE_KEY);
       }
 
       /**
-       * @name getStatics
-       * @memberof source.static.$staticProvider.$static
+       * @name arrayMerge
+       * @memberof source._shared.$toolsProvider.$tools
        *
        * @description
-       * Returns literals object or its promise depending on whether the static variables have been set.
+       * Public factory method for using _arrayMerge. Merges two arrays avoiding duplicate items.
        *
-       * @param {String} property
-       * @returns {Object|Promise}
+       * @param {Array} array1
+       * @param {Array} array2
+       * @returns {Array}
        */
-      function getStatics(property) {
-        var _property = property || null;
-        var output = null;
-        if (_statics && _property) {
-          if (_statics.hasOwnProperty(property)) {
-            output = _statics[property];
-          } else {
-            throw new ReferenceError('Trying to get statics property that does not exist: ("' + property + '")');
-          }
-        } else if (_statics) {
-          output = _statics;
-        } else {
-          output = _getStatics();
-        }
-        return output;
+      function arrayMerge(array1, array2) {
+        return _arrayMerge(array1, array2);
+      }
+
+      /**
+       * @name getValueFromDotedKey
+       * @memberof source._shared.$toolsProvider.$tools
+       *
+       * @description
+       * Allows dot notation traversing (Example: object["a.b.c"] in object["a"]["b"]["c"]).
+       * Returns undefined value instead of exception if no key in object.
+       *
+       * @param {Object} object
+       * @param {String} dotedKey
+       * @returns {*|Undefined}
+       */
+      function getValueFromDotedKey(object, dotedKey) {
+        return _getValueFromDotedKey(object, dotedKey);
+      }
+
+      /**
+       * @name parseObjectValues
+       * @memberof source._shared.$toolsProvider.$tools
+       *
+       * @description
+       * Parses keysObject to assign correct values from collection valuesObject.
+       *
+       * @param {Object} keysObject
+       * @param {Object} valuesObject
+       * @returns {Object}
+       */
+      function parseObjectValues(keysObject, valuesObject) {
+        return _parseObjectValues(keysObject, valuesObject);
+      }
+
+      /**
+       * @name setObjectUsingSchema
+       * @memberof source._shared.$toolsProvider.$tools
+       *
+       * @description
+       * Returns an object with values given in "objectSettings" following the pattern given by "objectSchema".
+       * Settings Object will be merged depending on optional variable "mergeOption".
+       *
+       * @param {Object} objectSchema
+       * @param {Object} objectSettings
+       * @param {Boolean|Object} [mergeOption = true] --> If Boolean: true to merge schema, false no merge with schema.
+       *                                              --> If Object, merge with given object.
+       * @returns {Object}
+       */
+      function setObjectUsingSchema(objectSchema, objectSettings, mergeOption) {
+        mergeOption = mergeOption || $.NO_MERGE;
+        return _setObjectUsingSchema(objectSchema, objectSettings, mergeOption);
       }
     }
   }

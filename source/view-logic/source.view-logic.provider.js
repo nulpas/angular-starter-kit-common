@@ -21,13 +21,79 @@
     var $ = appViewModelProvider.$;
     var $c = appViewModelProvider.get();
     var _domHandler = $c.schemas.domHandler;
+    var _registeredAnimations = $c.schemas.registeredAnimations;
 
     return {
       $: $,
       setDomHandler: setDomHandlerProvider,
       createDomHandlerObject: createDomHandlerObjectProvider,
+      createAnimationObject: createAnimationObjectProvider,
       $get: ['$filter', $get]
     };
+
+    /**
+     * @name _registerExternalAnimation
+     * @memberof source.view-logic.$appViewProvider
+     *
+     * @description
+     * Stores all animations different from defaults.
+     *
+     * @param animationData --> It can be an Object or String.
+     * @param {Boolean} animationMode
+     * @return {Object}
+     * @throws TypeError
+     * @private
+     */
+    function _registerExternalAnimation(animationData, animationMode) {
+      var _in = null;
+      var _out = null;
+      if (typeof animationData === 'string') {
+        if (animationMode === $.MODE_ANIMATION_IN) {
+          _in = animationData;
+        } else {
+          _out = animationData;
+        }
+      } else if (angular.isObject(animationData)) {
+        _in = animationData.classAnimationShow || _in;
+        _out = animationData.classAnimationHide || _out;
+      } else {
+        throw new TypeError('Wrong type of animation data: (' + typeof animationData + ')');
+      }
+      if (_in) {
+        _registeredAnimations.in = $toolsProvider.arrayMerge(_registeredAnimations.in, [_in]);
+      }
+      if (_out) {
+        _registeredAnimations.out = $toolsProvider.arrayMerge(_registeredAnimations.out, [_out]);
+      }
+      return _registeredAnimations;
+    }
+
+    /**
+     * @name _getClassList
+     * @memberof source.view-logic.$appViewProvider
+     *
+     * @description
+     * Returns string list space separated of animation classes to apply to removeClass method.
+     *
+     * @param {Boolean} animationMode
+     * @return {String}
+     * @private
+     */
+    function _getClassList(animationMode) {
+      var _animationObject = angular.copy(_registeredAnimations);
+      var _animationList = null;
+      if (animationMode === $.MODE_ANIMATION_IN) {
+        _animationList = _animationObject.in;
+        _animationList.push(_domHandler.classToShow);
+        _animationList.push(_domHandler.classDefaultAnimationShow);
+      } else {
+        _animationList = _animationObject.out;
+        _animationList.push(_domHandler.classToHide);
+        _animationList.push(_domHandler.classDefaultAnimationHide);
+      }
+      _animationList.push($.ACTIVATE_ANIMATION_CLASS);
+      return _animationList.join(' ');
+    }
 
     /**
      * @name _setDomHandler
@@ -46,18 +112,24 @@
     }
 
     /**
-     * @name _createDomHandlerObject
+     * @name _createSchemaObject
      * @memberof source.view-logic.$appViewProvider
      *
      * @description
-     * Returns an object with the same structure of DOM handler schema through given DOM handler object.
+     * Returns an object with the same structure of given schema through given object.
      *
-     * @param {Object} domHandlerObject
-     * @returns {Object}
+     * @param {Object} object
+     * @param {String} schema
+     * @return {Object}
+     * @throws ReferenceError
      * @private
      */
-    function _createDomHandlerObject(domHandlerObject) {
-      return $toolsProvider.setObjectUsingSchema($c.schemas.domHandler, domHandlerObject);
+    function _createSchemaObject(object, schema) {
+      if ($c.schemas.hasOwnProperty(schema)) {
+        return $toolsProvider.setObjectUsingSchema($c.schemas[schema], object);
+      } else {
+        throw new ReferenceError('Unknown given schema: (' + schema + ')');
+      }
     }
 
     /**
@@ -79,13 +151,27 @@
      * @memberof source.view-logic.$appViewProvider
      *
      * @description
-     * Provider function exposed for _createDomHandlerObject.
+     * Provider function exposed that create DOM handler object.
      *
      * @param {Object} domHandlerObject
      * @returns {Object}
      */
     function createDomHandlerObjectProvider(domHandlerObject) {
-      return _createDomHandlerObject(domHandlerObject);
+      return _createSchemaObject(domHandlerObject, $.SCHEMA_DOM_HANDLER);
+    }
+
+    /**
+     * @name createAnimationObjectProvider
+     * @memberof source.view-logic.$appViewProvider
+     *
+     * @description
+     * Provider function exposed that create animation object.
+     *
+     * @param {Object} animationObject
+     * @return {Object}
+     */
+    function createAnimationObjectProvider(animationObject) {
+      return _createSchemaObject(animationObject, $.SCHEMA_ANIMATION);
     }
 
     /**
@@ -104,6 +190,7 @@
         /* Config methods */
         setDomHandler: setDomHandlerService,
         createDomHandlerObject: createDomHandlerObjectService,
+        createAnimationObject: createAnimationObjectService,
         /* View tools */
         applyFilter: applyFilter,
         /* DOM tools */
@@ -121,16 +208,37 @@
        *
        * @param {Object} domElement
        * @param {Number} way
+       * @param animationData --> It can be an Object or String.
        * @private
        */
-      function _displayWayElement(domElement, way) {
+      function _displayWayElement(domElement, way, animationData) {
         way = way || $.SHOW;
+        var _animationIn = _domHandler.classDefaultAnimationShow;
+        var _animationOut = _domHandler.classDefaultAnimationHide;
+        if (animationData && (typeof animationData === 'string')) {
+          if (way === $.SHOW_ANIMATION) {
+            _animationIn = animationData;
+          } else if (way === $.HIDE_ANIMATION) {
+            _animationOut = animationData;
+          }
+        } else if (angular.isObject(animationData)) {
+          _animationIn = (animationData.classAnimationShow) ? animationData.classAnimationShow : _animationIn ;
+          _animationOut = (animationData.classAnimationHide) ? animationData.classAnimationHide : _animationOut ;
+        }
+        var _removeClassesShow = _getClassList($.MODE_ANIMATION_IN);
+        var _removeClassesHide = _getClassList($.MODE_ANIMATION_OUT);
         switch (way) {
           case $.SHOW:
-            domElement.removeClass(_domHandler.classToHide).addClass(_domHandler.classToShow);
+            domElement.removeClass(_removeClassesHide).addClass(_domHandler.classToShow);
             break;
           case $.HIDE:
-            domElement.removeClass(_domHandler.classToShow).addClass(_domHandler.classToHide);
+            domElement.removeClass(_removeClassesShow).addClass(_domHandler.classToHide);
+            break;
+          case $.SHOW_ANIMATION:
+            domElement.removeClass(_removeClassesHide).addClass($.ACTIVATE_ANIMATION_CLASS + ' ' + _animationIn);
+            break;
+          case $.HIDE_ANIMATION:
+            domElement.removeClass(_removeClassesShow).addClass($.ACTIVATE_ANIMATION_CLASS + ' ' + _animationOut);
             break;
         }
       }
@@ -154,13 +262,27 @@
        * @memberof source.view-logic.$appViewProvider.$appView
        *
        * @description
-       * Factory function exposed for _createDomHandlerObject.
+       * Factory function exposed that create DOM handler object.
        *
        * @param {Object} domHandlerObject
        * @returns {Object}
        */
       function createDomHandlerObjectService(domHandlerObject) {
-        return _createDomHandlerObject(domHandlerObject);
+        return _createSchemaObject(domHandlerObject, $.SCHEMA_DOM_HANDLER);
+      }
+
+      /**
+       * @name createAnimationObjectService
+       * @memberof source.view-logic.$appViewProvider.$appView
+       *
+       * @description
+       * Factory function exposed that create animation object.
+       *
+       * @param {Object} animationObject
+       * @return {Object}
+       */
+      function createAnimationObjectService(animationObject) {
+        return _createSchemaObject(animationObject, $.SCHEMA_ANIMATION);
       }
 
       /**
@@ -216,9 +338,16 @@
        * Applies CSS classes to show given DOM element.
        *
        * @param {Object} domElement
+       * @param {Boolean} [activateAnimation]
+       * @param {String|Object} [animationData]
        */
-      function showElement(domElement) {
-        return _displayWayElement(domElement, $.SHOW);
+      function showElement(domElement, activateAnimation, animationData) {
+        activateAnimation = activateAnimation || false;
+        var _showWay = (activateAnimation) ? $.SHOW_ANIMATION : $.SHOW ;
+        if (animationData) {
+          _registerExternalAnimation(animationData, $.MODE_ANIMATION_IN);
+        }
+        return _displayWayElement(domElement, _showWay, animationData);
       }
 
       /**
@@ -229,9 +358,16 @@
        * Applies CSS classes to hide given DOM element.
        *
        * @param {Object} domElement
+       * @param {Boolean} [activateAnimation]
+       * @param {String|Object} [animationData]
        */
-      function hideElement(domElement) {
-        return _displayWayElement(domElement, $.HIDE);
+      function hideElement(domElement, activateAnimation, animationData) {
+        activateAnimation = activateAnimation || false;
+        var _hideWay = (activateAnimation) ? $.HIDE_ANIMATION : $.HIDE ;
+        if (animationData) {
+          _registerExternalAnimation(animationData, $.MODE_ANIMATION_OUT);
+        }
+        return _displayWayElement(domElement, _hideWay, animationData);
       }
     }
   }

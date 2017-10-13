@@ -18,16 +18,62 @@
 
   function appViewModel($toolsProvider) {
     var _constants = {
+      SCHEMA_DOM_HANDLER: 'domHandler',
+      SCHEMA_ANIMATION: 'animation',
+      SCHEMA_REGISTERED_EXTERNAL_ANIMATIONS: 'registeredExternalAnimations',
+
       SHOW: 1,
-      HIDE: 2
+      HIDE: 2,
+      SHOW_ANIMATION: 3,
+      HIDE_ANIMATION: 4,
+
+      ANIMATION: true,
+      NO_ANIMATION: false,
+
+      MODE_ANIMATION_IN: true,
+      MODE_ANIMATION_OUT: false,
+
+      ACTIVATE_ANIMATION_CLASS: 'animated'
     };
     var $ = angular.extend({}, _constants, $toolsProvider.$);
 
+    /**
+     * @name _providerModel
+     * @memberof source.view-logic.appViewProvider
+     *
+     * @type {Object}
+     * @property {Object} schemas
+     *
+     * @property {Object} schemas.domHandler
+     * @property {String} schemas.domHandler.classToShow
+     * @property {String} schemas.domHandler.classToHide
+     * @property {String} schemas.domHandler.classDefaultAnimationShow
+     * @property {String} schemas.domHandler.classDefaultAnimationHide
+     *
+     * @property {Object} animation
+     * @property {String} animation.classAnimationShow
+     * @property {String} animation.classAnimationHide
+     *
+     * @property {Object} registeredAnimations
+     * @property {Array} registeredAnimations.in
+     * @property {Array} registeredAnimations.out
+     * @private
+     */
     var _providerModel = {
       schemas: {
         domHandler: {
           classToShow: null,
-          classToHide: null
+          classToHide: null,
+          classDefaultAnimationShow: null,
+          classDefaultAnimationHide: null
+        },
+        animation: {
+          classAnimationShow: null,
+          classAnimationHide: null
+        },
+        registeredAnimations: {
+          in: [],
+          out: []
         }
       }
     };

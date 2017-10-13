@@ -22,6 +22,8 @@
     return {
       /* Global constants */
       $: $,
+      /* Array tools */
+      arrayMerge: arrayMergeProvider,
       /* Object tools */
       setObjectUsingSchema: setObjectUsingSchemaProvider,
       /* $tools factory */
@@ -246,6 +248,21 @@
       } else {
         return output;
       }
+    }
+
+    /**
+     * @name arrayMergeProvider
+     * @memberof source._shared.$toolsProvider.$tools
+     *
+     * @description
+     * Exposed provider method for using _arrayMerge. Merges two arrays avoiding duplicate items.
+     *
+     * @param {Array} array1
+     * @param {Array} array2
+     * @returns {Array}
+     */
+    function arrayMergeProvider(array1, array2) {
+      return _arrayMerge(array1, array2);
     }
 
     /**
