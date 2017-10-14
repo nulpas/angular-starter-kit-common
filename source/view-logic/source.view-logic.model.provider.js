@@ -23,6 +23,11 @@
       SCHEMA_ANIMATION_EVENTS: 'animationEvents',
       SCHEMA_REGISTERED_EXTERNAL_ANIMATIONS: 'registeredExternalAnimations',
 
+      DOM_HANDLER_CLASS_TO_SHOW: 'classToShow',
+      DOM_HANDLER_CLASS_TO_HIDE: 'classToHide',
+      DOM_HANDLER_CLASS_DEFAULT_ANIMATION_SHOW: 'classDefaultAnimationShow',
+      DOM_HANDLER_CLASS_DEFAULT_ANIMATION_HIDE: 'classDefaultAnimationHide',
+
       SHOW: 1,
       HIDE: 2,
       SHOW_ANIMATION: 3,
