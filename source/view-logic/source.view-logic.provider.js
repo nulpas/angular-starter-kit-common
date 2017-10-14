@@ -300,18 +300,24 @@
         var _animationEventsEndList = _animationEvents[$.ANIMATION_END].join(' ');
         var _animationIn = _domHandler.classDefaultAnimationShow;
         var _animationOut = _domHandler.classDefaultAnimationHide;
-        if (_noAnimationBrowser && (way === $.SHOW_ANIMATION)) {
-          way = $.SHOW;
-        } else if (way === $.HIDE_ANIMATION) {
-          way = $.HIDE;
+        if (_noAnimationBrowser) {
+          if (way === $.SHOW_ANIMATION) {
+            way = $.SHOW;
+          } else {
+            way = $.HIDE;
+          }
         }
-        if (animationData && (typeof animationData === 'string') && (way === $.SHOW_ANIMATION)) {
-          _animationIn = animationData;
-        } else if (way === $.HIDE_ANIMATION) {
-          _animationOut = animationData;
-        } else if (angular.isObject(animationData)) {
-          _animationIn = (animationData.classAnimationShow) ? animationData.classAnimationShow : _animationIn ;
-          _animationOut = (animationData.classAnimationHide) ? animationData.classAnimationHide : _animationOut ;
+        if (animationData) {
+          if (typeof animationData === 'string') {
+            if (way === $.SHOW_ANIMATION) {
+              _animationIn = animationData;
+            } else if (way === $.HIDE_ANIMATION) {
+              _animationOut = animationData;
+            }
+          } else if (angular.isObject(animationData)) {
+            _animationIn = (animationData.classAnimationShow) ? animationData.classAnimationShow : _animationIn ;
+            _animationOut = (animationData.classAnimationHide) ? animationData.classAnimationHide : _animationOut ;
+          }
         }
         var _removeClassesShow = _getClassList($.MODE_ANIMATION_IN);
         var _removeClassesHide = _getClassList($.MODE_ANIMATION_OUT);
