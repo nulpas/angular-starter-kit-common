@@ -30,7 +30,7 @@
       arrayMerge: arrayMergeProvider,
       /* Object tools */
       setObjectUsingSchema: setObjectUsingSchemaProvider,
-      getCheckedObect: getCheckedObjectProvider,
+      getCheckedObject: getCheckedObjectProvider,
       /* $tools factory */
       $get: [$get]
     };
@@ -422,7 +422,7 @@
         $: $,
         /* Config methods */
         setDeviceInfo: setDeviceInfo,
-        getDeviceIngo: getDeviceInfo,
+        getDeviceInfo: getDeviceInfo,
         /* String tools */
         camelCaseTo: camelCaseTo,
         toCamelCase: toCamelCase,

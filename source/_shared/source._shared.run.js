@@ -13,7 +13,7 @@
      * @description
      * Run statement for shared module.
      */
-    .run('_sharedRun', _sharedRun);
+    .run(_sharedRun);
 
   _sharedRun.$inject = ['$tools', 'deviceDetector'];
 
