@@ -18,17 +18,49 @@
 
   function $tools(globalConstantsProvider) {
     var $ = globalConstantsProvider.get();
+    var _deviceInfo = null;
 
     return {
       /* Global constants */
       $: $,
+      /* Config methods */
+      setDeviceInfo: setDeviceInfoProvider,
+      getDeviceInfo: getDeviceInfoProvider,
       /* Array tools */
       arrayMerge: arrayMergeProvider,
       /* Object tools */
       setObjectUsingSchema: setObjectUsingSchemaProvider,
+      getCheckedObect: getCheckedObjectProvider,
       /* $tools factory */
       $get: [$get]
     };
+
+    /**
+     * @name _setDeviceInfo
+     * @memberof source._shared.$toolsProvider
+     *
+     * @description
+     * Method that set device info object.
+     *
+     * @param {Object} deviceObject
+     * @return {Object}
+     * @throws TypeError
+     * @private
+     */
+    function _setDeviceInfo(deviceObject) {
+      var _isObject = angular.isObject(deviceObject);
+      var _hasOs = deviceObject.hasOwnProperty($.DEVICE_INFO_OS);
+      var _hasBrowser = deviceObject.hasOwnProperty($.DEVICE_INFO_BROWSER);
+      var _hasDevice = deviceObject.hasOwnProperty($.DEVICE_INFO_DEVICE);
+      var _hasOsVersion = deviceObject.hasOwnProperty($.DEVICE_INFO_OS_VERSION);
+      var _hasBrowserVersion = deviceObject.hasOwnProperty($.DEVICE_INFO_BROWSER_VERSION);
+      if (_isObject && _hasOs && _hasBrowser && _hasDevice && _hasOsVersion && _hasBrowserVersion) {
+        _deviceInfo = deviceObject;
+      } else {
+        throw new TypeError('Parameter received to set device info is not valid.');
+      }
+      return _deviceInfo;
+    }
 
     /**
      * @name _convertString
@@ -251,8 +283,85 @@
     }
 
     /**
+     * @name _getCheckedObject
+     * @memberof source._shared.$toolsProvider
+     *
+     * @description
+     * General function with error control to get an object or one of its properties.
+     *
+     * @param {Object} objectToGet
+     * @param {String} [propertyToGet]
+     * @return {*}
+     * @throws ReferenceError
+     * @throws TypeError
+     * @private
+     */
+    function _getCheckedObject(objectToGet, propertyToGet) {
+      var _output = null;
+      if (angular.isObject(objectToGet)) {
+        propertyToGet = propertyToGet || null;
+        if (propertyToGet) {
+          if (typeof propertyToGet === 'string') {
+            if (objectToGet.hasOwnProperty(propertyToGet)) {
+              _output = objectToGet[propertyToGet];
+            } else {
+              var _propertyReferenceError = [
+                'Requested property (' + propertyToGet + ')',
+                'does not exist on object received.'
+              ];
+              throw new ReferenceError(_propertyReferenceError.join(' '));
+            }
+          } else {
+            var _propertyTypeError = [
+              'Invalid type of param property received in _getCheckedObject method.',
+              'It must be string and type received is: "' + typeof objectToGet + '".'
+            ];
+            throw new TypeError(_propertyTypeError.join(' '));
+          }
+        } else {
+          _output = objectToGet;
+        }
+      } else {
+        var _objectTypeError = [
+          'Invalid type of param object received in _getCheckedObject method.',
+          'It must be object and type received is: "' + typeof objectToGet + '".'
+        ];
+        throw new TypeError(_objectTypeError.join(' '));
+      }
+      return _output;
+    }
+
+    /**
+     * @name setDeviceInfoProvider
+     * @memberof source._shared.$toolsProvider
+     *
+     * @description
+     * Provider exposed methods to set device info object.
+     *
+     * @param {Object} deviceObject
+     * @return {Object}
+     */
+    function setDeviceInfoProvider(deviceObject) {
+      return _setDeviceInfo(deviceObject);
+    }
+
+    /**
+     * @name getDeviceInfoProvider
+     * @memberof source._shared.$toolsProvider
+     *
+     * @description
+     * Provider function that returns device info object.
+     *
+     * @param {String} [property]
+     * @return {*}
+     */
+    function getDeviceInfoProvider(property) {
+      return _getCheckedObject(_deviceInfo, property);
+    }
+
+    /**
      * @name arrayMergeProvider
-     * @memberof source._shared.$toolsProvider.$tools
+     * @memberof source._shared.$toolsProvider
      *
      * @description
      * Exposed provider method for using _arrayMerge. Merges two arrays avoiding duplicate items.
@@ -286,6 +395,21 @@
     }
 
     /**
+     * @name getCheckedObjectProvider
+     * @memberof source._shared.$toolsProvider
+     *
+     * @description
+     * Provider exposed function for _getCheckedObject.
+     *
+     * @param {Object} objectToGet
+     * @param {String} [propertyToGet]
+     * @return {*}
+     */
+    function getCheckedObjectProvider(objectToGet, propertyToGet) {
+      return _getCheckedObject(objectToGet, propertyToGet);
+    }
+
+    /**
      * @namespace $tools
      * @memberof source._shared.$toolsProvider
      *
@@ -296,6 +420,9 @@
       return {
         /* Global Constants */
         $: $,
+        /* Config methods */
+        setDeviceInfo: setDeviceInfo,
+        getDeviceIngo: getDeviceInfo,
         /* String tools */
         camelCaseTo: camelCaseTo,
         toCamelCase: toCamelCase,
@@ -308,8 +435,37 @@
         /* Object tools */
         getValueFromDotedKey: getValueFromDotedKey,
         parseObjectValues: parseObjectValues,
-        setObjectUsingSchema: setObjectUsingSchema
+        setObjectUsingSchema: setObjectUsingSchema,
+        getCheckedObject: getCheckedObject
       };
+
+      /**
+       * @name setDeviceInfoProvider
+       * @memberof source._shared.$toolsProvider.$tools
+       *
+       * @description
+       * Factory exposed methods to set device info object.
+       *
+       * @param {Object} deviceObject
+       * @return {Object}
+       */
+      function setDeviceInfo(deviceObject) {
+        return _setDeviceInfo(deviceObject);
+      }
+
+      /**
+       * @name getDeviceInfo
+       * @memberof source._shared.$toolsProvider.$tools
+       *
+       * @description
+       * Factory function that returns device info object.
+       *
+       * @param {String} [property]
+       * @return {*}
+       */
+      function getDeviceInfo(property) {
+        return _getCheckedObject(_deviceInfo, property);
+      }
 
       /**
        * @name camelCaseTo
@@ -462,6 +618,21 @@
       function setObjectUsingSchema(objectSchema, objectSettings, mergeOption) {
         mergeOption = mergeOption || $.NO_MERGE;
         return _setObjectUsingSchema(objectSchema, objectSettings, mergeOption);
+      }
+
+      /**
+       * @name getCheckedObject
+       * @memberof source._shared.$toolsProvider.$tools
+       *
+       * @description
+       * Factory exposed function for _getCheckedObject.
+       *
+       * @param {Object} objectToGet
+       * @param {String} [propertyToGet]
+       * @return {*}
+       */
+      function getCheckedObject(objectToGet, propertyToGet) {
+        return _getCheckedObject(objectToGet, propertyToGet);
       }
     }
   }

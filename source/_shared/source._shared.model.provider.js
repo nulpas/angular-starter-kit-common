@@ -55,7 +55,17 @@
           NAME: 'ArrowUp',
           CODE: 38
         }
-      }
+      },
+
+      DEVICE_INFO_OS: 'os',
+      DEVICE_INFO_BROWSER: 'browser',
+      DEVICE_INFO_DEVICE: 'device',
+      DEVICE_INFO_OS_VERSION: 'os_version',
+      DEVICE_INFO_BROWSER_VERSION: 'browser_version',
+
+      BROWSER_IE: 'ie',
+      BROWSER_EDGE: 'ms-edge',
+      BROWSER_CHROME: 'chrome'
     };
 
     return {
