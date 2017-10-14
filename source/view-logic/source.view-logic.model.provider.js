@@ -20,6 +20,7 @@
     var _constants = {
       SCHEMA_DOM_HANDLER: 'domHandler',
       SCHEMA_ANIMATION: 'animation',
+      SCHEMA_ANIMATION_EVENTS: 'animationEvents',
       SCHEMA_REGISTERED_EXTERNAL_ANIMATIONS: 'registeredExternalAnimations',
 
       SHOW: 1,
@@ -32,6 +33,10 @@
 
       MODE_ANIMATION_IN: true,
       MODE_ANIMATION_OUT: false,
+
+      ANIMATION_START: 'start',
+      ANIMATION_ITERATION: 'iteration',
+      ANIMATION_END: 'end',
 
       ACTIVATE_ANIMATION_CLASS: 'animated'
     };
@@ -50,6 +55,11 @@
      * @property {String} schemas.domHandler.classDefaultAnimationShow
      * @property {String} schemas.domHandler.classDefaultAnimationHide
      *
+     * @property {Object} schemas.animationEvents
+     * @property {Array} schemas.animationEvents.start
+     * @property {Array} schemas.animationEvents.iteration
+     * @property {Array} schemas.animationEvents.end
+     *
      * @property {Object} animation
      * @property {String} animation.classAnimationShow
      * @property {String} animation.classAnimationHide
@@ -66,6 +76,11 @@
           classToHide: null,
           classDefaultAnimationShow: null,
           classDefaultAnimationHide: null
+        },
+        animationEvents: {
+          start: [],
+          iteration: [],
+          end: []
         },
         animation: {
           classAnimationShow: null,
@@ -133,7 +148,7 @@
        * @memberof source.view-logic.appViewProvider.appView
        *
        * @description
-       * Returns appView model for Provider.
+       * Returns appView model for Factory.
        *
        * @returns {Object}
        * @private

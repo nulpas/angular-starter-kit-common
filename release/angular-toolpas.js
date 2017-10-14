@@ -34,20 +34,6 @@
 
   angular
     /**
-     * @namespace date-time
-     * @memberof source
-     *
-     * @description
-     * Definition of module "date time" for several tools and filters with datetime data.
-     */
-    .module('source.date-time', []);
-})();
-
-(function() {
-  'use strict';
-
-  angular
-    /**
      * @namespace api
      * @memberof source
      *
@@ -58,6 +44,20 @@
       /* External Modules */
       'restangular'
     ]);
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    /**
+     * @namespace date-time
+     * @memberof source
+     *
+     * @description
+     * Definition of module "date time" for several tools and filters with datetime data.
+     */
+    .module('source.date-time', []);
 })();
 
 (function() {
@@ -156,25 +156,6 @@
   'use strict';
 
   angular
-    .module('source.date-time')
-    /**
-     * @namespace dateTimeConfig
-     * @memberof source.date-time
-     *
-     * @description
-     * Config statement for datetime module.
-     */
-    .config(dateTimeConfig);
-
-  function dateTimeConfig() {
-    moment.tz.setDefault(moment.tz.guess());
-  }
-})();
-
-(function() {
-  'use strict';
-
-  angular
     .module('source.api')
     /**
      * @namespace apiConfig
@@ -213,6 +194,25 @@
   'use strict';
 
   angular
+    .module('source.date-time')
+    /**
+     * @namespace dateTimeConfig
+     * @memberof source.date-time
+     *
+     * @description
+     * Config statement for datetime module.
+     */
+    .config(dateTimeConfig);
+
+  function dateTimeConfig() {
+    moment.tz.setDefault(moment.tz.guess());
+  }
+})();
+
+(function() {
+  'use strict';
+
+  angular
     .module('source.toast')
     /**
      * @namespace toastConfig
@@ -240,142 +240,6 @@
       preventOpenDuplicates: false,
       target: 'body'
     });
-  }
-})();
-
-(function() {
-  'use strict';
-
-  angular
-    .module('source.date-time')
-    /**
-     * @namespace onlyHour
-     * @memberof source.date-time
-     *
-     * @description
-     * Filter that shows hour in "0-24" format for a complete date given.
-     */
-    .filter('onlyHour', onlyHour)
-
-    /**
-     * @namespace untilNow
-     * @memberof source.date-time
-     *
-     * @requires dateTimeModel
-     *
-     * @description
-     * Filter that shows human string for elapsed time.
-     */
-    .filter('untilNow', untilNow)
-
-    /**
-     * @namespace dateReduceHour
-     * @memberof source.date-time
-     *
-     * @description
-     * Filter that shows hour in "0-24" format and date with string month but without year.
-     */
-    .filter('dateReduceHour', dateReduceHour);
-
-  function onlyHour() {
-    return _onlyHour;
-
-    /**
-     * @name _onlyHour
-     * @memberof source.date-time.onlyHour
-     *
-     * @description
-     * Private function for "onlyHour" filter.
-     * Returns date formatted if variable "date" is a valid date or the same input data.
-     *
-     * @param {*} date
-     * @returns {String|*}
-     * @private
-     */
-    function _onlyHour(date) {
-      return (Date.parse(date)) ? moment(date).format('HH:mm') : date ;
-    }
-  }
-
-  untilNow.$inject = ['dateTimeModel'];
-
-  function untilNow(dateTimeModel) {
-    return _untilNow;
-
-    /**
-     * @name _untilNow
-     * @memberof source.date-time.untilNow
-     *
-     * @description
-     * Private function for "untilNow" filter.
-     * Returns locale string expressing elapsed time if variable "date" is a valid date or the same input data.
-     *
-     * @param {*} date
-     * @returns {String|*}
-     * @private
-     */
-    function _untilNow(date) {
-      return (Date.parse(date)) ? moment(date).calendar(null, dateTimeModel.momentCalendarFormat) : date ;
-    }
-  }
-
-  function dateReduceHour() {
-    return _dateReduceHour;
-
-    /**
-     * @name _dateReduceHour
-     * @memberof source.date-time.dateReduceHour
-     *
-     * @description
-     * Private function for "dateReduceHour" filter.
-     * Returns date formatted if variable "date" is a valid date or the same input data.
-     *
-     * @param {*} date
-     * @returns {String|*}
-     * @private
-     */
-    function _dateReduceHour(date) {
-      return (Date.parse(date)) ? moment(date).format('D MMMM - HH:mm') : date ;
-    }
-  }
-})();
-
-(function() {
-  'use strict';
-
-  angular
-    .module('source.date-time')
-    /**
-     * @namespace dateTimeModel
-     * @memberof source.date-time
-     *
-     * @description
-     * Service that defines constants for date time module.
-     */
-    .service('dateTimeModel', dateTimeModel);
-
-  function dateTimeModel() {
-    /* jshint validthis: true */
-    /**
-     * @name momentCalendarFormat
-     * @memberof source.date-time.dateTimeModel
-     *
-     * @type {Object}
-     * @property {String} sameDay
-     * @property {String} nextDay
-     * @property {String} nextWeek
-     * @property {String} lastDay
-     * @property {String} lastWeek
-     * @property {String} sameElse
-     */
-    this.momentCalendarFormat = {
-      sameDay: '[hoy]',
-      nextDay: '[mañana]',
-      nextWeek: '[próximo] dddd',
-      lastDay: '[ayer]',
-      lastWeek: 'dddd [pasado]',
-      sameElse: 'DD/MM/YYYY'
-    };
   }
 })();
 
@@ -1146,6 +1010,142 @@
         throw new Error('Invalid format of rejection object');
       }
     });
+  }
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    .module('source.date-time')
+    /**
+     * @namespace onlyHour
+     * @memberof source.date-time
+     *
+     * @description
+     * Filter that shows hour in "0-24" format for a complete date given.
+     */
+    .filter('onlyHour', onlyHour)
+
+    /**
+     * @namespace untilNow
+     * @memberof source.date-time
+     *
+     * @requires dateTimeModel
+     *
+     * @description
+     * Filter that shows human string for elapsed time.
+     */
+    .filter('untilNow', untilNow)
+
+    /**
+     * @namespace dateReduceHour
+     * @memberof source.date-time
+     *
+     * @description
+     * Filter that shows hour in "0-24" format and date with string month but without year.
+     */
+    .filter('dateReduceHour', dateReduceHour);
+
+  function onlyHour() {
+    return _onlyHour;
+
+    /**
+     * @name _onlyHour
+     * @memberof source.date-time.onlyHour
+     *
+     * @description
+     * Private function for "onlyHour" filter.
+     * Returns date formatted if variable "date" is a valid date or the same input data.
+     *
+     * @param {*} date
+     * @returns {String|*}
+     * @private
+     */
+    function _onlyHour(date) {
+      return (Date.parse(date)) ? moment(date).format('HH:mm') : date ;
+    }
+  }
+
+  untilNow.$inject = ['dateTimeModel'];
+
+  function untilNow(dateTimeModel) {
+    return _untilNow;
+
+    /**
+     * @name _untilNow
+     * @memberof source.date-time.untilNow
+     *
+     * @description
+     * Private function for "untilNow" filter.
+     * Returns locale string expressing elapsed time if variable "date" is a valid date or the same input data.
+     *
+     * @param {*} date
+     * @returns {String|*}
+     * @private
+     */
+    function _untilNow(date) {
+      return (Date.parse(date)) ? moment(date).calendar(null, dateTimeModel.momentCalendarFormat) : date ;
+    }
+  }
+
+  function dateReduceHour() {
+    return _dateReduceHour;
+
+    /**
+     * @name _dateReduceHour
+     * @memberof source.date-time.dateReduceHour
+     *
+     * @description
+     * Private function for "dateReduceHour" filter.
+     * Returns date formatted if variable "date" is a valid date or the same input data.
+     *
+     * @param {*} date
+     * @returns {String|*}
+     * @private
+     */
+    function _dateReduceHour(date) {
+      return (Date.parse(date)) ? moment(date).format('D MMMM - HH:mm') : date ;
+    }
+  }
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    .module('source.date-time')
+    /**
+     * @namespace dateTimeModel
+     * @memberof source.date-time
+     *
+     * @description
+     * Service that defines constants for date time module.
+     */
+    .service('dateTimeModel', dateTimeModel);
+
+  function dateTimeModel() {
+    /* jshint validthis: true */
+    /**
+     * @name momentCalendarFormat
+     * @memberof source.date-time.dateTimeModel
+     *
+     * @type {Object}
+     * @property {String} sameDay
+     * @property {String} nextDay
+     * @property {String} nextWeek
+     * @property {String} lastDay
+     * @property {String} lastWeek
+     * @property {String} sameElse
+     */
+    this.momentCalendarFormat = {
+      sameDay: '[hoy]',
+      nextDay: '[mañana]',
+      nextWeek: '[próximo] dddd',
+      lastDay: '[ayer]',
+      lastWeek: 'dddd [pasado]',
+      sameElse: 'DD/MM/YYYY'
+    };
   }
 })();
 
@@ -1967,6 +1967,7 @@
     var _constants = {
       SCHEMA_DOM_HANDLER: 'domHandler',
       SCHEMA_ANIMATION: 'animation',
+      SCHEMA_ANIMATION_EVENTS: 'animationEvents',
       SCHEMA_REGISTERED_EXTERNAL_ANIMATIONS: 'registeredExternalAnimations',
 
       SHOW: 1,
@@ -1979,6 +1980,10 @@
 
       MODE_ANIMATION_IN: true,
       MODE_ANIMATION_OUT: false,
+
+      ANIMATION_START: 'start',
+      ANIMATION_ITERATION: 'iteration',
+      ANIMATION_END: 'end',
 
       ACTIVATE_ANIMATION_CLASS: 'animated'
     };
@@ -1997,6 +2002,11 @@
      * @property {String} schemas.domHandler.classDefaultAnimationShow
      * @property {String} schemas.domHandler.classDefaultAnimationHide
      *
+     * @property {Object} schemas.animationEvents
+     * @property {Array} schemas.animationEvents.start
+     * @property {Array} schemas.animationEvents.iteration
+     * @property {Array} schemas.animationEvents.end
+     *
      * @property {Object} animation
      * @property {String} animation.classAnimationShow
      * @property {String} animation.classAnimationHide
@@ -2013,6 +2023,11 @@
           classToHide: null,
           classDefaultAnimationShow: null,
           classDefaultAnimationHide: null
+        },
+        animationEvents: {
+          start: [],
+          iteration: [],
+          end: []
         },
         animation: {
           classAnimationShow: null,
@@ -2080,7 +2095,7 @@
        * @memberof source.view-logic.appViewProvider.appView
        *
        * @description
-       * Returns appView model for Provider.
+       * Returns appView model for Factory.
        *
        * @returns {Object}
        * @private
@@ -2115,11 +2130,15 @@
     var $ = appViewModelProvider.$;
     var $c = appViewModelProvider.get();
     var _domHandler = $c.schemas.domHandler;
+    var _animationEvents = $c.schemas.animationEvents;
     var _registeredAnimations = $c.schemas.registeredAnimations;
 
     return {
       $: $,
       setDomHandler: setDomHandlerProvider,
+      getDomHandler: getDomHandlerProvider,
+      setAnimationEvents: setAnimationEventsProvider,
+      getAnimationEvents: getAnimationEventsProvider,
       createDomHandlerObject: createDomHandlerObjectProvider,
       createAnimationObject: createAnimationObjectProvider,
       $get: ['$filter', '$tools', $get]
@@ -2190,6 +2209,22 @@
     }
 
     /**
+     * @name _getServiceObject
+     * @memberof source.view-logic.$appViewProvider
+     *
+     * @description
+     * Returns requested service object or one of its properties.
+     *
+     * @param {Object} serviceObject
+     * @param {String} [property]
+     * @return {*}
+     * @private
+     */
+    function _getServiceObject(serviceObject, property) {
+      return $toolsProvider.getCheckedObject(serviceObject, property);
+    }
+
+    /**
      * @name _setDomHandler
      * @memberof source.view-logic.$appViewProvider
      *
@@ -2203,6 +2238,22 @@
     function _setDomHandler(config) {
       _domHandler = $toolsProvider.setObjectUsingSchema($c.schemas.domHandler, config, _domHandler);
       return _domHandler;
+    }
+
+    /**
+     * @name _setAnimationEvents
+     * @memberof source.view-logic.$appViewProvider
+     *
+     * @description
+     * Private function to setting animation events configuration object (_animationEvents).
+     *
+     * @param {Object} config
+     * @returns {Object}
+     * @private
+     */
+    function _setAnimationEvents(config) {
+      _animationEvents = $toolsProvider.setObjectUsingSchema($c.schemas.animationEvents, config, _animationEvents);
+      return _animationEvents;
     }
 
     /**
@@ -2238,6 +2289,48 @@
      */
     function setDomHandlerProvider(config) {
       return _setDomHandler(config);
+    }
+
+    /**
+     * @name getDomHandlerProvider
+     * @memberof source.view-logic.$appViewProvider
+     *
+     * @description
+     * Provider exposed method to get _domHandler object.
+     *
+     * @param {String} [property]
+     * @return {Object|String}
+     */
+    function getDomHandlerProvider(property) {
+      return _getServiceObject(_domHandler, property);
+    }
+
+    /**
+     * @name setAnimationEventsProvider
+     * @memberof source.view-logic.$appViewProvider
+     *
+     * @description
+     * Provider function that sets received object as _animationEvents object.
+     *
+     * @param {Object} receivedObject
+     * @return {Object}
+     */
+    function setAnimationEventsProvider(receivedObject) {
+      return _setAnimationEvents(receivedObject);
+    }
+
+    /**
+     * @name getAnimationEventsProvider
+     * @memberof source.view-logic.$appViewProvider
+     *
+     * @description
+     * Provider exposed method to get _animationEvents object.
+     *
+     * @param {String} [property]
+     * @return {*}
+     */
+    function getAnimationEventsProvider(property) {
+      return _getServiceObject(_animationEvents, property);
     }
 
     /**
@@ -2283,6 +2376,9 @@
         $: $,
         /* Config methods */
         setDomHandler: setDomHandlerService,
+        getDomHandler: getDomHandlerService,
+        setAnimationEvents: setAnimationEventsService,
+        getAnimationEvents: getAnimationEventsService,
         createDomHandlerObject: createDomHandlerObjectService,
         createAnimationObject: createAnimationObjectService,
         /* View tools */
@@ -2310,13 +2406,15 @@
         var _isEdge = ($tools.getDeviceInfo($.DEVICE_INFO_BROWSER) === $.BROWSER_EDGE);
         var _isIE = ($tools.getDeviceInfo($.DEVICE_INFO_BROWSER) === $.BROWSER_IE);
         var _noAnimationBrowser = (_isEdge || _isIE);
+        var _animationEventsEndList = _animationEvents[$.ANIMATION_END].join(' ');
         var _animationIn = _domHandler.classDefaultAnimationShow;
         var _animationOut = _domHandler.classDefaultAnimationHide;
-        if (animationData && _noAnimationBrowser && way === $.SHOW_ANIMATION) {
+        if (_noAnimationBrowser && (way === $.SHOW_ANIMATION)) {
           way = $.SHOW;
         } else if (way === $.HIDE_ANIMATION) {
           way = $.HIDE;
-        } else if (!_noAnimationBrowser && (typeof animationData === 'string') && ((way === $.SHOW_ANIMATION))) {
+        }
+        if (animationData && (typeof animationData === 'string') && (way === $.SHOW_ANIMATION)) {
           _animationIn = animationData;
         } else if (way === $.HIDE_ANIMATION) {
           _animationOut = animationData;
@@ -2337,8 +2435,7 @@
             domElement
               .removeClass(_removeClassesHide)
               .addClass($.ACTIVATE_ANIMATION_CLASS + ' ' + _animationIn)
-              .one('webkitAnimationEnd animationend MSAnimationEnd', function() {
-                console.log(domElement);
+              .one(_animationEventsEndList, function() {
                 domElement.attr('class', _domHandler.classToShow);
               });
             break;
@@ -2346,7 +2443,7 @@
             domElement
               .removeClass(_removeClassesShow)
               .addClass($.ACTIVATE_ANIMATION_CLASS + ' ' + _animationOut)
-              .one('webkitAnimationEnd  animationend MSAnimationEnd', function() {
+              .one(_animationEventsEndList, function() {
                 domElement.attr('class', _domHandler.classToHide);
               });
             break;
@@ -2365,6 +2462,48 @@
        */
       function setDomHandlerService(config) {
         return _setDomHandler(config);
+      }
+
+      /**
+       * @name getDomHandlerService
+       * @memberof source.view-logic.$appViewProvider.$appView
+       *
+       * @description
+       * Factory exposed method to get _domHandler object.
+       *
+       * @param {String} [property]
+       * @return {Object|String}
+       */
+      function getDomHandlerService(property) {
+        return _getServiceObject(_domHandler, property);
+      }
+
+      /**
+       * @name setAnimationEventsProvider
+       * @memberof source.view-logic.$appViewProvider.$appView
+       *
+       * @description
+       * Factory function that sets received object as _animationEvents object.
+       *
+       * @param {Object} receivedObject
+       * @return {Object}
+       */
+      function setAnimationEventsService(receivedObject) {
+        return _setAnimationEvents(receivedObject);
+      }
+
+      /**
+       * @name getAnimationEventsService
+       * @memberof source.view-logic.$appViewProvider.$appView
+       *
+       * @description
+       * Factory exposed method to get _animationEvents object.
+       *
+       * @param {String} [property]
+       * @return {*}
+       */
+      function getAnimationEventsService(property) {
+        return _getServiceObject(_animationEvents, property);
       }
 
       /**
@@ -2614,7 +2753,7 @@
      * @description
      * Run statement for shared module.
      */
-    .run('_sharedRun', _sharedRun);
+    .run(_sharedRun);
 
   _sharedRun.$inject = ['$tools', 'deviceDetector'];
 
@@ -2655,7 +2794,7 @@
       arrayMerge: arrayMergeProvider,
       /* Object tools */
       setObjectUsingSchema: setObjectUsingSchemaProvider,
-      getCheckedObect: getCheckedObjectProvider,
+      getCheckedObject: getCheckedObjectProvider,
       /* $tools factory */
       $get: [$get]
     };
@@ -3047,7 +3186,7 @@
         $: $,
         /* Config methods */
         setDeviceInfo: setDeviceInfo,
-        getDeviceIngo: getDeviceInfo,
+        getDeviceInfo: getDeviceInfo,
         /* String tools */
         camelCaseTo: camelCaseTo,
         toCamelCase: toCamelCase,

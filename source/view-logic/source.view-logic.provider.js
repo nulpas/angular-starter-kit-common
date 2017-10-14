@@ -21,11 +21,15 @@
     var $ = appViewModelProvider.$;
     var $c = appViewModelProvider.get();
     var _domHandler = $c.schemas.domHandler;
+    var _animationEvents = $c.schemas.animationEvents;
     var _registeredAnimations = $c.schemas.registeredAnimations;
 
     return {
       $: $,
       setDomHandler: setDomHandlerProvider,
+      getDomHandler: getDomHandlerProvider,
+      setAnimationEvents: setAnimationEventsProvider,
+      getAnimationEvents: getAnimationEventsProvider,
       createDomHandlerObject: createDomHandlerObjectProvider,
       createAnimationObject: createAnimationObjectProvider,
       $get: ['$filter', '$tools', $get]
@@ -96,6 +100,22 @@
     }
 
     /**
+     * @name _getServiceObject
+     * @memberof source.view-logic.$appViewProvider
+     *
+     * @description
+     * Returns requested service object or one of its properties.
+     *
+     * @param {Object} serviceObject
+     * @param {String} [property]
+     * @return {*}
+     * @private
+     */
+    function _getServiceObject(serviceObject, property) {
+      return $toolsProvider.getCheckedObject(serviceObject, property);
+    }
+
+    /**
      * @name _setDomHandler
      * @memberof source.view-logic.$appViewProvider
      *
@@ -109,6 +129,22 @@
     function _setDomHandler(config) {
       _domHandler = $toolsProvider.setObjectUsingSchema($c.schemas.domHandler, config, _domHandler);
       return _domHandler;
+    }
+
+    /**
+     * @name _setAnimationEvents
+     * @memberof source.view-logic.$appViewProvider
+     *
+     * @description
+     * Private function to setting animation events configuration object (_animationEvents).
+     *
+     * @param {Object} config
+     * @returns {Object}
+     * @private
+     */
+    function _setAnimationEvents(config) {
+      _animationEvents = $toolsProvider.setObjectUsingSchema($c.schemas.animationEvents, config, _animationEvents);
+      return _animationEvents;
     }
 
     /**
@@ -144,6 +180,48 @@
      */
     function setDomHandlerProvider(config) {
       return _setDomHandler(config);
+    }
+
+    /**
+     * @name getDomHandlerProvider
+     * @memberof source.view-logic.$appViewProvider
+     *
+     * @description
+     * Provider exposed method to get _domHandler object.
+     *
+     * @param {String} [property]
+     * @return {Object|String}
+     */
+    function getDomHandlerProvider(property) {
+      return _getServiceObject(_domHandler, property);
+    }
+
+    /**
+     * @name setAnimationEventsProvider
+     * @memberof source.view-logic.$appViewProvider
+     *
+     * @description
+     * Provider function that sets received object as _animationEvents object.
+     *
+     * @param {Object} receivedObject
+     * @return {Object}
+     */
+    function setAnimationEventsProvider(receivedObject) {
+      return _setAnimationEvents(receivedObject);
+    }
+
+    /**
+     * @name getAnimationEventsProvider
+     * @memberof source.view-logic.$appViewProvider
+     *
+     * @description
+     * Provider exposed method to get _animationEvents object.
+     *
+     * @param {String} [property]
+     * @return {*}
+     */
+    function getAnimationEventsProvider(property) {
+      return _getServiceObject(_animationEvents, property);
     }
 
     /**
@@ -189,6 +267,9 @@
         $: $,
         /* Config methods */
         setDomHandler: setDomHandlerService,
+        getDomHandler: getDomHandlerService,
+        setAnimationEvents: setAnimationEventsService,
+        getAnimationEvents: getAnimationEventsService,
         createDomHandlerObject: createDomHandlerObjectService,
         createAnimationObject: createAnimationObjectService,
         /* View tools */
@@ -216,13 +297,15 @@
         var _isEdge = ($tools.getDeviceInfo($.DEVICE_INFO_BROWSER) === $.BROWSER_EDGE);
         var _isIE = ($tools.getDeviceInfo($.DEVICE_INFO_BROWSER) === $.BROWSER_IE);
         var _noAnimationBrowser = (_isEdge || _isIE);
+        var _animationEventsEndList = _animationEvents[$.ANIMATION_END].join(' ');
         var _animationIn = _domHandler.classDefaultAnimationShow;
         var _animationOut = _domHandler.classDefaultAnimationHide;
-        if (animationData && _noAnimationBrowser && way === $.SHOW_ANIMATION) {
+        if (_noAnimationBrowser && (way === $.SHOW_ANIMATION)) {
           way = $.SHOW;
         } else if (way === $.HIDE_ANIMATION) {
           way = $.HIDE;
-        } else if (!_noAnimationBrowser && (typeof animationData === 'string') && ((way === $.SHOW_ANIMATION))) {
+        }
+        if (animationData && (typeof animationData === 'string') && (way === $.SHOW_ANIMATION)) {
           _animationIn = animationData;
         } else if (way === $.HIDE_ANIMATION) {
           _animationOut = animationData;
@@ -243,8 +326,7 @@
             domElement
               .removeClass(_removeClassesHide)
               .addClass($.ACTIVATE_ANIMATION_CLASS + ' ' + _animationIn)
-              .one('webkitAnimationEnd animationend MSAnimationEnd', function() {
-                console.log(domElement);
+              .one(_animationEventsEndList, function() {
                 domElement.attr('class', _domHandler.classToShow);
               });
             break;
@@ -252,7 +334,7 @@
             domElement
               .removeClass(_removeClassesShow)
               .addClass($.ACTIVATE_ANIMATION_CLASS + ' ' + _animationOut)
-              .one('webkitAnimationEnd  animationend MSAnimationEnd', function() {
+              .one(_animationEventsEndList, function() {
                 domElement.attr('class', _domHandler.classToHide);
               });
             break;
@@ -271,6 +353,48 @@
        */
       function setDomHandlerService(config) {
         return _setDomHandler(config);
+      }
+
+      /**
+       * @name getDomHandlerService
+       * @memberof source.view-logic.$appViewProvider.$appView
+       *
+       * @description
+       * Factory exposed method to get _domHandler object.
+       *
+       * @param {String} [property]
+       * @return {Object|String}
+       */
+      function getDomHandlerService(property) {
+        return _getServiceObject(_domHandler, property);
+      }
+
+      /**
+       * @name setAnimationEventsProvider
+       * @memberof source.view-logic.$appViewProvider.$appView
+       *
+       * @description
+       * Factory function that sets received object as _animationEvents object.
+       *
+       * @param {Object} receivedObject
+       * @return {Object}
+       */
+      function setAnimationEventsService(receivedObject) {
+        return _setAnimationEvents(receivedObject);
+      }
+
+      /**
+       * @name getAnimationEventsService
+       * @memberof source.view-logic.$appViewProvider.$appView
+       *
+       * @description
+       * Factory exposed method to get _animationEvents object.
+       *
+       * @param {String} [property]
+       * @return {*}
+       */
+      function getAnimationEventsService(property) {
+        return _getServiceObject(_animationEvents, property);
       }
 
       /**
