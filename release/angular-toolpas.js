@@ -34,6 +34,20 @@
 
   angular
     /**
+     * @namespace date-time
+     * @memberof source
+     *
+     * @description
+     * Definition of module "date time" for several tools and filters with datetime data.
+     */
+    .module('source.date-time', []);
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    /**
      * @namespace api
      * @memberof source
      *
@@ -44,20 +58,6 @@
       /* External Modules */
       'restangular'
     ]);
-})();
-
-(function() {
-  'use strict';
-
-  angular
-    /**
-     * @namespace date-time
-     * @memberof source
-     *
-     * @description
-     * Definition of module "date time" for several tools and filters with datetime data.
-     */
-    .module('source.date-time', []);
 })();
 
 (function() {
@@ -147,7 +147,28 @@
      * @description
      * Definition of module "_shared" for common minor services.
      */
-    .module('source._shared', []);
+    .module('source._shared', [
+      'ng.deviceDetector'
+    ]);
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    .module('source.date-time')
+    /**
+     * @namespace dateTimeConfig
+     * @memberof source.date-time
+     *
+     * @description
+     * Config statement for datetime module.
+     */
+    .config(dateTimeConfig);
+
+  function dateTimeConfig() {
+    moment.tz.setDefault(moment.tz.guess());
+  }
 })();
 
 (function() {
@@ -192,25 +213,6 @@
   'use strict';
 
   angular
-    .module('source.date-time')
-    /**
-     * @namespace dateTimeConfig
-     * @memberof source.date-time
-     *
-     * @description
-     * Config statement for datetime module.
-     */
-    .config(dateTimeConfig);
-
-  function dateTimeConfig() {
-    moment.tz.setDefault(moment.tz.guess());
-  }
-})();
-
-(function() {
-  'use strict';
-
-  angular
     .module('source.toast')
     /**
      * @namespace toastConfig
@@ -238,6 +240,142 @@
       preventOpenDuplicates: false,
       target: 'body'
     });
+  }
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    .module('source.date-time')
+    /**
+     * @namespace onlyHour
+     * @memberof source.date-time
+     *
+     * @description
+     * Filter that shows hour in "0-24" format for a complete date given.
+     */
+    .filter('onlyHour', onlyHour)
+
+    /**
+     * @namespace untilNow
+     * @memberof source.date-time
+     *
+     * @requires dateTimeModel
+     *
+     * @description
+     * Filter that shows human string for elapsed time.
+     */
+    .filter('untilNow', untilNow)
+
+    /**
+     * @namespace dateReduceHour
+     * @memberof source.date-time
+     *
+     * @description
+     * Filter that shows hour in "0-24" format and date with string month but without year.
+     */
+    .filter('dateReduceHour', dateReduceHour);
+
+  function onlyHour() {
+    return _onlyHour;
+
+    /**
+     * @name _onlyHour
+     * @memberof source.date-time.onlyHour
+     *
+     * @description
+     * Private function for "onlyHour" filter.
+     * Returns date formatted if variable "date" is a valid date or the same input data.
+     *
+     * @param {*} date
+     * @returns {String|*}
+     * @private
+     */
+    function _onlyHour(date) {
+      return (Date.parse(date)) ? moment(date).format('HH:mm') : date ;
+    }
+  }
+
+  untilNow.$inject = ['dateTimeModel'];
+
+  function untilNow(dateTimeModel) {
+    return _untilNow;
+
+    /**
+     * @name _untilNow
+     * @memberof source.date-time.untilNow
+     *
+     * @description
+     * Private function for "untilNow" filter.
+     * Returns locale string expressing elapsed time if variable "date" is a valid date or the same input data.
+     *
+     * @param {*} date
+     * @returns {String|*}
+     * @private
+     */
+    function _untilNow(date) {
+      return (Date.parse(date)) ? moment(date).calendar(null, dateTimeModel.momentCalendarFormat) : date ;
+    }
+  }
+
+  function dateReduceHour() {
+    return _dateReduceHour;
+
+    /**
+     * @name _dateReduceHour
+     * @memberof source.date-time.dateReduceHour
+     *
+     * @description
+     * Private function for "dateReduceHour" filter.
+     * Returns date formatted if variable "date" is a valid date or the same input data.
+     *
+     * @param {*} date
+     * @returns {String|*}
+     * @private
+     */
+    function _dateReduceHour(date) {
+      return (Date.parse(date)) ? moment(date).format('D MMMM - HH:mm') : date ;
+    }
+  }
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    .module('source.date-time')
+    /**
+     * @namespace dateTimeModel
+     * @memberof source.date-time
+     *
+     * @description
+     * Service that defines constants for date time module.
+     */
+    .service('dateTimeModel', dateTimeModel);
+
+  function dateTimeModel() {
+    /* jshint validthis: true */
+    /**
+     * @name momentCalendarFormat
+     * @memberof source.date-time.dateTimeModel
+     *
+     * @type {Object}
+     * @property {String} sameDay
+     * @property {String} nextDay
+     * @property {String} nextWeek
+     * @property {String} lastDay
+     * @property {String} lastWeek
+     * @property {String} sameElse
+     */
+    this.momentCalendarFormat = {
+      sameDay: '[hoy]',
+      nextDay: '[mañana]',
+      nextWeek: '[próximo] dddd',
+      lastDay: '[ayer]',
+      lastWeek: 'dddd [pasado]',
+      sameElse: 'DD/MM/YYYY'
+    };
   }
 })();
 
@@ -1008,142 +1146,6 @@
         throw new Error('Invalid format of rejection object');
       }
     });
-  }
-})();
-
-(function() {
-  'use strict';
-
-  angular
-    .module('source.date-time')
-    /**
-     * @namespace onlyHour
-     * @memberof source.date-time
-     *
-     * @description
-     * Filter that shows hour in "0-24" format for a complete date given.
-     */
-    .filter('onlyHour', onlyHour)
-
-    /**
-     * @namespace untilNow
-     * @memberof source.date-time
-     *
-     * @requires dateTimeModel
-     *
-     * @description
-     * Filter that shows human string for elapsed time.
-     */
-    .filter('untilNow', untilNow)
-
-    /**
-     * @namespace dateReduceHour
-     * @memberof source.date-time
-     *
-     * @description
-     * Filter that shows hour in "0-24" format and date with string month but without year.
-     */
-    .filter('dateReduceHour', dateReduceHour);
-
-  function onlyHour() {
-    return _onlyHour;
-
-    /**
-     * @name _onlyHour
-     * @memberof source.date-time.onlyHour
-     *
-     * @description
-     * Private function for "onlyHour" filter.
-     * Returns date formatted if variable "date" is a valid date or the same input data.
-     *
-     * @param {*} date
-     * @returns {String|*}
-     * @private
-     */
-    function _onlyHour(date) {
-      return (Date.parse(date)) ? moment(date).format('HH:mm') : date ;
-    }
-  }
-
-  untilNow.$inject = ['dateTimeModel'];
-
-  function untilNow(dateTimeModel) {
-    return _untilNow;
-
-    /**
-     * @name _untilNow
-     * @memberof source.date-time.untilNow
-     *
-     * @description
-     * Private function for "untilNow" filter.
-     * Returns locale string expressing elapsed time if variable "date" is a valid date or the same input data.
-     *
-     * @param {*} date
-     * @returns {String|*}
-     * @private
-     */
-    function _untilNow(date) {
-      return (Date.parse(date)) ? moment(date).calendar(null, dateTimeModel.momentCalendarFormat) : date ;
-    }
-  }
-
-  function dateReduceHour() {
-    return _dateReduceHour;
-
-    /**
-     * @name _dateReduceHour
-     * @memberof source.date-time.dateReduceHour
-     *
-     * @description
-     * Private function for "dateReduceHour" filter.
-     * Returns date formatted if variable "date" is a valid date or the same input data.
-     *
-     * @param {*} date
-     * @returns {String|*}
-     * @private
-     */
-    function _dateReduceHour(date) {
-      return (Date.parse(date)) ? moment(date).format('D MMMM - HH:mm') : date ;
-    }
-  }
-})();
-
-(function() {
-  'use strict';
-
-  angular
-    .module('source.date-time')
-    /**
-     * @namespace dateTimeModel
-     * @memberof source.date-time
-     *
-     * @description
-     * Service that defines constants for date time module.
-     */
-    .service('dateTimeModel', dateTimeModel);
-
-  function dateTimeModel() {
-    /* jshint validthis: true */
-    /**
-     * @name momentCalendarFormat
-     * @memberof source.date-time.dateTimeModel
-     *
-     * @type {Object}
-     * @property {String} sameDay
-     * @property {String} nextDay
-     * @property {String} nextWeek
-     * @property {String} lastDay
-     * @property {String} lastWeek
-     * @property {String} sameElse
-     */
-    this.momentCalendarFormat = {
-      sameDay: '[hoy]',
-      nextDay: '[mañana]',
-      nextWeek: '[próximo] dddd',
-      lastDay: '[ayer]',
-      lastWeek: 'dddd [pasado]',
-      sameElse: 'DD/MM/YYYY'
-    };
   }
 })();
 
@@ -2120,7 +2122,7 @@
       setDomHandler: setDomHandlerProvider,
       createDomHandlerObject: createDomHandlerObjectProvider,
       createAnimationObject: createAnimationObjectProvider,
-      $get: ['$filter', $get]
+      $get: ['$filter', '$tools', $get]
     };
 
     /**
@@ -2275,7 +2277,7 @@
      * @description
      * Factory statement for application view provider.
      */
-    function $get($filter) {
+    function $get($filter, $tools) {
       return {
         /* Global Constants */
         $: $,
@@ -2305,14 +2307,19 @@
        */
       function _displayWayElement(domElement, way, animationData) {
         way = way || $.SHOW;
+        var _isEdge = ($tools.getDeviceInfo($.DEVICE_INFO_BROWSER) === $.BROWSER_EDGE);
+        var _isIE = ($tools.getDeviceInfo($.DEVICE_INFO_BROWSER) === $.BROWSER_IE);
+        var _noAnimationBrowser = (_isEdge || _isIE);
         var _animationIn = _domHandler.classDefaultAnimationShow;
         var _animationOut = _domHandler.classDefaultAnimationHide;
-        if (animationData && (typeof animationData === 'string')) {
-          if (way === $.SHOW_ANIMATION) {
-            _animationIn = animationData;
-          } else if (way === $.HIDE_ANIMATION) {
-            _animationOut = animationData;
-          }
+        if (animationData && _noAnimationBrowser && way === $.SHOW_ANIMATION) {
+          way = $.SHOW;
+        } else if (way === $.HIDE_ANIMATION) {
+          way = $.HIDE;
+        } else if (!_noAnimationBrowser && (typeof animationData === 'string') && ((way === $.SHOW_ANIMATION))) {
+          _animationIn = animationData;
+        } else if (way === $.HIDE_ANIMATION) {
+          _animationOut = animationData;
         } else if (angular.isObject(animationData)) {
           _animationIn = (animationData.classAnimationShow) ? animationData.classAnimationShow : _animationIn ;
           _animationOut = (animationData.classAnimationHide) ? animationData.classAnimationHide : _animationOut ;
@@ -2327,10 +2334,21 @@
             domElement.removeClass(_removeClassesShow).addClass(_domHandler.classToHide);
             break;
           case $.SHOW_ANIMATION:
-            domElement.removeClass(_removeClassesHide).addClass($.ACTIVATE_ANIMATION_CLASS + ' ' + _animationIn);
+            domElement
+              .removeClass(_removeClassesHide)
+              .addClass($.ACTIVATE_ANIMATION_CLASS + ' ' + _animationIn)
+              .one('webkitAnimationEnd animationend MSAnimationEnd', function() {
+                console.log(domElement);
+                domElement.attr('class', _domHandler.classToShow);
+              });
             break;
           case $.HIDE_ANIMATION:
-            domElement.removeClass(_removeClassesShow).addClass($.ACTIVATE_ANIMATION_CLASS + ' ' + _animationOut);
+            domElement
+              .removeClass(_removeClassesShow)
+              .addClass($.ACTIVATE_ANIMATION_CLASS + ' ' + _animationOut)
+              .one('webkitAnimationEnd  animationend MSAnimationEnd', function() {
+                domElement.attr('class', _domHandler.classToHide);
+              });
             break;
         }
       }
@@ -2522,7 +2540,17 @@
           NAME: 'ArrowUp',
           CODE: 38
         }
-      }
+      },
+
+      DEVICE_INFO_OS: 'os',
+      DEVICE_INFO_BROWSER: 'browser',
+      DEVICE_INFO_DEVICE: 'device',
+      DEVICE_INFO_OS_VERSION: 'os_version',
+      DEVICE_INFO_BROWSER_VERSION: 'browser_version',
+
+      BROWSER_IE: 'ie',
+      BROWSER_EDGE: 'ms-edge',
+      BROWSER_CHROME: 'chrome'
     };
 
     return {
@@ -2577,6 +2605,30 @@
   angular
     .module('source._shared')
     /**
+     * @namespace _sharedRun
+     * @memberof source._shared
+     *
+     * @requires $tools
+     * @requires deviceDetector
+     *
+     * @description
+     * Run statement for shared module.
+     */
+    .run('_sharedRun', _sharedRun);
+
+  _sharedRun.$inject = ['$tools', 'deviceDetector'];
+
+  function _sharedRun($tools, deviceDetector) {
+    $tools.setDeviceInfo(deviceDetector);
+  }
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    .module('source._shared')
+    /**
      * @namespace $toolsProvider
      * @memberof source._shared
      *
@@ -2591,17 +2643,49 @@
 
   function $tools(globalConstantsProvider) {
     var $ = globalConstantsProvider.get();
+    var _deviceInfo = null;
 
     return {
       /* Global constants */
       $: $,
+      /* Config methods */
+      setDeviceInfo: setDeviceInfoProvider,
+      getDeviceInfo: getDeviceInfoProvider,
       /* Array tools */
       arrayMerge: arrayMergeProvider,
       /* Object tools */
       setObjectUsingSchema: setObjectUsingSchemaProvider,
+      getCheckedObect: getCheckedObjectProvider,
       /* $tools factory */
       $get: [$get]
     };
+
+    /**
+     * @name _setDeviceInfo
+     * @memberof source._shared.$toolsProvider
+     *
+     * @description
+     * Method that set device info object.
+     *
+     * @param {Object} deviceObject
+     * @return {Object}
+     * @throws TypeError
+     * @private
+     */
+    function _setDeviceInfo(deviceObject) {
+      var _isObject = angular.isObject(deviceObject);
+      var _hasOs = deviceObject.hasOwnProperty($.DEVICE_INFO_OS);
+      var _hasBrowser = deviceObject.hasOwnProperty($.DEVICE_INFO_BROWSER);
+      var _hasDevice = deviceObject.hasOwnProperty($.DEVICE_INFO_DEVICE);
+      var _hasOsVersion = deviceObject.hasOwnProperty($.DEVICE_INFO_OS_VERSION);
+      var _hasBrowserVersion = deviceObject.hasOwnProperty($.DEVICE_INFO_BROWSER_VERSION);
+      if (_isObject && _hasOs && _hasBrowser && _hasDevice && _hasOsVersion && _hasBrowserVersion) {
+        _deviceInfo = deviceObject;
+      } else {
+        throw new TypeError('Parameter received to set device info is not valid.');
+      }
+      return _deviceInfo;
+    }
 
     /**
      * @name _convertString
@@ -2824,8 +2908,85 @@
     }
 
     /**
+     * @name _getCheckedObject
+     * @memberof source._shared.$toolsProvider
+     *
+     * @description
+     * General function with error control to get an object or one of its properties.
+     *
+     * @param {Object} objectToGet
+     * @param {String} [propertyToGet]
+     * @return {*}
+     * @throws ReferenceError
+     * @throws TypeError
+     * @private
+     */
+    function _getCheckedObject(objectToGet, propertyToGet) {
+      var _output = null;
+      if (angular.isObject(objectToGet)) {
+        propertyToGet = propertyToGet || null;
+        if (propertyToGet) {
+          if (typeof propertyToGet === 'string') {
+            if (objectToGet.hasOwnProperty(propertyToGet)) {
+              _output = objectToGet[propertyToGet];
+            } else {
+              var _propertyReferenceError = [
+                'Requested property (' + propertyToGet + ')',
+                'does not exist on object received.'
+              ];
+              throw new ReferenceError(_propertyReferenceError.join(' '));
+            }
+          } else {
+            var _propertyTypeError = [
+              'Invalid type of param property received in _getCheckedObject method.',
+              'It must be string and type received is: "' + typeof objectToGet + '".'
+            ];
+            throw new TypeError(_propertyTypeError.join(' '));
+          }
+        } else {
+          _output = objectToGet;
+        }
+      } else {
+        var _objectTypeError = [
+          'Invalid type of param object received in _getCheckedObject method.',
+          'It must be object and type received is: "' + typeof objectToGet + '".'
+        ];
+        throw new TypeError(_objectTypeError.join(' '));
+      }
+      return _output;
+    }
+
+    /**
+     * @name setDeviceInfoProvider
+     * @memberof source._shared.$toolsProvider
+     *
+     * @description
+     * Provider exposed methods to set device info object.
+     *
+     * @param {Object} deviceObject
+     * @return {Object}
+     */
+    function setDeviceInfoProvider(deviceObject) {
+      return _setDeviceInfo(deviceObject);
+    }
+
+    /**
+     * @name getDeviceInfoProvider
+     * @memberof source._shared.$toolsProvider
+     *
+     * @description
+     * Provider function that returns device info object.
+     *
+     * @param {String} [property]
+     * @return {*}
+     */
+    function getDeviceInfoProvider(property) {
+      return _getCheckedObject(_deviceInfo, property);
+    }
+
+    /**
      * @name arrayMergeProvider
-     * @memberof source._shared.$toolsProvider.$tools
+     * @memberof source._shared.$toolsProvider
      *
      * @description
      * Exposed provider method for using _arrayMerge. Merges two arrays avoiding duplicate items.
@@ -2859,6 +3020,21 @@
     }
 
     /**
+     * @name getCheckedObjectProvider
+     * @memberof source._shared.$toolsProvider
+     *
+     * @description
+     * Provider exposed function for _getCheckedObject.
+     *
+     * @param {Object} objectToGet
+     * @param {String} [propertyToGet]
+     * @return {*}
+     */
+    function getCheckedObjectProvider(objectToGet, propertyToGet) {
+      return _getCheckedObject(objectToGet, propertyToGet);
+    }
+
+    /**
      * @namespace $tools
      * @memberof source._shared.$toolsProvider
      *
@@ -2869,6 +3045,9 @@
       return {
         /* Global Constants */
         $: $,
+        /* Config methods */
+        setDeviceInfo: setDeviceInfo,
+        getDeviceIngo: getDeviceInfo,
         /* String tools */
         camelCaseTo: camelCaseTo,
         toCamelCase: toCamelCase,
@@ -2881,8 +3060,37 @@
         /* Object tools */
         getValueFromDotedKey: getValueFromDotedKey,
         parseObjectValues: parseObjectValues,
-        setObjectUsingSchema: setObjectUsingSchema
+        setObjectUsingSchema: setObjectUsingSchema,
+        getCheckedObject: getCheckedObject
       };
+
+      /**
+       * @name setDeviceInfoProvider
+       * @memberof source._shared.$toolsProvider.$tools
+       *
+       * @description
+       * Factory exposed methods to set device info object.
+       *
+       * @param {Object} deviceObject
+       * @return {Object}
+       */
+      function setDeviceInfo(deviceObject) {
+        return _setDeviceInfo(deviceObject);
+      }
+
+      /**
+       * @name getDeviceInfo
+       * @memberof source._shared.$toolsProvider.$tools
+       *
+       * @description
+       * Factory function that returns device info object.
+       *
+       * @param {String} [property]
+       * @return {*}
+       */
+      function getDeviceInfo(property) {
+        return _getCheckedObject(_deviceInfo, property);
+      }
 
       /**
        * @name camelCaseTo
@@ -3035,6 +3243,21 @@
       function setObjectUsingSchema(objectSchema, objectSettings, mergeOption) {
         mergeOption = mergeOption || $.NO_MERGE;
         return _setObjectUsingSchema(objectSchema, objectSettings, mergeOption);
+      }
+
+      /**
+       * @name getCheckedObject
+       * @memberof source._shared.$toolsProvider.$tools
+       *
+       * @description
+       * Factory exposed function for _getCheckedObject.
+       *
+       * @param {Object} objectToGet
+       * @param {String} [propertyToGet]
+       * @return {*}
+       */
+      function getCheckedObject(objectToGet, propertyToGet) {
+        return _getCheckedObject(objectToGet, propertyToGet);
       }
     }
   }

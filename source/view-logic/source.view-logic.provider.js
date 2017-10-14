@@ -28,7 +28,7 @@
       setDomHandler: setDomHandlerProvider,
       createDomHandlerObject: createDomHandlerObjectProvider,
       createAnimationObject: createAnimationObjectProvider,
-      $get: ['$filter', $get]
+      $get: ['$filter', '$tools', $get]
     };
 
     /**
@@ -183,7 +183,7 @@
      * @description
      * Factory statement for application view provider.
      */
-    function $get($filter) {
+    function $get($filter, $tools) {
       return {
         /* Global Constants */
         $: $,
@@ -213,14 +213,19 @@
        */
       function _displayWayElement(domElement, way, animationData) {
         way = way || $.SHOW;
+        var _isEdge = ($tools.getDeviceInfo($.DEVICE_INFO_BROWSER) === $.BROWSER_EDGE);
+        var _isIE = ($tools.getDeviceInfo($.DEVICE_INFO_BROWSER) === $.BROWSER_IE);
+        var _noAnimationBrowser = (_isEdge || _isIE);
         var _animationIn = _domHandler.classDefaultAnimationShow;
         var _animationOut = _domHandler.classDefaultAnimationHide;
-        if (animationData && (typeof animationData === 'string')) {
-          if (way === $.SHOW_ANIMATION) {
-            _animationIn = animationData;
-          } else if (way === $.HIDE_ANIMATION) {
-            _animationOut = animationData;
-          }
+        if (animationData && _noAnimationBrowser && way === $.SHOW_ANIMATION) {
+          way = $.SHOW;
+        } else if (way === $.HIDE_ANIMATION) {
+          way = $.HIDE;
+        } else if (!_noAnimationBrowser && (typeof animationData === 'string') && ((way === $.SHOW_ANIMATION))) {
+          _animationIn = animationData;
+        } else if (way === $.HIDE_ANIMATION) {
+          _animationOut = animationData;
         } else if (angular.isObject(animationData)) {
           _animationIn = (animationData.classAnimationShow) ? animationData.classAnimationShow : _animationIn ;
           _animationOut = (animationData.classAnimationHide) ? animationData.classAnimationHide : _animationOut ;
@@ -235,10 +240,21 @@
             domElement.removeClass(_removeClassesShow).addClass(_domHandler.classToHide);
             break;
           case $.SHOW_ANIMATION:
-            domElement.removeClass(_removeClassesHide).addClass($.ACTIVATE_ANIMATION_CLASS + ' ' + _animationIn);
+            domElement
+              .removeClass(_removeClassesHide)
+              .addClass($.ACTIVATE_ANIMATION_CLASS + ' ' + _animationIn)
+              .one('webkitAnimationEnd animationend MSAnimationEnd', function() {
+                console.log(domElement);
+                domElement.attr('class', _domHandler.classToShow);
+              });
             break;
           case $.HIDE_ANIMATION:
-            domElement.removeClass(_removeClassesShow).addClass($.ACTIVATE_ANIMATION_CLASS + ' ' + _animationOut);
+            domElement
+              .removeClass(_removeClassesShow)
+              .addClass($.ACTIVATE_ANIMATION_CLASS + ' ' + _animationOut)
+              .one('webkitAnimationEnd  animationend MSAnimationEnd', function() {
+                domElement.attr('class', _domHandler.classToHide);
+              });
             break;
         }
       }

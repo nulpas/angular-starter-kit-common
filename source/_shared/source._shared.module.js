@@ -9,5 +9,7 @@
      * @description
      * Definition of module "_shared" for common minor services.
      */
-    .module('source._shared', []);
+    .module('source._shared', [
+      'ng.deviceDetector'
+    ]);
 })();
