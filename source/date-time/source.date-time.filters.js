@@ -24,13 +24,22 @@
     .filter('untilNow', untilNow)
 
     /**
-     * @namespace dateReduceHour
+     * @namespace dateReducedHour
      * @memberof source.date-time
      *
      * @description
      * Filter that shows hour in "0-24" format and date with string month but without year.
      */
-    .filter('dateReduceHour', dateReduceHour);
+    .filter('dateReducedHour', dateReducedHour)
+
+    /**
+     * @namespace dateMonthReduced
+     * @memberof source.date-time
+     *
+     * @description
+     * Filter that shows date with string abbreviated month.
+     */
+    .filter('dateMonthReduced', dateMonthReduced);
 
   function onlyHour() {
     return _onlyHour;
@@ -74,8 +83,8 @@
     }
   }
 
-  function dateReduceHour() {
-    return _dateReduceHour;
+  function dateReducedHour() {
+    return _dateReducedHour;
 
     /**
      * @name _dateReduceHour
@@ -89,8 +98,28 @@
      * @returns {String|*}
      * @private
      */
-    function _dateReduceHour(date) {
+    function _dateReducedHour(date) {
       return (Date.parse(date)) ? moment(date).format('D MMMM - HH:mm') : date ;
+    }
+  }
+
+  function dateMonthReduced() {
+    return _dateMonthReduced;
+
+    /**
+     * @name _dateReduceHour
+     * @memberof source.date-time.dateReduceHour
+     *
+     * @description
+     * Private function for "dateMonthReduced" filter.
+     * Returns date formatted if variable "date" is a valid date or the same input data.
+     *
+     * @param {*} date
+     * @returns {String|*}
+     * @private
+     */
+    function _dateMonthReduced(date) {
+      return (Date.parse(date)) ? moment(date).format('D MMM YYYY') : date ;
     }
   }
 })();
