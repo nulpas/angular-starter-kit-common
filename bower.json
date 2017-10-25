@@ -1,7 +1,7 @@
 {
   "name": "angular-toolpas",
   "description": "Angular Tool Box dependency",
-  "version": "0.9.37",
+  "version": "0.9.38",
   "main": "./release/angular-toolpas.js",
   "repository": {
     "type": "git",
@@ -32,12 +32,11 @@
     "angular-chart.js": "^1.1.1",
     "moment": "^2.19.1",
     "moment-timezone": "^0.5.13",
-    "dragular": "^4.4.6",
     "angular-local-storage": "^0.7.1",
     "lodash": "^4.17.4",
     "angular-i18n": "^1.6.6",
     "ng-device-detector": "^4.0.3",
-    "dialog-polyfill": "^0.4.9"
+    "angular-drag-and-drop-lists": "^2.1.0"
   },
   "devDependencies": {},
   "resolutions": {
@@ -59,12 +58,6 @@
       "main": [
         "material.js",
         "material.css"
-      ]
-    },
-    "dragular": {
-      "main": [
-        "dist/dragular.js",
-        "dist/dragular.css"
       ]
     }
   }

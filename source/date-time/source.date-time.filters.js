@@ -87,11 +87,11 @@
     return _dateReducedHour;
 
     /**
-     * @name _dateReduceHour
-     * @memberof source.date-time.dateReduceHour
+     * @name _dateReducedHour
+     * @memberof source.date-time.dateReducedHour
      *
      * @description
-     * Private function for "dateReduceHour" filter.
+     * Private function for "dateReducedHour" filter.
      * Returns date formatted if variable "date" is a valid date or the same input data.
      *
      * @param {*} date
@@ -107,8 +107,8 @@
     return _dateMonthReduced;
 
     /**
-     * @name _dateReduceHour
-     * @memberof source.date-time.dateReduceHour
+     * @name _dateMonthReduced
+     * @memberof source.date-time.dateMonthReduced
      *
      * @description
      * Private function for "dateMonthReduced" filter.
