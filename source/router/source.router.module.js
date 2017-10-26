@@ -1,6 +1,11 @@
 (function() {
   'use strict';
 
+  /**
+   * @namespace $urlRouterProvider
+   * @memberof ui.router
+   */
+
   angular
     /**
      * @namespace router

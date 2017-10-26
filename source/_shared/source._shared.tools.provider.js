@@ -182,6 +182,42 @@
     }
 
     /**
+     * @name _twoFromOne
+     * @memberof source._shared.$toolsProvider
+     *
+     * @description
+     * Divide an array in two from a given array length.
+     *
+     * @param {Number} lengthToDivide
+     * @param {Array} array
+     * @return {Object}
+     * @private
+     */
+    function _twoFromOne(lengthToDivide, array) {
+      var output = {
+        first: null,
+        second: null
+      };
+      if (typeof lengthToDivide === 'number') {
+        if (angular.isArray(array)) {
+          output.first = array;
+          var totalItems = array.length;
+          if (totalItems > lengthToDivide) {
+            var itemsFirst = Math.ceil(totalItems / 2);
+            var itemsSecond = (totalItems - itemsFirst);
+            output.first = array.slice(0, itemsFirst);
+            output.second = array.slice(-itemsSecond);
+          }
+        } else {
+          throw new TypeError('Expected array as second param typeof and received: "' + typeof array + '"');
+        }
+      } else {
+        throw new TypeError('Expected number as first param typeof and received: "' + typeof lengthToDivide + '"');
+      }
+      return output;
+    }
+
+    /**
      * @name _index
      * @memberof source._shared.$toolsProvider
      *
@@ -432,6 +468,7 @@
         removeArrayItem: removeArrayItem,
         removeArrayKey: removeArrayKey,
         arrayMerge: arrayMerge,
+        twoFromOne: twoFromOne,
         /* Object tools */
         getValueFromDotedKey: getValueFromDotedKey,
         parseObjectValues: parseObjectValues,
@@ -568,6 +605,21 @@
        */
       function arrayMerge(array1, array2) {
         return _arrayMerge(array1, array2);
+      }
+
+      /**
+       * @name twoFromOne
+       * @memberof source._shared.$toolsProvider.$tools
+       *
+       * @description
+       * Public factory method for using _twoFromOne. Divide an array in two from a given array length.
+       *
+       * @param {Number} lengthToDivide
+       * @param {Array} array
+       * @return {Object}
+       */
+      function twoFromOne(lengthToDivide, array) {
+        return _twoFromOne(lengthToDivide, array);
       }
 
       /**
