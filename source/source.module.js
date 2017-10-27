@@ -13,6 +13,7 @@
       'ngAnimate',
       'ngSanitize',
       'chart.js',
+      'LocalStorageModule',
       'dndLists',
       /* Source Core Modules */
       'source._shared',
