@@ -1,6 +1,11 @@
 (function() {
   'use strict';
 
+  /**
+   * @namespace localStorageServiceProvider
+   * @memberof LocalStorageModule
+   */
+
   angular
     /**
      * @namespace source
