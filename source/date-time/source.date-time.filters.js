@@ -39,7 +39,16 @@
      * @description
      * Filter that shows date with string abbreviated month.
      */
-    .filter('dateMonthReduced', dateMonthReduced);
+    .filter('dateMonthReduced', dateMonthReduced)
+
+    /**
+     * @namespace age
+     * @memberof source.date-time
+     *
+     * @description
+     * Filter that shows number of years between given date and current dateTime.
+     */
+    .filter('age', age);
 
   function onlyHour() {
     return _onlyHour;
@@ -120,6 +129,26 @@
      */
     function _dateMonthReduced(date) {
       return (Date.parse(date)) ? moment(date).format('D MMM YYYY') : date ;
+    }
+  }
+
+  function age() {
+    return _age;
+
+    /**
+     * @name _age
+     * @memberof source.date-time.dateMonthReduced
+     *
+     * @description
+     * Private function for "age" filter.
+     * Returns date formatted if variable "date" is a valid date or the same input data.
+     *
+     * @param {*} date
+     * @returns {String|*}
+     * @private
+     */
+    function _age(date) {
+      return (Date.parse(date)) ? Math.abs(moment(date).diff(moment(), 'years')) : date ;
     }
   }
 })();

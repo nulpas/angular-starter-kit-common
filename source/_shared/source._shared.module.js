@@ -1,6 +1,11 @@
 (function() {
   'use strict';
 
+  /**
+   * @namespace deviceDetector
+   * @memberof ng.deviceDetector
+   */
+
   angular
     /**
      * @namespace _shared
