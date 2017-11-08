@@ -4,6 +4,9 @@
   /**
    * @namespace $urlRouterProvider
    * @memberof ui.router
+   *
+   * @namespace $stateProvider
+   * @memberof ui.router
    */
 
   angular
