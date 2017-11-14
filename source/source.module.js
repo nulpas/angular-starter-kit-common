@@ -17,6 +17,7 @@
       /* External Modules */
       'ngAnimate',
       'ngSanitize',
+      'ngMaterial',
       'chart.js',
       'LocalStorageModule',
       'dndLists',
