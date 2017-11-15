@@ -42,44 +42,13 @@
 
   angular
     /**
-     * @namespace static
+     * @namespace date-time
      * @memberof source
      *
      * @description
-     * Module static definition for manage static data in application like literals or config variables.
+     * Definition of module "date time" for several tools and filters with datetime data.
      */
-    .module('source.static', []);
-})();
-
-(function() {
-  'use strict';
-
-  angular
-    /**
-     * @namespace toast
-     * @memberof source
-     *
-     * @description
-     * Definition of module "toast" for alert messages services.
-     */
-    .module('source.toast', [
-      /* External Modules */
-      'toastr'
-    ]);
-})();
-
-(function() {
-  'use strict';
-
-  angular
-    /**
-     * @namespace translate
-     * @memberof source
-     *
-     * @description
-     * Definition of module "translate" for translation services.
-     */
-    .module('source.translate', []);
+    .module('source.date-time', []);
 })();
 
 (function() {
@@ -97,55 +66,6 @@
       /* External Modules */
       'restangular'
     ]);
-})();
-
-(function() {
-  'use strict';
-
-  /**
-   * @namespace deviceDetector
-   * @memberof ng.deviceDetector
-   */
-
-  angular
-    /**
-     * @namespace _shared
-     * @memberof source
-     *
-     * @description
-     * Definition of module "_shared" for common minor services.
-     */
-    .module('source._shared', [
-      'ng.deviceDetector'
-    ]);
-})();
-
-(function() {
-  'use strict';
-
-  angular
-    /**
-     * @namespace view-logic
-     * @memberof source
-     *
-     * @description
-     * Module View Logic definition: helper for application view presentations.
-     */
-    .module('source.view-logic', []);
-})();
-
-(function() {
-  'use strict';
-
-  angular
-    /**
-     * @namespace date-time
-     * @memberof source
-     *
-     * @description
-     * Definition of module "date time" for several tools and filters with datetime data.
-     */
-    .module('source.date-time', []);
 })();
 
 (function() {
@@ -177,33 +97,98 @@
   'use strict';
 
   angular
-    .module('source.toast')
     /**
-     * @namespace toastConfig
-     * @memberof source.toast
-     *
-     * @requires 'toastrConfig'
+     * @namespace static
+     * @memberof source
      *
      * @description
-     * Config statement for alert module.
+     * Module static definition for manage static data in application like literals or config variables.
      */
-    .config(toastConfig);
+    .module('source.static', []);
+})();
 
-  toastConfig.$inject = ['toastrConfig'];
+(function() {
+  'use strict';
 
-  function toastConfig(toastrConfig) {
-    angular.extend(toastrConfig, {
-      allowHtml: true,
-      autoDismiss: false,
-      containerId: 'toast-container',
-      maxOpened: 0,
-      extendedTimeOut: 3600,
-      newestOnTop: true,
-      positionClass: 'toast-bottom-full-width',
-      preventDuplicates: false,
-      preventOpenDuplicates: false,
-      target: 'body'
-    });
+  /**
+   * @namespace deviceDetector
+   * @memberof ng.deviceDetector
+   */
+
+  angular
+    /**
+     * @namespace _shared
+     * @memberof source
+     *
+     * @description
+     * Definition of module "_shared" for common minor services.
+     */
+    .module('source._shared', [
+      'ng.deviceDetector'
+    ]);
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    /**
+     * @namespace toast
+     * @memberof source
+     *
+     * @description
+     * Definition of module "toast" for alert messages services.
+     */
+    .module('source.toast', [
+      /* External Modules */
+      'toastr'
+    ]);
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    /**
+     * @namespace view-logic
+     * @memberof source
+     *
+     * @description
+     * Module View Logic definition: helper for application view presentations.
+     */
+    .module('source.view-logic', []);
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    /**
+     * @namespace translate
+     * @memberof source
+     *
+     * @description
+     * Definition of module "translate" for translation services.
+     */
+    .module('source.translate', []);
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    .module('source.date-time')
+    /**
+     * @namespace dateTimeConfig
+     * @memberof source.date-time
+     *
+     * @description
+     * Config statement for datetime module.
+     */
+    .config(dateTimeConfig);
+
+  function dateTimeConfig() {
+    moment.tz.setDefault(moment.tz.guess());
   }
 })();
 
@@ -249,709 +234,187 @@
   'use strict';
 
   angular
+    .module('source.toast')
+    /**
+     * @namespace toastConfig
+     * @memberof source.toast
+     *
+     * @requires 'toastrConfig'
+     *
+     * @description
+     * Config statement for alert module.
+     */
+    .config(toastConfig);
+
+  toastConfig.$inject = ['toastrConfig'];
+
+  function toastConfig(toastrConfig) {
+    angular.extend(toastrConfig, {
+      allowHtml: true,
+      autoDismiss: false,
+      containerId: 'toast-container',
+      maxOpened: 0,
+      extendedTimeOut: 3600,
+      newestOnTop: true,
+      positionClass: 'toast-bottom-full-width',
+      preventDuplicates: false,
+      preventOpenDuplicates: false,
+      target: 'body'
+    });
+  }
+})();
+
+(function() {
+  'use strict';
+
+  angular
     .module('source.date-time')
     /**
-     * @namespace dateTimeConfig
+     * @namespace onlyHour
      * @memberof source.date-time
      *
      * @description
-     * Config statement for datetime module.
+     * Filter that shows hour in "0-24" format for a complete date given.
      */
-    .config(dateTimeConfig);
-
-  function dateTimeConfig() {
-    moment.tz.setDefault(moment.tz.guess());
-  }
-})();
-
-(function() {
-  'use strict';
-
-  /**
-   * @type Object
-   * @property {String} documentName
-   * @property {String} documentType
-   */
-
-  angular
-    .module('source.static')
-    /**
-     * @namespace $staticProvider
-     * @memberof source.static
-     *
-     * @requires globalConstantsProvider
-     *
-     * @description
-     * Provider statement to manage static variables for application.
-     */
-    .provider('$static', $static);
-
-  $static.$inject = ['globalConstantsProvider'];
-
-  function $static(globalConstantsProvider) {
-    var $ = globalConstantsProvider.get();
-    var _source = null;
-    var _statics = null;
-
-    return {
-      /* Global Constants */
-      $: $,
-      /* Provider LITERALS tools */
-      setSource: setProviderSource,
-      /* API Factory */
-      $get: ['$q', '$api', $get]
-    };
+    .filter('onlyHour', onlyHour)
 
     /**
-     * @name _setSource
-     * @memberof source.static.$staticProvider
+     * @namespace untilNow
+     * @memberof source.date-time
+     *
+     * @requires dateTimeModel
      *
      * @description
-     * Private method to set JSON source files containing the application static variables.
+     * Filter that shows human string for elapsed time.
+     */
+    .filter('untilNow', untilNow)
+
+    /**
+     * @namespace dateReducedHour
+     * @memberof source.date-time
      *
-     * @param {String|Array|Object} source
-     * @returns {Array|Object}
+     * @description
+     * Filter that shows hour in "0-24" format and date with string month but without year.
+     */
+    .filter('dateReducedHour', dateReducedHour)
+
+    /**
+     * @namespace dateMonthReduced
+     * @memberof source.date-time
+     *
+     * @description
+     * Filter that shows date with string abbreviated month.
+     */
+    .filter('dateMonthReduced', dateMonthReduced)
+
+    /**
+     * @namespace age
+     * @memberof source.date-time
+     *
+     * @description
+     * Filter that shows number of years between given date and current dateTime.
+     */
+    .filter('age', age);
+
+  function onlyHour() {
+    return _onlyHour;
+
+    /**
+     * @name _onlyHour
+     * @memberof source.date-time.onlyHour
+     *
+     * @description
+     * Private function for "onlyHour" filter.
+     * Returns date formatted if variable "date" is a valid date or the same input data.
+     *
+     * @param {*} date
+     * @returns {String|*}
      * @private
      */
-    function _setSource(source) {
-      var _isStringSource = (typeof source === 'string');
-      if (_isStringSource || angular.isObject(source)) {
-        _source = (_isStringSource) ? [source] : source ;
-      } else {
-        throw new TypeError('Wrong type argument: Static source must be string or array or object.');
-      }
-      return _source;
-    }
-
-    /**
-     * @name setProviderSource
-     * @memberof source.static.$staticProvider
-     *
-     * @description
-     * Provider public function to set JSON source files containing the application static variables.
-     *
-     * @param {String|Array|Object} source
-     * @returns {Array|Object}
-     */
-    function setProviderSource(source) {
-      return _setSource(source);
-    }
-
-    /**
-     * @namespace $static
-     * @memberof source.static.$staticProvider
-     *
-     * @requires $q
-     * @requires $api
-     *
-     * @description
-     * Factory statement to manage static variables for application.
-     */
-    function $get($q, $api) {
-      return {
-        $: $,
-        get: getStatics
-      };
-
-      /**
-       * @name _getStaticPromises
-       * @memberof source.static.$staticProvider.$static
-       *
-       * @description
-       * Build an array with promises of all sources of static variables that are defined in the application.
-       *
-       * @returns {Array}
-       * @private
-       */
-      function _getStaticPromises() {
-        var _isArraySource = (angular.isArray(_source));
-        var _literalPromises = [];
-        angular.forEach(_source, function(itemDir, keyDir) {
-          if (_isArraySource) {
-            var entityObject = $api.createEntityObject({
-              entityName: itemDir,
-              forceToOne: true
-            });
-            _literalPromises.push($api.getLocalEntity(entityObject));
-          } else {
-            angular.forEach(itemDir, function(itemFile) {
-              var entityObject = $api.createEntityObject({
-                entityName: keyDir + '/' + itemFile,
-                forceToOne: true
-              });
-              _literalPromises.push($api.getLocalEntity(entityObject));
-            });
-          }
-        });
-        return _literalPromises;
-      }
-
-      /**
-       * @name _getStatics
-       * @memberof source.static.$staticProvider.$static
-       *
-       * @description
-       * Create a promise with all statics processed and merged into a single object.
-       * Set statics object.
-       *
-       * @returns {Promise}
-       * @private
-       */
-      function _getStatics() {
-        var _promisesToResolve = _getStaticPromises() ;
-        var _itemObject = {};
-        var _defer = $q.defer();
-        _statics = {};
-        $q.all(_promisesToResolve).then(function(success) {
-          angular.forEach(success, function(item) {
-            if (item.hasOwnProperty('documentName') && item.hasOwnProperty('documentType')) {
-              if (!angular.isObject(_itemObject[item.documentName])) {
-                _itemObject[item.documentName] = {};
-              }
-              _itemObject[item.documentName][item.documentType] = item;
-            } else {
-              var errorText = 'No required properties are found in static files';
-              throw new TypeError(errorText + ': "documentName" or "documentType"');
-            }
-            _statics = angular.extend({}, _statics, _itemObject);
-          });
-          _defer.resolve(_statics);
-        });
-        return _defer.promise;
-      }
-
-      /**
-       * @name getStatics
-       * @memberof source.static.$staticProvider.$static
-       *
-       * @description
-       * Returns literals object or its promise depending on whether the static variables have been set.
-       *
-       * @param {String} property
-       * @returns {Object|Promise}
-       */
-      function getStatics(property) {
-        var _property = property || null;
-        var output = null;
-        if (_statics && _property) {
-          if (_statics.hasOwnProperty(property)) {
-            output = _statics[property];
-          } else {
-            throw new ReferenceError('Trying to get statics property that does not exist: ("' + property + '")');
-          }
-        } else if (_statics) {
-          output = _statics;
-        } else {
-          output = _getStatics();
-        }
-        return output;
-      }
+    function _onlyHour(date) {
+      return (Date.parse(date)) ? moment(date).format('HH:mm') : date ;
     }
   }
-})();
 
-(function() {
-  'use strict';
+  untilNow.$inject = ['dateTimeModel'];
 
-  angular
-    .module('source.toast')
-    /**
-     * @namespace toastModelProvider
-     * @memberof source.toast
-     *
-     * @description
-     * Provider that gets constants for toast services.
-     */
-    .provider('toastModel', toastModel);
-
-  toastModel.$inject = ['$toolsProvider'];
-
-  function toastModel($toolsProvider) {
-    var _constants = {
-      SUCCESS: 'SUCCESS',
-      INFO: 'INFO',
-      WARNING: 'WARNING',
-      ERROR: 'ERROR'
-    };
-    var $ = angular.extend({}, _constants, $toolsProvider.$);
-
-    return {
-      $: $,
-      $get: ['toastr', $get]
-    };
+  function untilNow(dateTimeModel) {
+    return _untilNow;
 
     /**
-     * @namespace toastModel
-     * @memberof source.toast.toastModelProvider
-     *
-     * @requires toastr
+     * @name _untilNow
+     * @memberof source.date-time.untilNow
      *
      * @description
-     * Factory that gets constants for toast services.
-     */
-    function $get(toastr) {
-      var _serviceModel = {
-        SUCCESS: toastr.success,
-        INFO: toastr.info,
-        WARNING: toastr.warning,
-        ERROR: toastr.error
-      };
-
-      return {
-        $: $,
-        get: getFactory
-      };
-
-      /**
-       * @name getFactory
-       * @memberof source.toast.toastModelProvider.toastModel
-       *
-       * @description
-       * Returns API model for Factory service.
-       *
-       * @returns {Object}
-       */
-      function getFactory() {
-        return _serviceModel;
-      }
-    }
-  }
-})();
-
-(function() {
-  'use strict';
-
-  angular
-    .module('source.toast')
-    /**
-     * @namespace $alertProvider
-     * @memberof source.toast
+     * Private function for "untilNow" filter.
+     * Returns locale string expressing elapsed time if variable "date" is a valid date or the same input data.
      *
-     * @description
-     * Provider custom statement to use toast alert's messages.
-     */
-    .provider('$alert', $alert);
-
-  $alert.$inject = ['toastModelProvider'];
-
-  function $alert(toastModelProvider) {
-    var $ = toastModelProvider.$;
-    var _toastOptions = {
-      timeOut: 9999
-    };
-
-    return {
-      $: $,
-      setDuration: _setDuration,
-      $get: ['toastModel', $get]
-    };
-
-    /**
-     * @name _setDuration
-     * @memberof source.toast.$alertProvider
-     *
-     * @description
-     * Set duration of toast message for provider configuration.
-     *
-     * @param {Integer} time
+     * @param {*} date
+     * @returns {String|*}
      * @private
      */
-    function _setDuration(time) {
-      _toastOptions.timeOut = time;
+    function _untilNow(date) {
+      return (Date.parse(date)) ? moment(date).calendar(null, dateTimeModel.momentCalendarFormat) : date ;
     }
+  }
+
+  function dateReducedHour() {
+    return _dateReducedHour;
 
     /**
-     * @name _launchToast
-     * @memberof source.toast.$alertProvider
+     * @name _dateReducedHour
+     * @memberof source.date-time.dateReducedHour
      *
      * @description
-     * Launch angular-toaster alert message.
+     * Private function for "dateReducedHour" filter.
+     * Returns date formatted if variable "date" is a valid date or the same input data.
      *
-     * @param {Object} toastFactoryModel
-     * @param {String|Array} message
-     * @param {String} type
-     * @param {String|Undefined} title
-     * @param {Integer|Undefined} duration
+     * @param {*} date
+     * @returns {String|*}
      * @private
      */
-    function _launchToast(toastFactoryModel, message, type, title, duration) {
-      if (title !== undefined && typeof title !== 'string' && !duration) {
-        duration = title;
-        title = undefined;
-      }
-
-      var toastOptions = (duration) ? angular.extend({}, _toastOptions, { timeOut: duration }) : _toastOptions ;
-      message = (angular.isArray(message)) ? message.join('<br>') : message ;
-      toastFactoryModel[type](message, title, toastOptions);
-    }
-
-    /**
-     * @namespace $alert
-     * @memberof source.toast.$alertProvider
-     *
-     * @requires toastr
-     *
-     * @description
-     * Factory statement for toast alert's messages.
-     */
-    function $get(toastModel) {
-      var toastFactoryModel = toastModel.get();
-
-      return {
-        $: $,
-        success: success,
-        info: info,
-        warning: warning,
-        error: error
-      };
-
-      /**
-       * @name success
-       * @memberof source.toast.$alertProvider.$alert
-       *
-       * @description
-       * Displays success toast message.
-       *
-       * @param {String} message
-       * @param {String} title
-       * @param {Integer|Undefined} duration
-       */
-      function success(message, title, duration) {
-        _launchToast(toastFactoryModel, message, $.SUCCESS, title, duration);
-      }
-
-      /**
-       * @name info
-       * @memberof source.toast.$alertProvider.$alert
-       *
-       * @description
-       * Displays info toast message.
-       *
-       * @param {String} message
-       * @param {String} title
-       * @param {Integer|Undefined} duration
-       */
-      function info(message, title, duration) {
-        _launchToast(toastFactoryModel, message, $.INFO, title, duration);
-      }
-
-      /**
-       * @name warning
-       * @memberof source.toast.$alertProvider.$alert
-       *
-       * @description
-       * Displays warning toast message.
-       *
-       * @param {String} message
-       * @param {String} title
-       * @param {Integer|Undefined} duration
-       */
-      function warning(message, title, duration) {
-        _launchToast(toastFactoryModel, message, $.WARNING, title, duration);
-      }
-
-      /**
-       * @name error
-       * @memberof source.toast.$alertProvider.$alert
-       *
-       * @description
-       * Displays error toast message.
-       *
-       * @param {String} message
-       * @param {String} title
-       * @param {Integer|Undefined} duration
-       */
-      function error(message, title, duration) {
-        _launchToast(toastFactoryModel, message, $.ERROR, title, duration);
-      }
+    function _dateReducedHour(date) {
+      return (Date.parse(date)) ? moment(date).format('D MMMM - HH:mm') : date ;
     }
   }
-})();
 
-(function() {
-  'use strict';
-
-  angular
-    .module('source.translate', [])
-    /**
-     * @namespace translate
-     * @memberof source.translate
-     *
-     * @requires $translate
-     *
-     * @description
-     * Filter for translating labels.
-     */
-    .filter('translate', translate);
-
-  translate.$inject = ['$translate'];
-
-  function translate($translate) {
-    return function(input) {
-      return $translate.getTranslations()[input] !== undefined ? $translate.getTranslations()[input] : input;
-    };
-  }
-})();
-
-(function() {
-  'use strict';
-
-  angular
-    .module('source.translate')
-    /**
-     * @namespace $translateProvider
-     * @memberof source.translate
-     *
-     * @requires $apiProvider
-     *
-     * @description
-     * Provider definition for translation labels.
-     */
-    .provider('$translate', $translate);
-
-  $translate.$inject = ['$apiProvider'];
-
-  function $translate($apiProvider) {
-    var _translateConfig = {
-      apiTranslationSource: null,
-      apiTranslationSections: null,
-      localTranslationSource: null,
-      localTranslationSections: null,
-      preferredDefaultLanguage: null
-    };
-
-    return {
-      setApiTranslationSource: setApiTranslationSource,
-      setApiTranslationSections: setApiTranslationSections,
-      setLocalTranslationSource: setLocalTranslationSource,
-      setLocalTranslationSections: setLocalTranslationSections,
-      setPreferredLanguage: setPreferredLanguage,
-      $get: ['$api', 'availableLanguages', $get]
-    };
+  function dateMonthReduced() {
+    return _dateMonthReduced;
 
     /**
-     * @name _setTranslationConfigProperty
-     * @memberof source.translate.$translateProvider
+     * @name _dateMonthReduced
+     * @memberof source.date-time.dateMonthReduced
      *
      * @description
-     * Set configurations for _translateConfig object.
+     * Private function for "dateMonthReduced" filter.
+     * Returns date formatted if variable "date" is a valid date or the same input data.
      *
-     * @param {String} configKey
-     * @param {String|Object} value
-     * @returns {Object}
+     * @param {*} date
+     * @returns {String|*}
      * @private
      */
-    function _setTranslationConfigProperty(configKey, value) {
-      value = (typeof value === 'string') ? $apiProvider.createEntityObject({ entityName: value }) : value ;
-      if (value && typeof value === 'object') {
-        _translateConfig[configKey] = value;
-        return _translateConfig;
-      } else {
-        throw new Error('Lost parameter or type parameter wrong');
-      }
+    function _dateMonthReduced(date) {
+      return (Date.parse(date)) ? moment(date).format('D MMM YYYY') : date ;
     }
+  }
+
+  function age() {
+    return _age;
 
     /**
-     * @name setApiTranslationSource
-     * @memberof source.translate.$translateProvider
+     * @name _age
+     * @memberof source.date-time.dateMonthReduced
      *
      * @description
-     * Set entity name for calling API to return translation labels.
+     * Private function for "age" filter.
+     * Returns date formatted if variable "date" is a valid date or the same input data.
      *
-     * @param {String} entityName
-     * @returns {Object}
+     * @param {*} date
+     * @returns {String|*}
+     * @private
      */
-    function setApiTranslationSource(entityName) {
-      return _setTranslationConfigProperty('apiTranslationSource', entityName);
-    }
-
-    /**
-     * @name setApiTranslationSections
-     * @memberof source.translate.$translateProvider
-     *
-     * @description
-     * Set sections from API response where will be found translations labels.
-     *
-     * @param {Object} sections
-     * @returns {Object}
-     */
-    function setApiTranslationSections(sections) {
-      return _setTranslationConfigProperty('apiTranslationSections', sections);
-    }
-
-    /**
-     * @name setLocalTranslationSource
-     * @memberof source.translate.$translateProvider
-     *
-     * @description
-     * Set file name for local JSON file where we will be found translation labels.
-     *
-     * @param {String} jsonFileName
-     * @returns {Object}
-     */
-    function setLocalTranslationSource(jsonFileName) {
-      return _setTranslationConfigProperty('localTranslationSource', jsonFileName);
-    }
-
-    /**
-     * @name setLocalTranslationSections
-     * @memberof source.translate.$translateProvider
-     *
-     * @description
-     * Set sections from local JSON file where will be found translations labels.
-     *
-     * @param {Object} sections
-     * @returns {Object}
-     */
-    function setLocalTranslationSections(sections) {
-      return _setTranslationConfigProperty('localTranslationSections', sections);
-    }
-
-    /**
-     * @name setPreferredLanguage
-     * @memberof source.translate.$translateProvider
-     *
-     * @description
-     * Set chosen language for application, defined by a locale code.
-     *
-     * @param {String} preferredLocale --> Locale code
-     * @returns {Object}
-     */
-    function setPreferredLanguage(preferredLocale) {
-      _translateConfig.preferredDefaultLanguage = preferredLocale;
-      return _translateConfig;
-    }
-
-    /**
-     * @namespace $translate
-     * @memberof source.translate.$translateProvider
-     *
-     * @requires $api
-     * @requires availableLanguages
-     *
-     * @description
-     * Factory definition for translation labels.
-     */
-    function $get($api, availableLanguages) {
-      var _translations = {};
-      var _appLanguage = null;
-
-      var $apiConstants = $api.$;
-
-      return {
-        initTranslationModule: initTranslationModule,
-        getTranslations: getTranslations,
-        getActualLanguage: getActualLanguage,
-        getAvailableLanguages: getAvailableLanguages
-      };
-
-      /**
-       * @name _initTranslationModule
-       * @memberof source.translate.$translateProvider.$translate
-       *
-       * @description
-       * Search for translation labels in source given by "source" parameter.
-       *
-       * @param {String} source --> Can be LOCAL or SERVER
-       * @returns {Promise|Null}
-       * @private
-       */
-      function _initTranslationModule(source) {
-        var config = {
-          source: _translateConfig.apiTranslationSource,
-          sections: _translateConfig.apiTranslationSections,
-          process: $api.getEntity
-        };
-        if (source === $apiConstants.API_LOCAL) {
-          config.source = _translateConfig.localTranslationSource;
-          config.sections = _translateConfig.localTranslationSections;
-          config.process = $api.getLocalEntity;
-        }
-        if (config.source) {
-          return config.process(config.source, function(success) {
-            var localTranslations = success.data;
-            if (config.sections) {
-              angular.forEach(config.sections, function(item) {
-                if (localTranslations.hasOwnProperty(item) && typeof localTranslations[item] === 'object') {
-                  _translations = angular.extend({}, _translations, localTranslations[item]);
-                }
-              });
-            } else {
-              _translations = angular.extend({}, _translations, localTranslations);
-            }
-          });
-        }
-
-        return null;
-      }
-
-      /**
-       * @name initTranslationModule
-       * @memberof source.translate.$translateProvider.$translate
-       *
-       * @description
-       * Search for translation labels in both sources: LOCAL and SERVER.
-       *
-       * @returns {Array}
-       */
-      function initTranslationModule() {
-        var translationsModules = [
-          _initTranslationModule($apiConstants.API_LOCAL),
-          _initTranslationModule($apiConstants.API_SERVER)
-        ];
-        var terms = {
-          one: _translateConfig.preferredDefaultLanguage,
-          two: typeof _translateConfig.preferredDefaultLanguage === 'string',
-          three: availableLanguages.languages.hasOwnProperty(_translateConfig.preferredDefaultLanguage)
-        };
-        if (terms.one && terms.two && terms.three) {
-          _appLanguage = availableLanguages.languages[_translateConfig.preferredDefaultLanguage];
-        } else {
-          _appLanguage = availableLanguages.default;
-          throw new Error('Locale code not found. Setting "en" automatically. Please, revise config statement.');
-        }
-
-        return translationsModules;
-      }
-
-      /**
-       * @name getTranslations
-       * @memberof source.translate.$translateProvider.$translate
-       *
-       * @description
-       * Catch general translation object: "_translations"
-       *
-       * @returns {Object}
-       */
-      function getTranslations() {
-        return _translations;
-      }
-
-      /**
-       * @name getActualLanguage
-       * @memberof source.translate.$translateProvider.$translate
-       *
-       * @description
-       * Catch actual defined language variable: "_appLanguage"
-       *
-       * @returns {Object}
-       */
-      function getActualLanguage() {
-        return _appLanguage;
-      }
-
-      /**
-       * @name getAvailableLanguages
-       * @memberof source.translate.$translateProvider.$translate
-       *
-       * @description
-       * Returns all application available languages, defined in "availableLanguages" service.
-       *
-       * @returns {Object}
-       */
-      function getAvailableLanguages() {
-        return availableLanguages.languages;
-      }
+    function _age(date) {
+      return (Date.parse(date)) ? Math.abs(moment(date).diff(moment(), 'years')) : date ;
     }
   }
 })();
@@ -960,47 +423,38 @@
   'use strict';
 
   angular
-    .module('source.translate')
+    .module('source.date-time')
     /**
-     * @namespace availableLanguages
-     * @memberof source.translate
+     * @namespace dateTimeModel
+     * @memberof source.date-time
      *
      * @description
-     * Service to setting all available languages into app. Languages are defined by its locale codes.
+     * Service that defines constants for date time module.
      */
-    .service('availableLanguages', availableLanguages);
+    .service('dateTimeModel', dateTimeModel);
 
-  function availableLanguages() {
+  function dateTimeModel() {
     /* jshint validthis: true */
-    this.languages = {
-      en: {
-        locale: 'en',
-        name: 'English',
-        sourceName: 'English'
-      },
-      es: {
-        locale: 'es',
-        name: 'Spanish',
-        sourceName: 'Español'
-      },
-      fr: {
-        locale: 'fr',
-        name: 'French',
-        sourceName: 'Français'
-      },
-      de: {
-        locale: 'de',
-        name: 'German',
-        sourceName: 'Deutsch'
-      },
-      pt: {
-        locale: 'pt',
-        name: 'Portuguese',
-        sourceName: 'Português'
-      }
+    /**
+     * @name momentCalendarFormat
+     * @memberof source.date-time.dateTimeModel
+     *
+     * @type {Object}
+     * @property {String} sameDay
+     * @property {String} nextDay
+     * @property {String} nextWeek
+     * @property {String} lastDay
+     * @property {String} lastWeek
+     * @property {String} sameElse
+     */
+    this.momentCalendarFormat = {
+      sameDay: '[hoy]',
+      nextDay: '[mañana]',
+      nextWeek: '[próximo] dddd',
+      lastDay: '[ayer]',
+      lastWeek: 'dddd [pasado]',
+      sameElse: 'DD/MM/YYYY'
     };
-
-    this.default = this.languages.en;
   }
 })();
 
@@ -1778,6 +1232,248 @@
   'use strict';
 
   angular
+  .module('source.router')
+  /**
+   * @namespace $router
+   * @memberof source.router
+   *
+   * @requires $state
+   * @requires $timeout
+   *
+   * @description
+   * Provider statement manage routing of the application.
+   */
+  .factory('$router', $router);
+
+  $router.$inject = ['$state', '$timeout'];
+
+  function $router($state, $timeout) {
+
+    return {
+      $state: $state,
+      resolveStateGo: resolveStateGo
+    };
+
+    /**
+     * @name _resolveStateGo
+     * @memberof source.router.$router
+     *
+     * @description
+     * Executes $state.go function into $timeout for use into state resolve.
+     *
+     * @param {String} stateName
+     */
+    function _resolveStateGo(stateName) {
+      $timeout(function() {
+        $state.go(stateName);
+      });
+    }
+
+    /**
+     * @name resolveStateGo
+     * @memberof source.router.$router
+     *
+     * @description
+     * Executes _resolveStateGo function.
+     *
+     * @param {String} stateName
+     */
+    function resolveStateGo(stateName) {
+      _resolveStateGo(stateName);
+    }
+  }
+})();
+
+(function() {
+  'use strict';
+
+  /**
+   * @type Object
+   * @property {String} documentName
+   * @property {String} documentType
+   */
+
+  angular
+    .module('source.static')
+    /**
+     * @namespace $staticProvider
+     * @memberof source.static
+     *
+     * @requires globalConstantsProvider
+     *
+     * @description
+     * Provider statement to manage static variables for application.
+     */
+    .provider('$static', $static);
+
+  $static.$inject = ['globalConstantsProvider'];
+
+  function $static(globalConstantsProvider) {
+    var $ = globalConstantsProvider.get();
+    var _source = null;
+    var _statics = null;
+
+    return {
+      /* Global Constants */
+      $: $,
+      /* Provider LITERALS tools */
+      setSource: setProviderSource,
+      /* API Factory */
+      $get: ['$q', '$api', $get]
+    };
+
+    /**
+     * @name _setSource
+     * @memberof source.static.$staticProvider
+     *
+     * @description
+     * Private method to set JSON source files containing the application static variables.
+     *
+     * @param {String|Array|Object} source
+     * @returns {Array|Object}
+     * @private
+     */
+    function _setSource(source) {
+      var _isStringSource = (typeof source === 'string');
+      if (_isStringSource || angular.isObject(source)) {
+        _source = (_isStringSource) ? [source] : source ;
+      } else {
+        throw new TypeError('Wrong type argument: Static source must be string or array or object.');
+      }
+      return _source;
+    }
+
+    /**
+     * @name setProviderSource
+     * @memberof source.static.$staticProvider
+     *
+     * @description
+     * Provider public function to set JSON source files containing the application static variables.
+     *
+     * @param {String|Array|Object} source
+     * @returns {Array|Object}
+     */
+    function setProviderSource(source) {
+      return _setSource(source);
+    }
+
+    /**
+     * @namespace $static
+     * @memberof source.static.$staticProvider
+     *
+     * @requires $q
+     * @requires $api
+     *
+     * @description
+     * Factory statement to manage static variables for application.
+     */
+    function $get($q, $api) {
+      return {
+        $: $,
+        get: getStatics
+      };
+
+      /**
+       * @name _getStaticPromises
+       * @memberof source.static.$staticProvider.$static
+       *
+       * @description
+       * Build an array with promises of all sources of static variables that are defined in the application.
+       *
+       * @returns {Array}
+       * @private
+       */
+      function _getStaticPromises() {
+        var _isArraySource = (angular.isArray(_source));
+        var _literalPromises = [];
+        angular.forEach(_source, function(itemDir, keyDir) {
+          if (_isArraySource) {
+            var entityObject = $api.createEntityObject({
+              entityName: itemDir,
+              forceToOne: true
+            });
+            _literalPromises.push($api.getLocalEntity(entityObject));
+          } else {
+            angular.forEach(itemDir, function(itemFile) {
+              var entityObject = $api.createEntityObject({
+                entityName: keyDir + '/' + itemFile,
+                forceToOne: true
+              });
+              _literalPromises.push($api.getLocalEntity(entityObject));
+            });
+          }
+        });
+        return _literalPromises;
+      }
+
+      /**
+       * @name _getStatics
+       * @memberof source.static.$staticProvider.$static
+       *
+       * @description
+       * Create a promise with all statics processed and merged into a single object.
+       * Set statics object.
+       *
+       * @returns {Promise}
+       * @private
+       */
+      function _getStatics() {
+        var _promisesToResolve = _getStaticPromises() ;
+        var _itemObject = {};
+        var _defer = $q.defer();
+        _statics = {};
+        $q.all(_promisesToResolve).then(function(success) {
+          angular.forEach(success, function(item) {
+            if (item.hasOwnProperty('documentName') && item.hasOwnProperty('documentType')) {
+              if (!angular.isObject(_itemObject[item.documentName])) {
+                _itemObject[item.documentName] = {};
+              }
+              _itemObject[item.documentName][item.documentType] = item;
+            } else {
+              var errorText = 'No required properties are found in static files';
+              throw new TypeError(errorText + ': "documentName" or "documentType"');
+            }
+            _statics = angular.extend({}, _statics, _itemObject);
+          });
+          _defer.resolve(_statics);
+        });
+        return _defer.promise;
+      }
+
+      /**
+       * @name getStatics
+       * @memberof source.static.$staticProvider.$static
+       *
+       * @description
+       * Returns literals object or its promise depending on whether the static variables have been set.
+       *
+       * @param {String} property
+       * @returns {Object|Promise}
+       */
+      function getStatics(property) {
+        var _property = property || null;
+        var output = null;
+        if (_statics && _property) {
+          if (_statics.hasOwnProperty(property)) {
+            output = _statics[property];
+          } else {
+            throw new ReferenceError('Trying to get statics property that does not exist: ("' + property + '")');
+          }
+        } else if (_statics) {
+          output = _statics;
+        } else {
+          output = _getStatics();
+        }
+        return output;
+      }
+    }
+  }
+})();
+
+(function() {
+  'use strict';
+
+  angular
     .module('source._shared')
     /**
      * @namespace globalConstantsProvider
@@ -2284,6 +1980,21 @@
     }
 
     /**
+     * @name _dateToIso
+     * @memberof source._shared.$toolsProvider
+     *
+     * @description
+     * Method to transform any format date to ISO date.
+     *
+     * @param {String} date
+     * @return {String}
+     * @private
+     */
+    function _dateToIso(date) {
+      return moment(date);
+    }
+
+    /**
      * @name setDeviceInfoProvider
      * @memberof source._shared.$toolsProvider
      *
@@ -2389,7 +2100,9 @@
         getValueFromDotedKey: getValueFromDotedKey,
         parseObjectValues: parseObjectValues,
         setObjectUsingSchema: setObjectUsingSchema,
-        getCheckedObject: getCheckedObject
+        getCheckedObject: getCheckedObject,
+        /* Date tools */
+        dateToIso: dateToIso
       };
 
       /**
@@ -2601,6 +2314,238 @@
        */
       function getCheckedObject(objectToGet, propertyToGet) {
         return _getCheckedObject(objectToGet, propertyToGet);
+      }
+
+      /**
+       * @name dateToIso
+       * @memberof source._shared.$toolsProvider.$tools
+       *
+       * @description
+       * Factory exposed function to _dateToIso
+       *
+       * @param {String} date
+       * @return {String}
+       */
+      function dateToIso(date) {
+        return _dateToIso(date);
+      }
+    }
+  }
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    .module('source.toast')
+    /**
+     * @namespace toastModelProvider
+     * @memberof source.toast
+     *
+     * @description
+     * Provider that gets constants for toast services.
+     */
+    .provider('toastModel', toastModel);
+
+  toastModel.$inject = ['$toolsProvider'];
+
+  function toastModel($toolsProvider) {
+    var _constants = {
+      SUCCESS: 'SUCCESS',
+      INFO: 'INFO',
+      WARNING: 'WARNING',
+      ERROR: 'ERROR'
+    };
+    var $ = angular.extend({}, _constants, $toolsProvider.$);
+
+    return {
+      $: $,
+      $get: ['toastr', $get]
+    };
+
+    /**
+     * @namespace toastModel
+     * @memberof source.toast.toastModelProvider
+     *
+     * @requires toastr
+     *
+     * @description
+     * Factory that gets constants for toast services.
+     */
+    function $get(toastr) {
+      var _serviceModel = {
+        SUCCESS: toastr.success,
+        INFO: toastr.info,
+        WARNING: toastr.warning,
+        ERROR: toastr.error
+      };
+
+      return {
+        $: $,
+        get: getFactory
+      };
+
+      /**
+       * @name getFactory
+       * @memberof source.toast.toastModelProvider.toastModel
+       *
+       * @description
+       * Returns API model for Factory service.
+       *
+       * @returns {Object}
+       */
+      function getFactory() {
+        return _serviceModel;
+      }
+    }
+  }
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    .module('source.toast')
+    /**
+     * @namespace $alertProvider
+     * @memberof source.toast
+     *
+     * @description
+     * Provider custom statement to use toast alert's messages.
+     */
+    .provider('$alert', $alert);
+
+  $alert.$inject = ['toastModelProvider'];
+
+  function $alert(toastModelProvider) {
+    var $ = toastModelProvider.$;
+    var _toastOptions = {
+      timeOut: 9999
+    };
+
+    return {
+      $: $,
+      setDuration: _setDuration,
+      $get: ['toastModel', $get]
+    };
+
+    /**
+     * @name _setDuration
+     * @memberof source.toast.$alertProvider
+     *
+     * @description
+     * Set duration of toast message for provider configuration.
+     *
+     * @param {Integer} time
+     * @private
+     */
+    function _setDuration(time) {
+      _toastOptions.timeOut = time;
+    }
+
+    /**
+     * @name _launchToast
+     * @memberof source.toast.$alertProvider
+     *
+     * @description
+     * Launch angular-toaster alert message.
+     *
+     * @param {Object} toastFactoryModel
+     * @param {String|Array} message
+     * @param {String} type
+     * @param {String|Undefined} title
+     * @param {Integer|Undefined} duration
+     * @private
+     */
+    function _launchToast(toastFactoryModel, message, type, title, duration) {
+      if (title !== undefined && typeof title !== 'string' && !duration) {
+        duration = title;
+        title = undefined;
+      }
+
+      var toastOptions = (duration) ? angular.extend({}, _toastOptions, { timeOut: duration }) : _toastOptions ;
+      message = (angular.isArray(message)) ? message.join('<br>') : message ;
+      toastFactoryModel[type](message, title, toastOptions);
+    }
+
+    /**
+     * @namespace $alert
+     * @memberof source.toast.$alertProvider
+     *
+     * @requires toastr
+     *
+     * @description
+     * Factory statement for toast alert's messages.
+     */
+    function $get(toastModel) {
+      var toastFactoryModel = toastModel.get();
+
+      return {
+        $: $,
+        success: success,
+        info: info,
+        warning: warning,
+        error: error
+      };
+
+      /**
+       * @name success
+       * @memberof source.toast.$alertProvider.$alert
+       *
+       * @description
+       * Displays success toast message.
+       *
+       * @param {String} message
+       * @param {String} title
+       * @param {Integer|Undefined} duration
+       */
+      function success(message, title, duration) {
+        _launchToast(toastFactoryModel, message, $.SUCCESS, title, duration);
+      }
+
+      /**
+       * @name info
+       * @memberof source.toast.$alertProvider.$alert
+       *
+       * @description
+       * Displays info toast message.
+       *
+       * @param {String} message
+       * @param {String} title
+       * @param {Integer|Undefined} duration
+       */
+      function info(message, title, duration) {
+        _launchToast(toastFactoryModel, message, $.INFO, title, duration);
+      }
+
+      /**
+       * @name warning
+       * @memberof source.toast.$alertProvider.$alert
+       *
+       * @description
+       * Displays warning toast message.
+       *
+       * @param {String} message
+       * @param {String} title
+       * @param {Integer|Undefined} duration
+       */
+      function warning(message, title, duration) {
+        _launchToast(toastFactoryModel, message, $.WARNING, title, duration);
+      }
+
+      /**
+       * @name error
+       * @memberof source.toast.$alertProvider.$alert
+       *
+       * @description
+       * Displays error toast message.
+       *
+       * @param {String} message
+       * @param {String} title
+       * @param {Integer|Undefined} duration
+       */
+      function error(message, title, duration) {
+        _launchToast(toastFactoryModel, message, $.ERROR, title, duration);
       }
     }
   }
@@ -3298,192 +3243,23 @@
   'use strict';
 
   angular
-    .module('source.date-time')
+    .module('source.translate', [])
     /**
-     * @namespace onlyHour
-     * @memberof source.date-time
+     * @namespace translate
+     * @memberof source.translate
+     *
+     * @requires $translate
      *
      * @description
-     * Filter that shows hour in "0-24" format for a complete date given.
+     * Filter for translating labels.
      */
-    .filter('onlyHour', onlyHour)
+    .filter('translate', translate);
 
-    /**
-     * @namespace untilNow
-     * @memberof source.date-time
-     *
-     * @requires dateTimeModel
-     *
-     * @description
-     * Filter that shows human string for elapsed time.
-     */
-    .filter('untilNow', untilNow)
+  translate.$inject = ['$translate'];
 
-    /**
-     * @namespace dateReducedHour
-     * @memberof source.date-time
-     *
-     * @description
-     * Filter that shows hour in "0-24" format and date with string month but without year.
-     */
-    .filter('dateReducedHour', dateReducedHour)
-
-    /**
-     * @namespace dateMonthReduced
-     * @memberof source.date-time
-     *
-     * @description
-     * Filter that shows date with string abbreviated month.
-     */
-    .filter('dateMonthReduced', dateMonthReduced)
-
-    /**
-     * @namespace age
-     * @memberof source.date-time
-     *
-     * @description
-     * Filter that shows number of years between given date and current dateTime.
-     */
-    .filter('age', age);
-
-  function onlyHour() {
-    return _onlyHour;
-
-    /**
-     * @name _onlyHour
-     * @memberof source.date-time.onlyHour
-     *
-     * @description
-     * Private function for "onlyHour" filter.
-     * Returns date formatted if variable "date" is a valid date or the same input data.
-     *
-     * @param {*} date
-     * @returns {String|*}
-     * @private
-     */
-    function _onlyHour(date) {
-      return (Date.parse(date)) ? moment(date).format('HH:mm') : date ;
-    }
-  }
-
-  untilNow.$inject = ['dateTimeModel'];
-
-  function untilNow(dateTimeModel) {
-    return _untilNow;
-
-    /**
-     * @name _untilNow
-     * @memberof source.date-time.untilNow
-     *
-     * @description
-     * Private function for "untilNow" filter.
-     * Returns locale string expressing elapsed time if variable "date" is a valid date or the same input data.
-     *
-     * @param {*} date
-     * @returns {String|*}
-     * @private
-     */
-    function _untilNow(date) {
-      return (Date.parse(date)) ? moment(date).calendar(null, dateTimeModel.momentCalendarFormat) : date ;
-    }
-  }
-
-  function dateReducedHour() {
-    return _dateReducedHour;
-
-    /**
-     * @name _dateReducedHour
-     * @memberof source.date-time.dateReducedHour
-     *
-     * @description
-     * Private function for "dateReducedHour" filter.
-     * Returns date formatted if variable "date" is a valid date or the same input data.
-     *
-     * @param {*} date
-     * @returns {String|*}
-     * @private
-     */
-    function _dateReducedHour(date) {
-      return (Date.parse(date)) ? moment(date).format('D MMMM - HH:mm') : date ;
-    }
-  }
-
-  function dateMonthReduced() {
-    return _dateMonthReduced;
-
-    /**
-     * @name _dateMonthReduced
-     * @memberof source.date-time.dateMonthReduced
-     *
-     * @description
-     * Private function for "dateMonthReduced" filter.
-     * Returns date formatted if variable "date" is a valid date or the same input data.
-     *
-     * @param {*} date
-     * @returns {String|*}
-     * @private
-     */
-    function _dateMonthReduced(date) {
-      return (Date.parse(date)) ? moment(date).format('D MMM YYYY') : date ;
-    }
-  }
-
-  function age() {
-    return _age;
-
-    /**
-     * @name _age
-     * @memberof source.date-time.dateMonthReduced
-     *
-     * @description
-     * Private function for "age" filter.
-     * Returns date formatted if variable "date" is a valid date or the same input data.
-     *
-     * @param {*} date
-     * @returns {String|*}
-     * @private
-     */
-    function _age(date) {
-      return (Date.parse(date)) ? Math.abs(moment(date).diff(moment(), 'years')) : date ;
-    }
-  }
-})();
-
-(function() {
-  'use strict';
-
-  angular
-    .module('source.date-time')
-    /**
-     * @namespace dateTimeModel
-     * @memberof source.date-time
-     *
-     * @description
-     * Service that defines constants for date time module.
-     */
-    .service('dateTimeModel', dateTimeModel);
-
-  function dateTimeModel() {
-    /* jshint validthis: true */
-    /**
-     * @name momentCalendarFormat
-     * @memberof source.date-time.dateTimeModel
-     *
-     * @type {Object}
-     * @property {String} sameDay
-     * @property {String} nextDay
-     * @property {String} nextWeek
-     * @property {String} lastDay
-     * @property {String} lastWeek
-     * @property {String} sameElse
-     */
-    this.momentCalendarFormat = {
-      sameDay: '[hoy]',
-      nextDay: '[mañana]',
-      nextWeek: '[próximo] dddd',
-      lastDay: '[ayer]',
-      lastWeek: 'dddd [pasado]',
-      sameElse: 'DD/MM/YYYY'
+  function translate($translate) {
+    return function(input) {
+      return $translate.getTranslations()[input] !== undefined ? $translate.getTranslations()[input] : input;
     };
   }
 })();
@@ -3492,54 +3268,309 @@
   'use strict';
 
   angular
-  .module('source.router')
-  /**
-   * @namespace $router
-   * @memberof source.router
-   *
-   * @requires $state
-   * @requires $timeout
-   *
-   * @description
-   * Provider statement manage routing of the application.
-   */
-  .factory('$router', $router);
+    .module('source.translate')
+    /**
+     * @namespace $translateProvider
+     * @memberof source.translate
+     *
+     * @requires $apiProvider
+     *
+     * @description
+     * Provider definition for translation labels.
+     */
+    .provider('$translate', $translate);
 
-  $router.$inject = ['$state', '$timeout'];
+  $translate.$inject = ['$apiProvider'];
 
-  function $router($state, $timeout) {
+  function $translate($apiProvider) {
+    var _translateConfig = {
+      apiTranslationSource: null,
+      apiTranslationSections: null,
+      localTranslationSource: null,
+      localTranslationSections: null,
+      preferredDefaultLanguage: null
+    };
 
     return {
-      $state: $state,
-      resolveStateGo: resolveStateGo
+      setApiTranslationSource: setApiTranslationSource,
+      setApiTranslationSections: setApiTranslationSections,
+      setLocalTranslationSource: setLocalTranslationSource,
+      setLocalTranslationSections: setLocalTranslationSections,
+      setPreferredLanguage: setPreferredLanguage,
+      $get: ['$api', 'availableLanguages', $get]
     };
 
     /**
-     * @name _resolveStateGo
-     * @memberof source.router.$router
+     * @name _setTranslationConfigProperty
+     * @memberof source.translate.$translateProvider
      *
      * @description
-     * Executes $state.go function into $timeout for use into state resolve.
+     * Set configurations for _translateConfig object.
      *
-     * @param {String} stateName
+     * @param {String} configKey
+     * @param {String|Object} value
+     * @returns {Object}
+     * @private
      */
-    function _resolveStateGo(stateName) {
-      $timeout(function() {
-        $state.go(stateName);
-      });
+    function _setTranslationConfigProperty(configKey, value) {
+      value = (typeof value === 'string') ? $apiProvider.createEntityObject({ entityName: value }) : value ;
+      if (value && typeof value === 'object') {
+        _translateConfig[configKey] = value;
+        return _translateConfig;
+      } else {
+        throw new Error('Lost parameter or type parameter wrong');
+      }
     }
 
     /**
-     * @name resolveStateGo
-     * @memberof source.router.$router
+     * @name setApiTranslationSource
+     * @memberof source.translate.$translateProvider
      *
      * @description
-     * Executes _resolveStateGo function.
+     * Set entity name for calling API to return translation labels.
      *
-     * @param {String} stateName
+     * @param {String} entityName
+     * @returns {Object}
      */
-    function resolveStateGo(stateName) {
-      _resolveStateGo(stateName);
+    function setApiTranslationSource(entityName) {
+      return _setTranslationConfigProperty('apiTranslationSource', entityName);
     }
+
+    /**
+     * @name setApiTranslationSections
+     * @memberof source.translate.$translateProvider
+     *
+     * @description
+     * Set sections from API response where will be found translations labels.
+     *
+     * @param {Object} sections
+     * @returns {Object}
+     */
+    function setApiTranslationSections(sections) {
+      return _setTranslationConfigProperty('apiTranslationSections', sections);
+    }
+
+    /**
+     * @name setLocalTranslationSource
+     * @memberof source.translate.$translateProvider
+     *
+     * @description
+     * Set file name for local JSON file where we will be found translation labels.
+     *
+     * @param {String} jsonFileName
+     * @returns {Object}
+     */
+    function setLocalTranslationSource(jsonFileName) {
+      return _setTranslationConfigProperty('localTranslationSource', jsonFileName);
+    }
+
+    /**
+     * @name setLocalTranslationSections
+     * @memberof source.translate.$translateProvider
+     *
+     * @description
+     * Set sections from local JSON file where will be found translations labels.
+     *
+     * @param {Object} sections
+     * @returns {Object}
+     */
+    function setLocalTranslationSections(sections) {
+      return _setTranslationConfigProperty('localTranslationSections', sections);
+    }
+
+    /**
+     * @name setPreferredLanguage
+     * @memberof source.translate.$translateProvider
+     *
+     * @description
+     * Set chosen language for application, defined by a locale code.
+     *
+     * @param {String} preferredLocale --> Locale code
+     * @returns {Object}
+     */
+    function setPreferredLanguage(preferredLocale) {
+      _translateConfig.preferredDefaultLanguage = preferredLocale;
+      return _translateConfig;
+    }
+
+    /**
+     * @namespace $translate
+     * @memberof source.translate.$translateProvider
+     *
+     * @requires $api
+     * @requires availableLanguages
+     *
+     * @description
+     * Factory definition for translation labels.
+     */
+    function $get($api, availableLanguages) {
+      var _translations = {};
+      var _appLanguage = null;
+
+      var $apiConstants = $api.$;
+
+      return {
+        initTranslationModule: initTranslationModule,
+        getTranslations: getTranslations,
+        getActualLanguage: getActualLanguage,
+        getAvailableLanguages: getAvailableLanguages
+      };
+
+      /**
+       * @name _initTranslationModule
+       * @memberof source.translate.$translateProvider.$translate
+       *
+       * @description
+       * Search for translation labels in source given by "source" parameter.
+       *
+       * @param {String} source --> Can be LOCAL or SERVER
+       * @returns {Promise|Null}
+       * @private
+       */
+      function _initTranslationModule(source) {
+        var config = {
+          source: _translateConfig.apiTranslationSource,
+          sections: _translateConfig.apiTranslationSections,
+          process: $api.getEntity
+        };
+        if (source === $apiConstants.API_LOCAL) {
+          config.source = _translateConfig.localTranslationSource;
+          config.sections = _translateConfig.localTranslationSections;
+          config.process = $api.getLocalEntity;
+        }
+        if (config.source) {
+          return config.process(config.source, function(success) {
+            var localTranslations = success.data;
+            if (config.sections) {
+              angular.forEach(config.sections, function(item) {
+                if (localTranslations.hasOwnProperty(item) && typeof localTranslations[item] === 'object') {
+                  _translations = angular.extend({}, _translations, localTranslations[item]);
+                }
+              });
+            } else {
+              _translations = angular.extend({}, _translations, localTranslations);
+            }
+          });
+        }
+
+        return null;
+      }
+
+      /**
+       * @name initTranslationModule
+       * @memberof source.translate.$translateProvider.$translate
+       *
+       * @description
+       * Search for translation labels in both sources: LOCAL and SERVER.
+       *
+       * @returns {Array}
+       */
+      function initTranslationModule() {
+        var translationsModules = [
+          _initTranslationModule($apiConstants.API_LOCAL),
+          _initTranslationModule($apiConstants.API_SERVER)
+        ];
+        var terms = {
+          one: _translateConfig.preferredDefaultLanguage,
+          two: typeof _translateConfig.preferredDefaultLanguage === 'string',
+          three: availableLanguages.languages.hasOwnProperty(_translateConfig.preferredDefaultLanguage)
+        };
+        if (terms.one && terms.two && terms.three) {
+          _appLanguage = availableLanguages.languages[_translateConfig.preferredDefaultLanguage];
+        } else {
+          _appLanguage = availableLanguages.default;
+          throw new Error('Locale code not found. Setting "en" automatically. Please, revise config statement.');
+        }
+
+        return translationsModules;
+      }
+
+      /**
+       * @name getTranslations
+       * @memberof source.translate.$translateProvider.$translate
+       *
+       * @description
+       * Catch general translation object: "_translations"
+       *
+       * @returns {Object}
+       */
+      function getTranslations() {
+        return _translations;
+      }
+
+      /**
+       * @name getActualLanguage
+       * @memberof source.translate.$translateProvider.$translate
+       *
+       * @description
+       * Catch actual defined language variable: "_appLanguage"
+       *
+       * @returns {Object}
+       */
+      function getActualLanguage() {
+        return _appLanguage;
+      }
+
+      /**
+       * @name getAvailableLanguages
+       * @memberof source.translate.$translateProvider.$translate
+       *
+       * @description
+       * Returns all application available languages, defined in "availableLanguages" service.
+       *
+       * @returns {Object}
+       */
+      function getAvailableLanguages() {
+        return availableLanguages.languages;
+      }
+    }
+  }
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    .module('source.translate')
+    /**
+     * @namespace availableLanguages
+     * @memberof source.translate
+     *
+     * @description
+     * Service to setting all available languages into app. Languages are defined by its locale codes.
+     */
+    .service('availableLanguages', availableLanguages);
+
+  function availableLanguages() {
+    /* jshint validthis: true */
+    this.languages = {
+      en: {
+        locale: 'en',
+        name: 'English',
+        sourceName: 'English'
+      },
+      es: {
+        locale: 'es',
+        name: 'Spanish',
+        sourceName: 'Español'
+      },
+      fr: {
+        locale: 'fr',
+        name: 'French',
+        sourceName: 'Français'
+      },
+      de: {
+        locale: 'de',
+        name: 'German',
+        sourceName: 'Deutsch'
+      },
+      pt: {
+        locale: 'pt',
+        name: 'Portuguese',
+        sourceName: 'Português'
+      }
+    };
+
+    this.default = this.languages.en;
   }
 })();
