@@ -374,12 +374,12 @@
      * @description
      * Method to transform any format date to ISO date.
      *
-     * @param {String} date
+     * @param {*} date
      * @return {String}
      * @private
      */
     function _dateToIso(date) {
-      return moment(date);
+      return moment(date).toISOString();
     }
 
     /**
@@ -711,7 +711,7 @@
        * @description
        * Factory exposed function to _dateToIso
        *
-       * @param {String} date
+       * @param {*} date
        * @return {String}
        */
       function dateToIso(date) {
