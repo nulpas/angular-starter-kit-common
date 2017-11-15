@@ -368,6 +368,21 @@
     }
 
     /**
+     * @name _dateToIso
+     * @memberof source._shared.$toolsProvider
+     *
+     * @description
+     * Method to transform any format date to ISO date.
+     *
+     * @param {String} date
+     * @return {String}
+     * @private
+     */
+    function _dateToIso(date) {
+      return moment(date);
+    }
+
+    /**
      * @name setDeviceInfoProvider
      * @memberof source._shared.$toolsProvider
      *
@@ -473,7 +488,9 @@
         getValueFromDotedKey: getValueFromDotedKey,
         parseObjectValues: parseObjectValues,
         setObjectUsingSchema: setObjectUsingSchema,
-        getCheckedObject: getCheckedObject
+        getCheckedObject: getCheckedObject,
+        /* Date tools */
+        dateToIso: dateToIso
       };
 
       /**
@@ -685,6 +702,20 @@
        */
       function getCheckedObject(objectToGet, propertyToGet) {
         return _getCheckedObject(objectToGet, propertyToGet);
+      }
+
+      /**
+       * @name dateToIso
+       * @memberof source._shared.$toolsProvider.$tools
+       *
+       * @description
+       * Factory exposed function to _dateToIso
+       *
+       * @param {String} date
+       * @return {String}
+       */
+      function dateToIso(date) {
+        return _dateToIso(date);
       }
     }
   }
