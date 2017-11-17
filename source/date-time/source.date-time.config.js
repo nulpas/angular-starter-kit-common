@@ -12,7 +12,13 @@
      */
     .config(dateTimeConfig);
 
-  function dateTimeConfig() {
+  dateTimeConfig.$inject = ['$mdDateLocaleProvider'];
+
+  function dateTimeConfig($mdDateLocaleProvider) {
     moment.tz.setDefault(moment.tz.guess());
+
+    $mdDateLocaleProvider.formatDate = function(date) {
+      return moment(date).format('DD/MM/YYYY');
+    };
   }
 })();
