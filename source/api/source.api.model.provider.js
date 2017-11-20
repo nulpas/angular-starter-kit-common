@@ -94,7 +94,7 @@
     return {
       $: $,
       get: getProvider,
-      $get: ['Restangular', $get]
+      $get: ['Restangular', '$tools', $get]
     };
 
     /**
@@ -136,7 +136,7 @@
      * @description
      * Factory that gets constants for API services.
      */
-    function $get(Restangular) {
+    function $get(Restangular, $tools) {
       var _defaults = {
         defaultHeaders: {
           'Content-Type': 'application/json'
@@ -203,7 +203,7 @@
                */
               subProcess: function(requestObject) {
                 var e = requestObject.entity;
-                var eUrl = requestObject.json + '/' + e.entityName + '.json';
+                var eUrl = requestObject.json + '/' + $tools.cleanApiUrlForLocalUse(e.entityName) + '.json';
                 var forceToOne = (e.hasOwnProperty('forceToOne')) ? e.forceToOne : false ;
                 var subProcess = (forceToOne) ?
                   Restangular.oneUrl(e.entityName, eUrl).get : Restangular.allUrl(e.entityName, eUrl).getList ;

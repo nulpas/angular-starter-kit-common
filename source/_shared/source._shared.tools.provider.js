@@ -383,6 +383,26 @@
     }
 
     /**
+     * @name _cleanUrl
+     * @memberof source._shared.$toolsProvider
+     *
+     * @description
+     * This method cuts an URL string in separator string given and returns only first part.
+     *
+     * @param {String} url
+     * @param {String} separator
+     * @return {String}
+     * @private
+     */
+    function _cleanUrl(url, separator) {
+      var _arrayUrl = url.split(separator);
+      if (_arrayUrl.length > 1) {
+        _arrayUrl.pop();
+      }
+      return _arrayUrl.join('');
+    }
+
+    /**
      * @name setDeviceInfoProvider
      * @memberof source._shared.$toolsProvider
      *
@@ -490,7 +510,9 @@
         setObjectUsingSchema: setObjectUsingSchema,
         getCheckedObject: getCheckedObject,
         /* Date tools */
-        dateToIso: dateToIso
+        dateToIso: dateToIso,
+        /* URL tools */
+        cleanApiUrlForLocalUse: cleanApiUrlForLocalUse
       };
 
       /**
@@ -716,6 +738,20 @@
        */
       function dateToIso(date) {
         return _dateToIso(date);
+      }
+
+      /**
+       * @name cleanApiUrlForLocalUse
+       * @memberof source._shared.$toolsProvider.$tools
+       *
+       * @description
+       * Removes all API URL string part starting with "?" chart.
+       *
+       * @param {String} url
+       * @return {String}
+       */
+      function cleanApiUrlForLocalUse(url) {
+        return _cleanUrl(url, '?');
       }
     }
   }
