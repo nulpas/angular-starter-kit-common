@@ -139,7 +139,7 @@
     function $get(Restangular, $tools) {
       var _defaults = {
         defaultHeaders: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json;charset=UTF-8'
         },
         defaultParams: {}
       };
