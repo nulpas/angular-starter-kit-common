@@ -230,7 +230,11 @@
      * @private
      */
     function _index(object, index) {
-      return object[index];
+      if (angular.isArray(object)) {
+        return angular.copy(object).shift()[index];
+      } else {
+        return object[index];
+      }
     }
 
     /**
