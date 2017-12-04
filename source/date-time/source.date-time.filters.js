@@ -48,7 +48,16 @@
      * @description
      * Filter that shows number of years between given date and current dateTime.
      */
-    .filter('age', age);
+    .filter('age', age)
+
+    /**
+     * @namespace completeDateHour
+     * @memberof source.date-time
+     *
+     * @description
+     * Filter that shows complete date and complete hour.
+     */
+    .filter('completeDateHour', completeDateHour);
 
   function onlyHour() {
     return _onlyHour;
@@ -137,7 +146,7 @@
 
     /**
      * @name _age
-     * @memberof source.date-time.dateMonthReduced
+     * @memberof source.date-time.age
      *
      * @description
      * Private function for "age" filter.
@@ -149,6 +158,25 @@
      */
     function _age(date) {
       return (Date.parse(date)) ? Math.abs(moment(date).diff(moment(), 'years')) : date ;
+    }
+  }
+
+  function completeDateHour() {
+    return _completeDateHour;
+
+    /**
+     * @name _completeDateHour
+     * @memberof source.date-time.completeDateHour
+     *
+     * @description
+     * Returns complete date with numbers and complete hour.
+     *
+     * @param {*} date
+     * @returns {String|*}
+     * @private
+     */
+    function _completeDateHour(date) {
+      return (Date.parse(date)) ? moment(date).format('D/MM/YYYY HH:mm:ss') : date ;
     }
   }
 })();
