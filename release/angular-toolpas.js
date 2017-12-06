@@ -42,20 +42,6 @@
 
   angular
     /**
-     * @namespace date-time
-     * @memberof source
-     *
-     * @description
-     * Definition of module "date time" for several tools and filters with datetime data.
-     */
-    .module('source.date-time', []);
-})();
-
-(function() {
-  'use strict';
-
-  angular
-    /**
      * @namespace api
      * @memberof source
      *
@@ -66,6 +52,20 @@
       /* External Modules */
       'restangular'
     ]);
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    /**
+     * @namespace date-time
+     * @memberof source
+     *
+     * @description
+     * Definition of module "date time" for several tools and filters with datetime data.
+     */
+    .module('source.date-time', []);
 })();
 
 (function() {
@@ -112,20 +112,6 @@
 
   angular
     /**
-     * @namespace translate
-     * @memberof source
-     *
-     * @description
-     * Definition of module "translate" for translation services.
-     */
-    .module('source.translate', []);
-})();
-
-(function() {
-  'use strict';
-
-  angular
-    /**
      * @namespace toast
      * @memberof source
      *
@@ -136,6 +122,20 @@
       /* External Modules */
       'toastr'
     ]);
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    /**
+     * @namespace translate
+     * @memberof source
+     *
+     * @description
+     * Definition of module "translate" for translation services.
+     */
+    .module('source.translate', []);
 })();
 
 (function() {
@@ -171,31 +171,6 @@
     .module('source._shared', [
       'ng.deviceDetector'
     ]);
-})();
-
-(function() {
-  'use strict';
-
-  angular
-    .module('source.date-time')
-    /**
-     * @namespace dateTimeConfig
-     * @memberof source.date-time
-     *
-     * @description
-     * Config statement for datetime module.
-     */
-    .config(dateTimeConfig);
-
-  dateTimeConfig.$inject = ['$mdDateLocaleProvider'];
-
-  function dateTimeConfig($mdDateLocaleProvider) {
-    moment.tz.setDefault(moment.tz.guess());
-
-    $mdDateLocaleProvider.formatDate = function(date) {
-      return moment(date).format('DD/MM/YYYY');
-    };
-  }
 })();
 
 (function() {
@@ -240,6 +215,31 @@
   'use strict';
 
   angular
+    .module('source.date-time')
+    /**
+     * @namespace dateTimeConfig
+     * @memberof source.date-time
+     *
+     * @description
+     * Config statement for datetime module.
+     */
+    .config(dateTimeConfig);
+
+  dateTimeConfig.$inject = ['$mdDateLocaleProvider'];
+
+  function dateTimeConfig($mdDateLocaleProvider) {
+    moment.tz.setDefault(moment.tz.guess());
+
+    $mdDateLocaleProvider.formatDate = function(date) {
+      return moment(date).format('DD/MM/YYYY');
+    };
+  }
+})();
+
+(function() {
+  'use strict';
+
+  angular
     .module('source.toast')
     /**
      * @namespace toastConfig
@@ -267,228 +267,6 @@
       preventOpenDuplicates: false,
       target: 'body'
     });
-  }
-})();
-
-(function() {
-  'use strict';
-
-  angular
-    .module('source.date-time')
-    /**
-     * @namespace onlyHour
-     * @memberof source.date-time
-     *
-     * @description
-     * Filter that shows hour in "0-24" format for a complete date given.
-     */
-    .filter('onlyHour', onlyHour)
-
-    /**
-     * @namespace untilNow
-     * @memberof source.date-time
-     *
-     * @requires dateTimeModel
-     *
-     * @description
-     * Filter that shows human string for elapsed time.
-     */
-    .filter('untilNow', untilNow)
-
-    /**
-     * @namespace dateReducedHour
-     * @memberof source.date-time
-     *
-     * @description
-     * Filter that shows hour in "0-24" format and date with string month but without year.
-     */
-    .filter('dateReducedHour', dateReducedHour)
-
-    /**
-     * @namespace dateMonthReduced
-     * @memberof source.date-time
-     *
-     * @description
-     * Filter that shows date with string abbreviated month.
-     */
-    .filter('dateMonthReduced', dateMonthReduced)
-
-    /**
-     * @namespace age
-     * @memberof source.date-time
-     *
-     * @description
-     * Filter that shows number of years between given date and current dateTime.
-     */
-    .filter('age', age)
-
-    /**
-     * @namespace completeDateHour
-     * @memberof source.date-time
-     *
-     * @description
-     * Filter that shows complete date and complete hour.
-     */
-    .filter('completeDateHour', completeDateHour);
-
-  function onlyHour() {
-    return _onlyHour;
-
-    /**
-     * @name _onlyHour
-     * @memberof source.date-time.onlyHour
-     *
-     * @description
-     * Private function for "onlyHour" filter.
-     * Returns date formatted if variable "date" is a valid date or the same input data.
-     *
-     * @param {*} date
-     * @returns {String|*}
-     * @private
-     */
-    function _onlyHour(date) {
-      return (Date.parse(date)) ? moment(date).format('HH:mm') : date ;
-    }
-  }
-
-  untilNow.$inject = ['dateTimeModel'];
-
-  function untilNow(dateTimeModel) {
-    return _untilNow;
-
-    /**
-     * @name _untilNow
-     * @memberof source.date-time.untilNow
-     *
-     * @description
-     * Private function for "untilNow" filter.
-     * Returns locale string expressing elapsed time if variable "date" is a valid date or the same input data.
-     *
-     * @param {*} date
-     * @returns {String|*}
-     * @private
-     */
-    function _untilNow(date) {
-      return (Date.parse(date)) ? moment(date).calendar(null, dateTimeModel.momentCalendarFormat) : date ;
-    }
-  }
-
-  function dateReducedHour() {
-    return _dateReducedHour;
-
-    /**
-     * @name _dateReducedHour
-     * @memberof source.date-time.dateReducedHour
-     *
-     * @description
-     * Private function for "dateReducedHour" filter.
-     * Returns date formatted if variable "date" is a valid date or the same input data.
-     *
-     * @param {*} date
-     * @returns {String|*}
-     * @private
-     */
-    function _dateReducedHour(date) {
-      return (Date.parse(date)) ? moment(date).format('D MMMM - HH:mm') : date ;
-    }
-  }
-
-  function dateMonthReduced() {
-    return _dateMonthReduced;
-
-    /**
-     * @name _dateMonthReduced
-     * @memberof source.date-time.dateMonthReduced
-     *
-     * @description
-     * Private function for "dateMonthReduced" filter.
-     * Returns date formatted if variable "date" is a valid date or the same input data.
-     *
-     * @param {*} date
-     * @returns {String|*}
-     * @private
-     */
-    function _dateMonthReduced(date) {
-      return (Date.parse(date)) ? moment(date).format('D MMM YYYY') : date ;
-    }
-  }
-
-  function age() {
-    return _age;
-
-    /**
-     * @name _age
-     * @memberof source.date-time.age
-     *
-     * @description
-     * Private function for "age" filter.
-     * Returns date formatted if variable "date" is a valid date or the same input data.
-     *
-     * @param {*} date
-     * @returns {String|*}
-     * @private
-     */
-    function _age(date) {
-      return (Date.parse(date)) ? Math.abs(moment(date).diff(moment(), 'years')) : date ;
-    }
-  }
-
-  function completeDateHour() {
-    return _completeDateHour;
-
-    /**
-     * @name _completeDateHour
-     * @memberof source.date-time.completeDateHour
-     *
-     * @description
-     * Returns complete date with numbers and complete hour.
-     *
-     * @param {*} date
-     * @returns {String|*}
-     * @private
-     */
-    function _completeDateHour(date) {
-      return (Date.parse(date)) ? moment(date).format('D/MM/YYYY HH:mm:ss') : date ;
-    }
-  }
-})();
-
-(function() {
-  'use strict';
-
-  angular
-    .module('source.date-time')
-    /**
-     * @namespace dateTimeModel
-     * @memberof source.date-time
-     *
-     * @description
-     * Service that defines constants for date time module.
-     */
-    .service('dateTimeModel', dateTimeModel);
-
-  function dateTimeModel() {
-    /* jshint validthis: true */
-    /**
-     * @name momentCalendarFormat
-     * @memberof source.date-time.dateTimeModel
-     *
-     * @type {Object}
-     * @property {String} sameDay
-     * @property {String} nextDay
-     * @property {String} nextWeek
-     * @property {String} lastDay
-     * @property {String} lastWeek
-     * @property {String} sameElse
-     */
-    this.momentCalendarFormat = {
-      sameDay: '[hoy]',
-      nextDay: '[mañana]',
-      nextWeek: '[próximo] dddd',
-      lastDay: '[ayer]',
-      lastWeek: 'dddd [pasado]',
-      sameElse: 'DD/MM/YYYY'
-    };
   }
 })();
 
@@ -1266,6 +1044,228 @@
   'use strict';
 
   angular
+    .module('source.date-time')
+    /**
+     * @namespace onlyHour
+     * @memberof source.date-time
+     *
+     * @description
+     * Filter that shows hour in "0-24" format for a complete date given.
+     */
+    .filter('onlyHour', onlyHour)
+
+    /**
+     * @namespace untilNow
+     * @memberof source.date-time
+     *
+     * @requires dateTimeModel
+     *
+     * @description
+     * Filter that shows human string for elapsed time.
+     */
+    .filter('untilNow', untilNow)
+
+    /**
+     * @namespace dateReducedHour
+     * @memberof source.date-time
+     *
+     * @description
+     * Filter that shows hour in "0-24" format and date with string month but without year.
+     */
+    .filter('dateReducedHour', dateReducedHour)
+
+    /**
+     * @namespace dateMonthReduced
+     * @memberof source.date-time
+     *
+     * @description
+     * Filter that shows date with string abbreviated month.
+     */
+    .filter('dateMonthReduced', dateMonthReduced)
+
+    /**
+     * @namespace age
+     * @memberof source.date-time
+     *
+     * @description
+     * Filter that shows number of years between given date and current dateTime.
+     */
+    .filter('age', age)
+
+    /**
+     * @namespace completeDateHour
+     * @memberof source.date-time
+     *
+     * @description
+     * Filter that shows complete date and complete hour.
+     */
+    .filter('completeDateHour', completeDateHour);
+
+  function onlyHour() {
+    return _onlyHour;
+
+    /**
+     * @name _onlyHour
+     * @memberof source.date-time.onlyHour
+     *
+     * @description
+     * Private function for "onlyHour" filter.
+     * Returns date formatted if variable "date" is a valid date or the same input data.
+     *
+     * @param {*} date
+     * @returns {String|*}
+     * @private
+     */
+    function _onlyHour(date) {
+      return (Date.parse(date)) ? moment(date).format('HH:mm') : date ;
+    }
+  }
+
+  untilNow.$inject = ['dateTimeModel'];
+
+  function untilNow(dateTimeModel) {
+    return _untilNow;
+
+    /**
+     * @name _untilNow
+     * @memberof source.date-time.untilNow
+     *
+     * @description
+     * Private function for "untilNow" filter.
+     * Returns locale string expressing elapsed time if variable "date" is a valid date or the same input data.
+     *
+     * @param {*} date
+     * @returns {String|*}
+     * @private
+     */
+    function _untilNow(date) {
+      return (Date.parse(date)) ? moment(date).calendar(null, dateTimeModel.momentCalendarFormat) : date ;
+    }
+  }
+
+  function dateReducedHour() {
+    return _dateReducedHour;
+
+    /**
+     * @name _dateReducedHour
+     * @memberof source.date-time.dateReducedHour
+     *
+     * @description
+     * Private function for "dateReducedHour" filter.
+     * Returns date formatted if variable "date" is a valid date or the same input data.
+     *
+     * @param {*} date
+     * @returns {String|*}
+     * @private
+     */
+    function _dateReducedHour(date) {
+      return (Date.parse(date)) ? moment(date).format('D MMMM - HH:mm') : date ;
+    }
+  }
+
+  function dateMonthReduced() {
+    return _dateMonthReduced;
+
+    /**
+     * @name _dateMonthReduced
+     * @memberof source.date-time.dateMonthReduced
+     *
+     * @description
+     * Private function for "dateMonthReduced" filter.
+     * Returns date formatted if variable "date" is a valid date or the same input data.
+     *
+     * @param {*} date
+     * @returns {String|*}
+     * @private
+     */
+    function _dateMonthReduced(date) {
+      return (Date.parse(date)) ? moment(date).format('D MMM YYYY') : date ;
+    }
+  }
+
+  function age() {
+    return _age;
+
+    /**
+     * @name _age
+     * @memberof source.date-time.age
+     *
+     * @description
+     * Private function for "age" filter.
+     * Returns date formatted if variable "date" is a valid date or the same input data.
+     *
+     * @param {*} date
+     * @returns {String|*}
+     * @private
+     */
+    function _age(date) {
+      return (Date.parse(date)) ? Math.abs(moment(date).diff(moment(), 'years')) : date ;
+    }
+  }
+
+  function completeDateHour() {
+    return _completeDateHour;
+
+    /**
+     * @name _completeDateHour
+     * @memberof source.date-time.completeDateHour
+     *
+     * @description
+     * Returns complete date with numbers and complete hour.
+     *
+     * @param {*} date
+     * @returns {String|*}
+     * @private
+     */
+    function _completeDateHour(date) {
+      return (Date.parse(date)) ? moment(date).format('D/MM/YYYY HH:mm:ss') : date ;
+    }
+  }
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    .module('source.date-time')
+    /**
+     * @namespace dateTimeModel
+     * @memberof source.date-time
+     *
+     * @description
+     * Service that defines constants for date time module.
+     */
+    .service('dateTimeModel', dateTimeModel);
+
+  function dateTimeModel() {
+    /* jshint validthis: true */
+    /**
+     * @name momentCalendarFormat
+     * @memberof source.date-time.dateTimeModel
+     *
+     * @type {Object}
+     * @property {String} sameDay
+     * @property {String} nextDay
+     * @property {String} nextWeek
+     * @property {String} lastDay
+     * @property {String} lastWeek
+     * @property {String} sameElse
+     */
+    this.momentCalendarFormat = {
+      sameDay: '[hoy]',
+      nextDay: '[mañana]',
+      nextWeek: '[próximo] dddd',
+      lastDay: '[ayer]',
+      lastWeek: 'dddd [pasado]',
+      sameElse: 'DD/MM/YYYY'
+    };
+  }
+})();
+
+(function() {
+  'use strict';
+
+  angular
   .module('source.router')
   /**
    * @namespace $router
@@ -1499,6 +1499,224 @@
           output = _getStatics();
         }
         return output;
+      }
+    }
+  }
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    .module('source.toast')
+    /**
+     * @namespace toastModelProvider
+     * @memberof source.toast
+     *
+     * @description
+     * Provider that gets constants for toast services.
+     */
+    .provider('toastModel', toastModel);
+
+  toastModel.$inject = ['$toolsProvider'];
+
+  function toastModel($toolsProvider) {
+    var _constants = {
+      SUCCESS: 'SUCCESS',
+      INFO: 'INFO',
+      WARNING: 'WARNING',
+      ERROR: 'ERROR'
+    };
+    var $ = angular.extend({}, _constants, $toolsProvider.$);
+
+    return {
+      $: $,
+      $get: ['toastr', $get]
+    };
+
+    /**
+     * @namespace toastModel
+     * @memberof source.toast.toastModelProvider
+     *
+     * @requires toastr
+     *
+     * @description
+     * Factory that gets constants for toast services.
+     */
+    function $get(toastr) {
+      var _serviceModel = {
+        SUCCESS: toastr.success,
+        INFO: toastr.info,
+        WARNING: toastr.warning,
+        ERROR: toastr.error
+      };
+
+      return {
+        $: $,
+        get: getFactory
+      };
+
+      /**
+       * @name getFactory
+       * @memberof source.toast.toastModelProvider.toastModel
+       *
+       * @description
+       * Returns API model for Factory service.
+       *
+       * @returns {Object}
+       */
+      function getFactory() {
+        return _serviceModel;
+      }
+    }
+  }
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    .module('source.toast')
+    /**
+     * @namespace $alertProvider
+     * @memberof source.toast
+     *
+     * @description
+     * Provider custom statement to use toast alert's messages.
+     */
+    .provider('$alert', $alert);
+
+  $alert.$inject = ['toastModelProvider'];
+
+  function $alert(toastModelProvider) {
+    var $ = toastModelProvider.$;
+    var _toastOptions = {
+      timeOut: 9999
+    };
+
+    return {
+      $: $,
+      setDuration: _setDuration,
+      $get: ['toastModel', $get]
+    };
+
+    /**
+     * @name _setDuration
+     * @memberof source.toast.$alertProvider
+     *
+     * @description
+     * Set duration of toast message for provider configuration.
+     *
+     * @param {Integer} time
+     * @private
+     */
+    function _setDuration(time) {
+      _toastOptions.timeOut = time;
+    }
+
+    /**
+     * @name _launchToast
+     * @memberof source.toast.$alertProvider
+     *
+     * @description
+     * Launch angular-toaster alert message.
+     *
+     * @param {Object} toastFactoryModel
+     * @param {String|Array} message
+     * @param {String} type
+     * @param {String|Undefined} title
+     * @param {Integer|Undefined} duration
+     * @private
+     */
+    function _launchToast(toastFactoryModel, message, type, title, duration) {
+      if (title !== undefined && typeof title !== 'string' && !duration) {
+        duration = title;
+        title = undefined;
+      }
+
+      var toastOptions = (duration) ? angular.extend({}, _toastOptions, { timeOut: duration }) : _toastOptions ;
+      message = (angular.isArray(message)) ? message.join('<br>') : message ;
+      toastFactoryModel[type](message, title, toastOptions);
+    }
+
+    /**
+     * @namespace $alert
+     * @memberof source.toast.$alertProvider
+     *
+     * @requires toastr
+     *
+     * @description
+     * Factory statement for toast alert's messages.
+     */
+    function $get(toastModel) {
+      var toastFactoryModel = toastModel.get();
+
+      return {
+        $: $,
+        success: success,
+        info: info,
+        warning: warning,
+        error: error
+      };
+
+      /**
+       * @name success
+       * @memberof source.toast.$alertProvider.$alert
+       *
+       * @description
+       * Displays success toast message.
+       *
+       * @param {String} message
+       * @param {String} title
+       * @param {Integer|Undefined} duration
+       */
+      function success(message, title, duration) {
+        _launchToast(toastFactoryModel, message, $.SUCCESS, title, duration);
+      }
+
+      /**
+       * @name info
+       * @memberof source.toast.$alertProvider.$alert
+       *
+       * @description
+       * Displays info toast message.
+       *
+       * @param {String} message
+       * @param {String} title
+       * @param {Integer|Undefined} duration
+       */
+      function info(message, title, duration) {
+        _launchToast(toastFactoryModel, message, $.INFO, title, duration);
+      }
+
+      /**
+       * @name warning
+       * @memberof source.toast.$alertProvider.$alert
+       *
+       * @description
+       * Displays warning toast message.
+       *
+       * @param {String} message
+       * @param {String} title
+       * @param {Integer|Undefined} duration
+       */
+      function warning(message, title, duration) {
+        _launchToast(toastFactoryModel, message, $.WARNING, title, duration);
+      }
+
+      /**
+       * @name error
+       * @memberof source.toast.$alertProvider.$alert
+       *
+       * @description
+       * Displays error toast message.
+       *
+       * @param {String} message
+       * @param {String} title
+       * @param {Integer|Undefined} duration
+       */
+      function error(message, title, duration) {
+        _launchToast(toastFactoryModel, message, $.ERROR, title, duration);
       }
     }
   }
@@ -1837,224 +2055,6 @@
     };
 
     this.default = this.languages.en;
-  }
-})();
-
-(function() {
-  'use strict';
-
-  angular
-    .module('source.toast')
-    /**
-     * @namespace toastModelProvider
-     * @memberof source.toast
-     *
-     * @description
-     * Provider that gets constants for toast services.
-     */
-    .provider('toastModel', toastModel);
-
-  toastModel.$inject = ['$toolsProvider'];
-
-  function toastModel($toolsProvider) {
-    var _constants = {
-      SUCCESS: 'SUCCESS',
-      INFO: 'INFO',
-      WARNING: 'WARNING',
-      ERROR: 'ERROR'
-    };
-    var $ = angular.extend({}, _constants, $toolsProvider.$);
-
-    return {
-      $: $,
-      $get: ['toastr', $get]
-    };
-
-    /**
-     * @namespace toastModel
-     * @memberof source.toast.toastModelProvider
-     *
-     * @requires toastr
-     *
-     * @description
-     * Factory that gets constants for toast services.
-     */
-    function $get(toastr) {
-      var _serviceModel = {
-        SUCCESS: toastr.success,
-        INFO: toastr.info,
-        WARNING: toastr.warning,
-        ERROR: toastr.error
-      };
-
-      return {
-        $: $,
-        get: getFactory
-      };
-
-      /**
-       * @name getFactory
-       * @memberof source.toast.toastModelProvider.toastModel
-       *
-       * @description
-       * Returns API model for Factory service.
-       *
-       * @returns {Object}
-       */
-      function getFactory() {
-        return _serviceModel;
-      }
-    }
-  }
-})();
-
-(function() {
-  'use strict';
-
-  angular
-    .module('source.toast')
-    /**
-     * @namespace $alertProvider
-     * @memberof source.toast
-     *
-     * @description
-     * Provider custom statement to use toast alert's messages.
-     */
-    .provider('$alert', $alert);
-
-  $alert.$inject = ['toastModelProvider'];
-
-  function $alert(toastModelProvider) {
-    var $ = toastModelProvider.$;
-    var _toastOptions = {
-      timeOut: 9999
-    };
-
-    return {
-      $: $,
-      setDuration: _setDuration,
-      $get: ['toastModel', $get]
-    };
-
-    /**
-     * @name _setDuration
-     * @memberof source.toast.$alertProvider
-     *
-     * @description
-     * Set duration of toast message for provider configuration.
-     *
-     * @param {Integer} time
-     * @private
-     */
-    function _setDuration(time) {
-      _toastOptions.timeOut = time;
-    }
-
-    /**
-     * @name _launchToast
-     * @memberof source.toast.$alertProvider
-     *
-     * @description
-     * Launch angular-toaster alert message.
-     *
-     * @param {Object} toastFactoryModel
-     * @param {String|Array} message
-     * @param {String} type
-     * @param {String|Undefined} title
-     * @param {Integer|Undefined} duration
-     * @private
-     */
-    function _launchToast(toastFactoryModel, message, type, title, duration) {
-      if (title !== undefined && typeof title !== 'string' && !duration) {
-        duration = title;
-        title = undefined;
-      }
-
-      var toastOptions = (duration) ? angular.extend({}, _toastOptions, { timeOut: duration }) : _toastOptions ;
-      message = (angular.isArray(message)) ? message.join('<br>') : message ;
-      toastFactoryModel[type](message, title, toastOptions);
-    }
-
-    /**
-     * @namespace $alert
-     * @memberof source.toast.$alertProvider
-     *
-     * @requires toastr
-     *
-     * @description
-     * Factory statement for toast alert's messages.
-     */
-    function $get(toastModel) {
-      var toastFactoryModel = toastModel.get();
-
-      return {
-        $: $,
-        success: success,
-        info: info,
-        warning: warning,
-        error: error
-      };
-
-      /**
-       * @name success
-       * @memberof source.toast.$alertProvider.$alert
-       *
-       * @description
-       * Displays success toast message.
-       *
-       * @param {String} message
-       * @param {String} title
-       * @param {Integer|Undefined} duration
-       */
-      function success(message, title, duration) {
-        _launchToast(toastFactoryModel, message, $.SUCCESS, title, duration);
-      }
-
-      /**
-       * @name info
-       * @memberof source.toast.$alertProvider.$alert
-       *
-       * @description
-       * Displays info toast message.
-       *
-       * @param {String} message
-       * @param {String} title
-       * @param {Integer|Undefined} duration
-       */
-      function info(message, title, duration) {
-        _launchToast(toastFactoryModel, message, $.INFO, title, duration);
-      }
-
-      /**
-       * @name warning
-       * @memberof source.toast.$alertProvider.$alert
-       *
-       * @description
-       * Displays warning toast message.
-       *
-       * @param {String} message
-       * @param {String} title
-       * @param {Integer|Undefined} duration
-       */
-      function warning(message, title, duration) {
-        _launchToast(toastFactoryModel, message, $.WARNING, title, duration);
-      }
-
-      /**
-       * @name error
-       * @memberof source.toast.$alertProvider.$alert
-       *
-       * @description
-       * Displays error toast message.
-       *
-       * @param {String} message
-       * @param {String} title
-       * @param {Integer|Undefined} duration
-       */
-      function error(message, title, duration) {
-        _launchToast(toastFactoryModel, message, $.ERROR, title, duration);
-      }
-    }
   }
 })();
 
@@ -2920,7 +2920,7 @@
       setObjectUsingSchema: setObjectUsingSchemaProvider,
       getCheckedObject: getCheckedObjectProvider,
       /* $tools factory */
-      $get: [$get]
+      $get: ['$filter', $get]
     };
 
     /**
@@ -3376,10 +3376,12 @@
      * @namespace $tools
      * @memberof source._shared.$toolsProvider
      *
+     * @requires $filter
+     *
      * @description
      * Factory statement for several useful tools.
      */
-    function $get() {
+    function $get($filter) {
       return {
         /* Global Constants */
         $: $,
@@ -3396,6 +3398,7 @@
         removeArrayKey: removeArrayKey,
         arrayMerge: arrayMerge,
         twoFromOne: twoFromOne,
+        objectsArrayIndexOf: objectsArrayIndexOf,
         /* Object tools */
         getValueFromDotedKey: getValueFromDotedKey,
         parseObjectValues: parseObjectValues,
@@ -3406,6 +3409,33 @@
         /* URL tools */
         cleanApiUrlForLocalUse: cleanApiUrlForLocalUse
       };
+
+      /**
+       * @name _objectsArrayIndexOf
+       * @memberof source._shared.$toolsProvider.$tools
+       *
+       * @description
+       * Returns array index for an array of objects.
+       *
+       * @param {Array} array
+       * @param {Object} matchProperties
+       * @return {Number}
+       * @private
+       */
+      function _objectsArrayIndexOf(array, matchProperties) {
+        var _output = null;
+        if (angular.isArray(array) && angular.isObject(matchProperties)) {
+          var _matchedObjectList = $filter('filter')(array, matchProperties);
+          if (angular.isArray(_matchedObjectList) && _matchedObjectList.length === 1) {
+            _output = array.indexOf(_matchedObjectList[0]);
+          } else {
+            throw new Error('Multiple array matching.');
+          }
+        } else {
+          throw new TypeError('Expected array of objects like first method param and object like second param.');
+        }
+        return _output;
+      }
 
       /**
        * @name setDeviceInfoProvider
@@ -3551,6 +3581,21 @@
        */
       function twoFromOne(lengthToDivide, array) {
         return _twoFromOne(lengthToDivide, array);
+      }
+
+      /**
+       * @name objectsArrayIndexOf
+       * @memberof source._shared.$toolsProvider.$tools
+       *
+       * @description
+       * Public factory method for using _objectsArrayIndexOf.
+       *
+       * @param {Array} array
+       * @param {Object} matchProperties
+       * @return {Number}
+       */
+      function objectsArrayIndexOf(array, matchProperties) {
+        return _objectsArrayIndexOf(array, matchProperties);
       }
 
       /**
