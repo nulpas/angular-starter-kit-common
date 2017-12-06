@@ -32,7 +32,7 @@
       setObjectUsingSchema: setObjectUsingSchemaProvider,
       getCheckedObject: getCheckedObjectProvider,
       /* $tools factory */
-      $get: [$get]
+      $get: ['$filter', $get]
     };
 
     /**
@@ -488,10 +488,12 @@
      * @namespace $tools
      * @memberof source._shared.$toolsProvider
      *
+     * @requires $filter
+     *
      * @description
      * Factory statement for several useful tools.
      */
-    function $get() {
+    function $get($filter) {
       return {
         /* Global Constants */
         $: $,
@@ -508,6 +510,7 @@
         removeArrayKey: removeArrayKey,
         arrayMerge: arrayMerge,
         twoFromOne: twoFromOne,
+        objectsArrayIndexOf: objectsArrayIndexOf,
         /* Object tools */
         getValueFromDotedKey: getValueFromDotedKey,
         parseObjectValues: parseObjectValues,
@@ -518,6 +521,33 @@
         /* URL tools */
         cleanApiUrlForLocalUse: cleanApiUrlForLocalUse
       };
+
+      /**
+       * @name _objectsArrayIndexOf
+       * @memberof source._shared.$toolsProvider.$tools
+       *
+       * @description
+       * Returns array index for an array of objects.
+       *
+       * @param {Array} array
+       * @param {Object} matchProperties
+       * @return {Number}
+       * @private
+       */
+      function _objectsArrayIndexOf(array, matchProperties) {
+        var _output = null;
+        if (angular.isArray(array) && angular.isObject(matchProperties)) {
+          var _matchedObjectList = $filter('filter')(array, matchProperties);
+          if (angular.isArray(_matchedObjectList) && _matchedObjectList.length === 1) {
+            _output = array.indexOf(_matchedObjectList[0]);
+          } else {
+            throw new Error('Multiple array matching.');
+          }
+        } else {
+          throw new TypeError('Expected array of objects like first method param and object like second param.');
+        }
+        return _output;
+      }
 
       /**
        * @name setDeviceInfoProvider
@@ -663,6 +693,21 @@
        */
       function twoFromOne(lengthToDivide, array) {
         return _twoFromOne(lengthToDivide, array);
+      }
+
+      /**
+       * @name objectsArrayIndexOf
+       * @memberof source._shared.$toolsProvider.$tools
+       *
+       * @description
+       * Public factory method for using _objectsArrayIndexOf.
+       *
+       * @param {Array} array
+       * @param {Object} matchProperties
+       * @return {Number}
+       */
+      function objectsArrayIndexOf(array, matchProperties) {
+        return _objectsArrayIndexOf(array, matchProperties);
       }
 
       /**
