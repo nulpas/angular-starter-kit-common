@@ -24,20 +24,24 @@
     Restangular.setBaseUrl(configuredApi.apiBaseUrl);
 
     Restangular.setErrorInterceptor(function(rejection, deferred) {
-      if (rejection.status && angular.isObject(rejection.data)) {
-        var ownRejection = rejection;
-        if (ownRejection.data.error) {
-          ownRejection.error = ownRejection.data.error;
-          delete ownRejection.data;
+      if (rejection.status) {
+        var ownReject = angular.copy(rejection);
+        if () {
+
         }
-        var message = (ownRejection.status !== -1) ? ownRejection.error : 'Unable to access resource.' ;
-        if (ownRejection.status === 401 && $state.current.name !== 'login') {
+
+        if (ownReject.data.error) {
+          ownReject.error = ownReject.data.error;
+          delete ownReject.data;
+        }
+        var message = (ownReject.status !== -1) ? ownReject.error : 'Unable to access resource.' ;
+        if (ownReject.status === 401 && $state.current.name !== 'login') {
           $state.go('login');
         } else {
           $alert.error(message);
         }
-        console.error(new Error(message + ' (' + ownRejection.status + ')'));
-        deferred.reject(ownRejection);
+        console.error(new Error(message + ' (' + ownReject.status + ')'));
+        deferred.reject(ownReject);
       } else {
         throw new Error('Invalid format of rejection object');
       }

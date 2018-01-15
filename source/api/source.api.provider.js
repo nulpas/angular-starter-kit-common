@@ -46,6 +46,11 @@
      */
     function _setApiConfig(config) {
       _apiGeneralConfig = $toolsProvider.setObjectUsingSchema($c.schemas.apiGeneralConfig, config, _apiGeneralConfig);
+      if (_apiGeneralConfig.errorDefinition) {
+        var _eDef = angular.copy(_apiGeneralConfig.errorDefinition);
+        _eDef = $toolsProvider.setObjectUsingSchema($c.schemas.errorDefinition, _eDef, $.MERGE);
+        _apiGeneralConfig.errorDefinition = _eDef;
+      }
       return _apiGeneralConfig;
     }
 
