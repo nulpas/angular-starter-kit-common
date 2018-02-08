@@ -40,7 +40,8 @@
           apiBaseUrl: null,
           apiToken: null,
           apiLanguage: null,
-          isSuperAdmin: null
+          isSuperAdmin: null,
+          errorDefinition: null
         },
 
         /* Connection object schema */
@@ -63,10 +64,12 @@
           params: null
         },
 
-        /* API promise schema */
-        apiPromise: {
-          _cursor: null,
-          error: null
+        /* Error definition schema */
+        errorDefinition: {
+          errorSchema: null,
+          errorStatus: null,
+          errorMessage: null,
+          loginGoIf401: null
         },
 
         /* Partial request param object schema */

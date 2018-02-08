@@ -98,20 +98,6 @@
 
   angular
     /**
-     * @namespace static
-     * @memberof source
-     *
-     * @description
-     * Module static definition for manage static data in application like literals or config variables.
-     */
-    .module('source.static', []);
-})();
-
-(function() {
-  'use strict';
-
-  angular
-    /**
      * @namespace toast
      * @memberof source
      *
@@ -122,6 +108,20 @@
       /* External Modules */
       'toastr'
     ]);
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    /**
+     * @namespace static
+     * @memberof source
+     *
+     * @description
+     * Module static definition for manage static data in application like literals or config variables.
+     */
+    .module('source.static', []);
 })();
 
 (function() {
@@ -312,7 +312,8 @@
           apiBaseUrl: null,
           apiToken: null,
           apiLanguage: null,
-          isSuperAdmin: null
+          isSuperAdmin: null,
+          errorDefinition: null
         },
 
         /* Connection object schema */
@@ -335,10 +336,12 @@
           params: null
         },
 
-        /* API promise schema */
-        apiPromise: {
-          _cursor: null,
-          error: null
+        /* Error definition schema */
+        errorDefinition: {
+          errorSchema: null,
+          errorStatus: null,
+          errorMessage: null,
+          loginGoIf401: null
         },
 
         /* Partial request param object schema */
@@ -628,6 +631,11 @@
      */
     function _setApiConfig(config) {
       _apiGeneralConfig = $toolsProvider.setObjectUsingSchema($c.schemas.apiGeneralConfig, config, _apiGeneralConfig);
+      if (_apiGeneralConfig.errorDefinition) {
+        var _eDef = angular.copy(_apiGeneralConfig.errorDefinition);
+        _eDef = $toolsProvider.setObjectUsingSchema($c.schemas.errorDefinition, _eDef, $.MERGE);
+        _apiGeneralConfig.errorDefinition = _eDef;
+      }
       return _apiGeneralConfig;
     }
 
@@ -831,8 +839,13 @@
               callback(promise);
             }
           }, function(reject) {
-            promise.error = (reject.error.plain) ? reject.error.plain() : reject.error ;
-            if (reject.errorAlert) {
+            if (reject.hasOwnProperty('error')) {
+              promise.error = (reject.error && reject.error.plain) ? reject.error.plain() : reject.error ;
+            }
+            if (reject.hasOwnProperty('data')) {
+              promise.data = (reject.data && reject.data.plain) ? reject.data.plain() : reject.data ;
+            }
+            if (reject.hasOwnProperty('errorAlert')) {
               $alert.error(reject.errorAlert);
             }
             deferred.reject(promise);
@@ -1004,6 +1017,7 @@
      *
      * @requires Restangular
      * @requires $state
+     * @requires $tools
      * @requires $api
      * @requires $alert
      *
@@ -1012,27 +1026,36 @@
      */
     .run(apiRun);
 
-  apiRun.$inject = ['Restangular', '$state', '$api', '$alert'];
+  apiRun.$inject = ['Restangular', '$state', '$tools', '$api', '$alert'];
 
-  function apiRun(Restangular, $state, $api, $alert) {
-    var configuredApi = $api.getApiConfig();
-    Restangular.setBaseUrl(configuredApi.apiBaseUrl);
+  function apiRun(Restangular, $state, $tools, $api, $alert) {
+    var _apiConfiguration = $api.getApiConfig();
+    Restangular.setBaseUrl(_apiConfiguration.apiBaseUrl);
 
     Restangular.setErrorInterceptor(function(rejection, deferred) {
-      if (rejection.status && angular.isObject(rejection.data)) {
-        var ownRejection = rejection;
-        if (ownRejection.data.error) {
-          ownRejection.error = ownRejection.data.error;
-          delete ownRejection.data;
-        }
-        var message = (ownRejection.status !== -1) ? ownRejection.error : 'Unable to access resource.' ;
-        if (ownRejection.status === 401 && $state.current.name !== 'login') {
-          $state.go('login');
+      var _formatCondition = (rejection.hasOwnProperty('status') && rejection.hasOwnProperty('statusText'));
+      if (angular.isObject(rejection) && _formatCondition && rejection.hasOwnProperty('data')) {
+        var _errorSchema = _apiConfiguration.errorDefinition.errorSchema;
+        var _receivedError = $tools.setObjectUsingSchema(_errorSchema, rejection.data, $api.$.MERGE);
+        var _structureCondition01 = _receivedError.hasOwnProperty(_apiConfiguration.errorDefinition.errorMessage);
+        var _structureCondition02 = _receivedError.hasOwnProperty(_apiConfiguration.errorDefinition.errorStatus);
+        if (_structureCondition01 && _structureCondition02) {
+          var _receivedStatus = _receivedError[_apiConfiguration.errorDefinition.errorStatus];
+          var _receivedMessage = _receivedError[_apiConfiguration.errorDefinition.errorMessage];
+          var _status = (_receivedStatus) ? _receivedStatus : rejection.status ;
+          var _message = (_receivedMessage) ? _receivedMessage : rejection.statusText;
+          _status = (_status === -1) ? 500 : _status ;
+          _message = (!_message) ? 'Unable to access resource.' : _message ;
+          if (_apiConfiguration.errorDefinition.loginGoIf401 && _status === 401 && $state.current.name !== 'login') {
+            $state.go('login');
+          } else {
+            $alert.error('ERROR ' + _status + ': ' + _message);
+          }
+          console.error(new Error(_message + ' (' + _status + ')'));
+          deferred.reject(rejection);
         } else {
-          $alert.error(message);
+          throw new ReferenceError('Incorrect error definition. Check "$apiProvider.setApiConfig" in your project.');
         }
-        console.error(new Error(message + ' (' + ownRejection.status + ')'));
-        deferred.reject(ownRejection);
       } else {
         throw new Error('Invalid format of rejection object');
       }
@@ -1321,192 +1344,6 @@
 (function() {
   'use strict';
 
-  /**
-   * @type Object
-   * @property {String} documentName
-   * @property {String} documentType
-   */
-
-  angular
-    .module('source.static')
-    /**
-     * @namespace $staticProvider
-     * @memberof source.static
-     *
-     * @requires globalConstantsProvider
-     *
-     * @description
-     * Provider statement to manage static variables for application.
-     */
-    .provider('$static', $static);
-
-  $static.$inject = ['globalConstantsProvider'];
-
-  function $static(globalConstantsProvider) {
-    var $ = globalConstantsProvider.get();
-    var _source = null;
-    var _statics = null;
-
-    return {
-      /* Global Constants */
-      $: $,
-      /* Provider LITERALS tools */
-      setSource: setProviderSource,
-      /* API Factory */
-      $get: ['$q', '$api', $get]
-    };
-
-    /**
-     * @name _setSource
-     * @memberof source.static.$staticProvider
-     *
-     * @description
-     * Private method to set JSON source files containing the application static variables.
-     *
-     * @param {String|Array|Object} source
-     * @returns {Array|Object}
-     * @private
-     */
-    function _setSource(source) {
-      var _isStringSource = (typeof source === 'string');
-      if (_isStringSource || angular.isObject(source)) {
-        _source = (_isStringSource) ? [source] : source ;
-      } else {
-        throw new TypeError('Wrong type argument: Static source must be string or array or object.');
-      }
-      return _source;
-    }
-
-    /**
-     * @name setProviderSource
-     * @memberof source.static.$staticProvider
-     *
-     * @description
-     * Provider public function to set JSON source files containing the application static variables.
-     *
-     * @param {String|Array|Object} source
-     * @returns {Array|Object}
-     */
-    function setProviderSource(source) {
-      return _setSource(source);
-    }
-
-    /**
-     * @namespace $static
-     * @memberof source.static.$staticProvider
-     *
-     * @requires $q
-     * @requires $api
-     *
-     * @description
-     * Factory statement to manage static variables for application.
-     */
-    function $get($q, $api) {
-      return {
-        $: $,
-        get: getStatics
-      };
-
-      /**
-       * @name _getStaticPromises
-       * @memberof source.static.$staticProvider.$static
-       *
-       * @description
-       * Build an array with promises of all sources of static variables that are defined in the application.
-       *
-       * @returns {Array}
-       * @private
-       */
-      function _getStaticPromises() {
-        var _isArraySource = (angular.isArray(_source));
-        var _literalPromises = [];
-        angular.forEach(_source, function(itemDir, keyDir) {
-          if (_isArraySource) {
-            var entityObject = $api.createEntityObject({
-              entityName: itemDir,
-              forceToOne: true
-            });
-            _literalPromises.push($api.getLocalEntity(entityObject));
-          } else {
-            angular.forEach(itemDir, function(itemFile) {
-              var entityObject = $api.createEntityObject({
-                entityName: keyDir + '/' + itemFile,
-                forceToOne: true
-              });
-              _literalPromises.push($api.getLocalEntity(entityObject));
-            });
-          }
-        });
-        return _literalPromises;
-      }
-
-      /**
-       * @name _getStatics
-       * @memberof source.static.$staticProvider.$static
-       *
-       * @description
-       * Create a promise with all statics processed and merged into a single object.
-       * Set statics object.
-       *
-       * @returns {Promise}
-       * @private
-       */
-      function _getStatics() {
-        var _promisesToResolve = _getStaticPromises() ;
-        var _itemObject = {};
-        var _defer = $q.defer();
-        _statics = {};
-        $q.all(_promisesToResolve).then(function(success) {
-          angular.forEach(success, function(item) {
-            if (item.hasOwnProperty('documentName') && item.hasOwnProperty('documentType')) {
-              if (!angular.isObject(_itemObject[item.documentName])) {
-                _itemObject[item.documentName] = {};
-              }
-              _itemObject[item.documentName][item.documentType] = item;
-            } else {
-              var errorText = 'No required properties are found in static files';
-              throw new TypeError(errorText + ': "documentName" or "documentType"');
-            }
-            _statics = angular.extend({}, _statics, _itemObject);
-          });
-          _defer.resolve(_statics);
-        });
-        return _defer.promise;
-      }
-
-      /**
-       * @name getStatics
-       * @memberof source.static.$staticProvider.$static
-       *
-       * @description
-       * Returns literals object or its promise depending on whether the static variables have been set.
-       *
-       * @param {String} property
-       * @returns {Object|Promise}
-       */
-      function getStatics(property) {
-        var _property = property || null;
-        var output = null;
-        if (_statics && _property) {
-          if (_statics.hasOwnProperty(property)) {
-            output = _statics[property];
-          } else {
-            throw new ReferenceError('Trying to get statics property that does not exist: ("' + property + '")');
-          }
-        } else if (_statics) {
-          output = _statics;
-        } else {
-          output = _getStatics();
-        }
-        return output;
-      }
-    }
-  }
-})();
-
-(function() {
-  'use strict';
-
   angular
     .module('source.toast')
     /**
@@ -1717,6 +1554,192 @@
        */
       function error(message, title, duration) {
         _launchToast(toastFactoryModel, message, $.ERROR, title, duration);
+      }
+    }
+  }
+})();
+
+(function() {
+  'use strict';
+
+  /**
+   * @type Object
+   * @property {String} documentName
+   * @property {String} documentType
+   */
+
+  angular
+    .module('source.static')
+    /**
+     * @namespace $staticProvider
+     * @memberof source.static
+     *
+     * @requires globalConstantsProvider
+     *
+     * @description
+     * Provider statement to manage static variables for application.
+     */
+    .provider('$static', $static);
+
+  $static.$inject = ['globalConstantsProvider'];
+
+  function $static(globalConstantsProvider) {
+    var $ = globalConstantsProvider.get();
+    var _source = null;
+    var _statics = null;
+
+    return {
+      /* Global Constants */
+      $: $,
+      /* Provider LITERALS tools */
+      setSource: setProviderSource,
+      /* API Factory */
+      $get: ['$q', '$api', $get]
+    };
+
+    /**
+     * @name _setSource
+     * @memberof source.static.$staticProvider
+     *
+     * @description
+     * Private method to set JSON source files containing the application static variables.
+     *
+     * @param {String|Array|Object} source
+     * @returns {Array|Object}
+     * @private
+     */
+    function _setSource(source) {
+      var _isStringSource = (typeof source === 'string');
+      if (_isStringSource || angular.isObject(source)) {
+        _source = (_isStringSource) ? [source] : source ;
+      } else {
+        throw new TypeError('Wrong type argument: Static source must be string or array or object.');
+      }
+      return _source;
+    }
+
+    /**
+     * @name setProviderSource
+     * @memberof source.static.$staticProvider
+     *
+     * @description
+     * Provider public function to set JSON source files containing the application static variables.
+     *
+     * @param {String|Array|Object} source
+     * @returns {Array|Object}
+     */
+    function setProviderSource(source) {
+      return _setSource(source);
+    }
+
+    /**
+     * @namespace $static
+     * @memberof source.static.$staticProvider
+     *
+     * @requires $q
+     * @requires $api
+     *
+     * @description
+     * Factory statement to manage static variables for application.
+     */
+    function $get($q, $api) {
+      return {
+        $: $,
+        get: getStatics
+      };
+
+      /**
+       * @name _getStaticPromises
+       * @memberof source.static.$staticProvider.$static
+       *
+       * @description
+       * Build an array with promises of all sources of static variables that are defined in the application.
+       *
+       * @returns {Array}
+       * @private
+       */
+      function _getStaticPromises() {
+        var _isArraySource = (angular.isArray(_source));
+        var _literalPromises = [];
+        angular.forEach(_source, function(itemDir, keyDir) {
+          if (_isArraySource) {
+            var entityObject = $api.createEntityObject({
+              entityName: itemDir,
+              forceToOne: true
+            });
+            _literalPromises.push($api.getLocalEntity(entityObject));
+          } else {
+            angular.forEach(itemDir, function(itemFile) {
+              var entityObject = $api.createEntityObject({
+                entityName: keyDir + '/' + itemFile,
+                forceToOne: true
+              });
+              _literalPromises.push($api.getLocalEntity(entityObject));
+            });
+          }
+        });
+        return _literalPromises;
+      }
+
+      /**
+       * @name _getStatics
+       * @memberof source.static.$staticProvider.$static
+       *
+       * @description
+       * Create a promise with all statics processed and merged into a single object.
+       * Set statics object.
+       *
+       * @returns {Promise}
+       * @private
+       */
+      function _getStatics() {
+        var _promisesToResolve = _getStaticPromises() ;
+        var _itemObject = {};
+        var _defer = $q.defer();
+        _statics = {};
+        $q.all(_promisesToResolve).then(function(success) {
+          angular.forEach(success, function(item) {
+            if (item.hasOwnProperty('documentName') && item.hasOwnProperty('documentType')) {
+              if (!angular.isObject(_itemObject[item.documentName])) {
+                _itemObject[item.documentName] = {};
+              }
+              _itemObject[item.documentName][item.documentType] = item;
+            } else {
+              var errorText = 'No required properties are found in static files';
+              throw new TypeError(errorText + ': "documentName" or "documentType"');
+            }
+            _statics = angular.extend({}, _statics, _itemObject);
+          });
+          _defer.resolve(_statics);
+        });
+        return _defer.promise;
+      }
+
+      /**
+       * @name getStatics
+       * @memberof source.static.$staticProvider.$static
+       *
+       * @description
+       * Returns literals object or its promise depending on whether the static variables have been set.
+       *
+       * @param {String} property
+       * @returns {Object|Promise}
+       */
+      function getStatics(property) {
+        var _property = property || null;
+        var output = null;
+        if (_statics && _property) {
+          if (_statics.hasOwnProperty(property)) {
+            output = _statics[property];
+          } else {
+            throw new ReferenceError('Trying to get statics property that does not exist: ("' + property + '")');
+          }
+        } else if (_statics) {
+          output = _statics;
+        } else {
+          output = _getStatics();
+        }
+        return output;
       }
     }
   }

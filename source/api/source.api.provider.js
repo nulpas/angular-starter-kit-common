@@ -46,6 +46,11 @@
      */
     function _setApiConfig(config) {
       _apiGeneralConfig = $toolsProvider.setObjectUsingSchema($c.schemas.apiGeneralConfig, config, _apiGeneralConfig);
+      if (_apiGeneralConfig.errorDefinition) {
+        var _eDef = angular.copy(_apiGeneralConfig.errorDefinition);
+        _eDef = $toolsProvider.setObjectUsingSchema($c.schemas.errorDefinition, _eDef, $.MERGE);
+        _apiGeneralConfig.errorDefinition = _eDef;
+      }
       return _apiGeneralConfig;
     }
 
@@ -249,8 +254,13 @@
               callback(promise);
             }
           }, function(reject) {
-            promise.error = (reject.error.plain) ? reject.error.plain() : reject.error ;
-            if (reject.errorAlert) {
+            if (reject.hasOwnProperty('error')) {
+              promise.error = (reject.error && reject.error.plain) ? reject.error.plain() : reject.error ;
+            }
+            if (reject.hasOwnProperty('data')) {
+              promise.data = (reject.data && reject.data.plain) ? reject.data.plain() : reject.data ;
+            }
+            if (reject.hasOwnProperty('errorAlert')) {
               $alert.error(reject.errorAlert);
             }
             deferred.reject(promise);
