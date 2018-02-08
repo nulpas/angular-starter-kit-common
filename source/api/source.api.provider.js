@@ -254,8 +254,13 @@
               callback(promise);
             }
           }, function(reject) {
-            promise.error = (reject.error.plain) ? reject.error.plain() : reject.error ;
-            if (reject.errorAlert) {
+            if (reject.hasOwnProperty('error')) {
+              promise.error = (reject.error && reject.error.plain) ? reject.error.plain() : reject.error ;
+            }
+            if (reject.hasOwnProperty('data')) {
+              promise.data = (reject.data && reject.data.plain) ? reject.data.plain() : reject.data ;
+            }
+            if (reject.hasOwnProperty('errorAlert')) {
               $alert.error(reject.errorAlert);
             }
             deferred.reject(promise);

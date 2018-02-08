@@ -68,7 +68,8 @@
         errorDefinition: {
           errorSchema: null,
           errorStatus: null,
-          errorMessage: null
+          errorMessage: null,
+          loginGoIf401: null
         },
 
         /* Partial request param object schema */

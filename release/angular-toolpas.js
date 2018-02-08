@@ -57,6 +57,20 @@
 (function() {
   'use strict';
 
+  angular
+    /**
+     * @namespace date-time
+     * @memberof source
+     *
+     * @description
+     * Definition of module "date time" for several tools and filters with datetime data.
+     */
+    .module('source.date-time', []);
+})();
+
+(function() {
+  'use strict';
+
   /**
    * @namespace $urlRouterProvider
    * @memberof ui.router
@@ -84,20 +98,6 @@
 
   angular
     /**
-     * @namespace date-time
-     * @memberof source
-     *
-     * @description
-     * Definition of module "date time" for several tools and filters with datetime data.
-     */
-    .module('source.date-time', []);
-})();
-
-(function() {
-  'use strict';
-
-  angular
-    /**
      * @namespace toast
      * @memberof source
      *
@@ -108,6 +108,20 @@
       /* External Modules */
       'toastr'
     ]);
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    /**
+     * @namespace static
+     * @memberof source
+     *
+     * @description
+     * Module static definition for manage static data in application like literals or config variables.
+     */
+    .module('source.static', []);
 })();
 
 (function() {
@@ -129,13 +143,13 @@
 
   angular
     /**
-     * @namespace static
+     * @namespace view-logic
      * @memberof source
      *
      * @description
-     * Module static definition for manage static data in application like literals or config variables.
+     * Module View Logic definition: helper for application view presentations.
      */
-    .module('source.static', []);
+    .module('source.view-logic', []);
 })();
 
 (function() {
@@ -157,20 +171,6 @@
     .module('source._shared', [
       'ng.deviceDetector'
     ]);
-})();
-
-(function() {
-  'use strict';
-
-  angular
-    /**
-     * @namespace view-logic
-     * @memberof source
-     *
-     * @description
-     * Module View Logic definition: helper for application view presentations.
-     */
-    .module('source.view-logic', []);
 })();
 
 (function() {
@@ -340,7 +340,8 @@
         errorDefinition: {
           errorSchema: null,
           errorStatus: null,
-          errorMessage: null
+          errorMessage: null,
+          loginGoIf401: null
         },
 
         /* Partial request param object schema */
@@ -838,8 +839,13 @@
               callback(promise);
             }
           }, function(reject) {
-            promise.error = (reject.error.plain) ? reject.error.plain() : reject.error ;
-            if (reject.errorAlert) {
+            if (reject.hasOwnProperty('error')) {
+              promise.error = (reject.error && reject.error.plain) ? reject.error.plain() : reject.error ;
+            }
+            if (reject.hasOwnProperty('data')) {
+              promise.data = (reject.data && reject.data.plain) ? reject.data.plain() : reject.data ;
+            }
+            if (reject.hasOwnProperty('errorAlert')) {
               $alert.error(reject.errorAlert);
             }
             deferred.reject(promise);
@@ -1023,86 +1029,37 @@
   apiRun.$inject = ['Restangular', '$state', '$tools', '$api', '$alert'];
 
   function apiRun(Restangular, $state, $tools, $api, $alert) {
-    var configuredApi = $api.getApiConfig();
-    Restangular.setBaseUrl(configuredApi.apiBaseUrl);
+    var _apiConfiguration = $api.getApiConfig();
+    Restangular.setBaseUrl(_apiConfiguration.apiBaseUrl);
 
     Restangular.setErrorInterceptor(function(rejection, deferred) {
-      if (rejection.status) {
-        var ownReject = angular.copy(rejection);
-        ownReject.data = $tools.setObjectUsingSchema($api.$.schemas.errorDefinition, ownReject.data, $api.$.MERGE);
-
-        if (ownReject.data.error) {
-          ownReject.error = ownReject.data.error;
-          delete ownReject.data;
-        }
-        var message = (ownReject.status !== -1) ? ownReject.error : 'Unable to access resource.' ;
-        if (ownReject.status === 401 && $state.current.name !== 'login') {
-          $state.go('login');
+      var _formatCondition = (rejection.hasOwnProperty('status') && rejection.hasOwnProperty('statusText'));
+      if (angular.isObject(rejection) && _formatCondition && rejection.hasOwnProperty('data')) {
+        var _errorSchema = _apiConfiguration.errorDefinition.errorSchema;
+        var _receivedError = $tools.setObjectUsingSchema(_errorSchema, rejection.data, $api.$.MERGE);
+        var _structureCondition01 = _receivedError.hasOwnProperty(_apiConfiguration.errorDefinition.errorMessage);
+        var _structureCondition02 = _receivedError.hasOwnProperty(_apiConfiguration.errorDefinition.errorStatus);
+        if (_structureCondition01 && _structureCondition02) {
+          var _receivedStatus = _receivedError[_apiConfiguration.errorDefinition.errorStatus];
+          var _receivedMessage = _receivedError[_apiConfiguration.errorDefinition.errorMessage];
+          var _status = (_receivedStatus) ? _receivedStatus : rejection.status ;
+          var _message = (_receivedMessage) ? _receivedMessage : rejection.statusText;
+          _status = (_status === -1) ? 500 : _status ;
+          _message = (!_message) ? 'Unable to access resource.' : _message ;
+          if (_apiConfiguration.errorDefinition.loginGoIf401 && _status === 401 && $state.current.name !== 'login') {
+            $state.go('login');
+          } else {
+            $alert.error('ERROR ' + _status + ': ' + _message);
+          }
+          console.error(new Error(_message + ' (' + _status + ')'));
+          deferred.reject(rejection);
         } else {
-          $alert.error(message);
+          throw new ReferenceError('Incorrect error definition. Check "$apiProvider.setApiConfig" in your project.');
         }
-        console.error(new Error(message + ' (' + ownReject.status + ')'));
-        deferred.reject(ownReject);
       } else {
         throw new Error('Invalid format of rejection object');
       }
     });
-  }
-})();
-
-(function() {
-  'use strict';
-
-  angular
-  .module('source.router')
-  /**
-   * @namespace $router
-   * @memberof source.router
-   *
-   * @requires $state
-   * @requires $timeout
-   *
-   * @description
-   * Provider statement manage routing of the application.
-   */
-  .factory('$router', $router);
-
-  $router.$inject = ['$state', '$timeout'];
-
-  function $router($state, $timeout) {
-
-    return {
-      $state: $state,
-      resolveStateGo: resolveStateGo
-    };
-
-    /**
-     * @name _resolveStateGo
-     * @memberof source.router.$router
-     *
-     * @description
-     * Executes $state.go function into $timeout for use into state resolve.
-     *
-     * @param {String} stateName
-     */
-    function _resolveStateGo(stateName) {
-      $timeout(function() {
-        $state.go(stateName);
-      });
-    }
-
-    /**
-     * @name resolveStateGo
-     * @memberof source.router.$router
-     *
-     * @description
-     * Executes _resolveStateGo function.
-     *
-     * @param {String} stateName
-     */
-    function resolveStateGo(stateName) {
-      _resolveStateGo(stateName);
-    }
   }
 })();
 
@@ -1332,6 +1289,62 @@
   'use strict';
 
   angular
+  .module('source.router')
+  /**
+   * @namespace $router
+   * @memberof source.router
+   *
+   * @requires $state
+   * @requires $timeout
+   *
+   * @description
+   * Provider statement manage routing of the application.
+   */
+  .factory('$router', $router);
+
+  $router.$inject = ['$state', '$timeout'];
+
+  function $router($state, $timeout) {
+
+    return {
+      $state: $state,
+      resolveStateGo: resolveStateGo
+    };
+
+    /**
+     * @name _resolveStateGo
+     * @memberof source.router.$router
+     *
+     * @description
+     * Executes $state.go function into $timeout for use into state resolve.
+     *
+     * @param {String} stateName
+     */
+    function _resolveStateGo(stateName) {
+      $timeout(function() {
+        $state.go(stateName);
+      });
+    }
+
+    /**
+     * @name resolveStateGo
+     * @memberof source.router.$router
+     *
+     * @description
+     * Executes _resolveStateGo function.
+     *
+     * @param {String} stateName
+     */
+    function resolveStateGo(stateName) {
+      _resolveStateGo(stateName);
+    }
+  }
+})();
+
+(function() {
+  'use strict';
+
+  angular
     .module('source.toast')
     /**
      * @namespace toastModelProvider
@@ -1541,6 +1554,192 @@
        */
       function error(message, title, duration) {
         _launchToast(toastFactoryModel, message, $.ERROR, title, duration);
+      }
+    }
+  }
+})();
+
+(function() {
+  'use strict';
+
+  /**
+   * @type Object
+   * @property {String} documentName
+   * @property {String} documentType
+   */
+
+  angular
+    .module('source.static')
+    /**
+     * @namespace $staticProvider
+     * @memberof source.static
+     *
+     * @requires globalConstantsProvider
+     *
+     * @description
+     * Provider statement to manage static variables for application.
+     */
+    .provider('$static', $static);
+
+  $static.$inject = ['globalConstantsProvider'];
+
+  function $static(globalConstantsProvider) {
+    var $ = globalConstantsProvider.get();
+    var _source = null;
+    var _statics = null;
+
+    return {
+      /* Global Constants */
+      $: $,
+      /* Provider LITERALS tools */
+      setSource: setProviderSource,
+      /* API Factory */
+      $get: ['$q', '$api', $get]
+    };
+
+    /**
+     * @name _setSource
+     * @memberof source.static.$staticProvider
+     *
+     * @description
+     * Private method to set JSON source files containing the application static variables.
+     *
+     * @param {String|Array|Object} source
+     * @returns {Array|Object}
+     * @private
+     */
+    function _setSource(source) {
+      var _isStringSource = (typeof source === 'string');
+      if (_isStringSource || angular.isObject(source)) {
+        _source = (_isStringSource) ? [source] : source ;
+      } else {
+        throw new TypeError('Wrong type argument: Static source must be string or array or object.');
+      }
+      return _source;
+    }
+
+    /**
+     * @name setProviderSource
+     * @memberof source.static.$staticProvider
+     *
+     * @description
+     * Provider public function to set JSON source files containing the application static variables.
+     *
+     * @param {String|Array|Object} source
+     * @returns {Array|Object}
+     */
+    function setProviderSource(source) {
+      return _setSource(source);
+    }
+
+    /**
+     * @namespace $static
+     * @memberof source.static.$staticProvider
+     *
+     * @requires $q
+     * @requires $api
+     *
+     * @description
+     * Factory statement to manage static variables for application.
+     */
+    function $get($q, $api) {
+      return {
+        $: $,
+        get: getStatics
+      };
+
+      /**
+       * @name _getStaticPromises
+       * @memberof source.static.$staticProvider.$static
+       *
+       * @description
+       * Build an array with promises of all sources of static variables that are defined in the application.
+       *
+       * @returns {Array}
+       * @private
+       */
+      function _getStaticPromises() {
+        var _isArraySource = (angular.isArray(_source));
+        var _literalPromises = [];
+        angular.forEach(_source, function(itemDir, keyDir) {
+          if (_isArraySource) {
+            var entityObject = $api.createEntityObject({
+              entityName: itemDir,
+              forceToOne: true
+            });
+            _literalPromises.push($api.getLocalEntity(entityObject));
+          } else {
+            angular.forEach(itemDir, function(itemFile) {
+              var entityObject = $api.createEntityObject({
+                entityName: keyDir + '/' + itemFile,
+                forceToOne: true
+              });
+              _literalPromises.push($api.getLocalEntity(entityObject));
+            });
+          }
+        });
+        return _literalPromises;
+      }
+
+      /**
+       * @name _getStatics
+       * @memberof source.static.$staticProvider.$static
+       *
+       * @description
+       * Create a promise with all statics processed and merged into a single object.
+       * Set statics object.
+       *
+       * @returns {Promise}
+       * @private
+       */
+      function _getStatics() {
+        var _promisesToResolve = _getStaticPromises() ;
+        var _itemObject = {};
+        var _defer = $q.defer();
+        _statics = {};
+        $q.all(_promisesToResolve).then(function(success) {
+          angular.forEach(success, function(item) {
+            if (item.hasOwnProperty('documentName') && item.hasOwnProperty('documentType')) {
+              if (!angular.isObject(_itemObject[item.documentName])) {
+                _itemObject[item.documentName] = {};
+              }
+              _itemObject[item.documentName][item.documentType] = item;
+            } else {
+              var errorText = 'No required properties are found in static files';
+              throw new TypeError(errorText + ': "documentName" or "documentType"');
+            }
+            _statics = angular.extend({}, _statics, _itemObject);
+          });
+          _defer.resolve(_statics);
+        });
+        return _defer.promise;
+      }
+
+      /**
+       * @name getStatics
+       * @memberof source.static.$staticProvider.$static
+       *
+       * @description
+       * Returns literals object or its promise depending on whether the static variables have been set.
+       *
+       * @param {String} property
+       * @returns {Object|Promise}
+       */
+      function getStatics(property) {
+        var _property = property || null;
+        var output = null;
+        if (_statics && _property) {
+          if (_statics.hasOwnProperty(property)) {
+            output = _statics[property];
+          } else {
+            throw new ReferenceError('Trying to get statics property that does not exist: ("' + property + '")');
+          }
+        } else if (_statics) {
+          output = _statics;
+        } else {
+          output = _getStatics();
+        }
+        return output;
       }
     }
   }
@@ -1885,184 +2084,686 @@
 (function() {
   'use strict';
 
-  /**
-   * @type Object
-   * @property {String} documentName
-   * @property {String} documentType
-   */
-
   angular
-    .module('source.static')
+    .module('source.view-logic')
     /**
-     * @namespace $staticProvider
-     * @memberof source.static
+     * @namespace appViewModelProvider
+     * @memberof source.view-logic
      *
-     * @requires globalConstantsProvider
+     * @requires $toolsProvider
      *
      * @description
-     * Provider statement to manage static variables for application.
+     * Provider that gets constants and models for appView services.
      */
-    .provider('$static', $static);
+    .provider('appViewModel', appViewModel);
 
-  $static.$inject = ['globalConstantsProvider'];
+  appViewModel.$inject = ['$toolsProvider'];
 
-  function $static(globalConstantsProvider) {
-    var $ = globalConstantsProvider.get();
-    var _source = null;
-    var _statics = null;
+  function appViewModel($toolsProvider) {
+    var _constants = {
+      SCHEMA_DOM_HANDLER: 'domHandler',
+      SCHEMA_ANIMATION: 'animation',
+      SCHEMA_ANIMATION_EVENTS: 'animationEvents',
+      SCHEMA_REGISTERED_EXTERNAL_ANIMATIONS: 'registeredExternalAnimations',
+
+      DOM_HANDLER_CLASS_TO_SHOW: 'classToShow',
+      DOM_HANDLER_CLASS_TO_HIDE: 'classToHide',
+      DOM_HANDLER_CLASS_DEFAULT_ANIMATION_SHOW: 'classDefaultAnimationShow',
+      DOM_HANDLER_CLASS_DEFAULT_ANIMATION_HIDE: 'classDefaultAnimationHide',
+
+      SHOW: 1,
+      HIDE: 2,
+      SHOW_ANIMATION: 3,
+      HIDE_ANIMATION: 4,
+
+      ANIMATION: true,
+      NO_ANIMATION: false,
+
+      MODE_ANIMATION_IN: true,
+      MODE_ANIMATION_OUT: false,
+
+      ANIMATION_START: 'start',
+      ANIMATION_ITERATION: 'iteration',
+      ANIMATION_END: 'end',
+
+      ACTIVATE_ANIMATION_CLASS: 'animated'
+    };
+    var $ = angular.extend({}, _constants, $toolsProvider.$);
+
+    /**
+     * @name _providerModel
+     * @memberof source.view-logic.appViewProvider
+     *
+     * @type {Object}
+     * @property {Object} schemas
+     *
+     * @property {Object} schemas.domHandler
+     * @property {String} schemas.domHandler.classToShow
+     * @property {String} schemas.domHandler.classToHide
+     * @property {String} schemas.domHandler.classDefaultAnimationShow
+     * @property {String} schemas.domHandler.classDefaultAnimationHide
+     *
+     * @property {Object} schemas.animationEvents
+     * @property {Array} schemas.animationEvents.start
+     * @property {Array} schemas.animationEvents.iteration
+     * @property {Array} schemas.animationEvents.end
+     *
+     * @property {Object} animation
+     * @property {String} animation.classAnimationShow
+     * @property {String} animation.classAnimationHide
+     *
+     * @property {Object} registeredAnimations
+     * @property {Array} registeredAnimations.in
+     * @property {Array} registeredAnimations.out
+     * @private
+     */
+    var _providerModel = {
+      schemas: {
+        domHandler: {
+          classToShow: null,
+          classToHide: null,
+          classDefaultAnimationShow: null,
+          classDefaultAnimationHide: null
+        },
+        animationEvents: {
+          start: [],
+          iteration: [],
+          end: []
+        },
+        animation: {
+          classAnimationShow: null,
+          classAnimationHide: null
+        },
+        registeredAnimations: {
+          in: [],
+          out: []
+        }
+      }
+    };
 
     return {
-      /* Global Constants */
       $: $,
-      /* Provider LITERALS tools */
-      setSource: setProviderSource,
-      /* API Factory */
-      $get: ['$q', '$api', $get]
+      get: _getProvider,
+      $get: [$get]
     };
 
     /**
-     * @name _setSource
-     * @memberof source.static.$staticProvider
+     * @name _getModelSource
+     * @memberof source.view-logic.appViewProvider
      *
      * @description
-     * Private method to set JSON source files containing the application static variables.
+     * Returns appView model depending on the applicant: Provider or Service.
      *
-     * @param {String|Array|Object} source
-     * @returns {Array|Object}
+     * @param {Boolean} source
+     * @param {Object} [factoryModel = null]
+     * @returns {Object}
      * @private
      */
-    function _setSource(source) {
-      var _isStringSource = (typeof source === 'string');
-      if (_isStringSource || angular.isObject(source)) {
-        _source = (_isStringSource) ? [source] : source ;
-      } else {
-        throw new TypeError('Wrong type argument: Static source must be string or array or object.');
-      }
-      return _source;
+    function _getModelSource(source, factoryModel) {
+      factoryModel = factoryModel || null;
+      return (source === $.PROVIDER) ? _providerModel : angular.extend({}, _providerModel, factoryModel) ;
     }
 
     /**
-     * @name setProviderSource
-     * @memberof source.static.$staticProvider
+     * @name _getProvider
+     * @memberof source.view-logic.appViewProvider
      *
      * @description
-     * Provider public function to set JSON source files containing the application static variables.
+     * Returns appView model for Provider.
      *
-     * @param {String|Array|Object} source
-     * @returns {Array|Object}
+     * @returns {Object}
+     * @private
      */
-    function setProviderSource(source) {
-      return _setSource(source);
+    function _getProvider() {
+      return _getModelSource($.PROVIDER);
     }
 
     /**
-     * @namespace $static
-     * @memberof source.static.$staticProvider
-     *
-     * @requires $q
-     * @requires $api
+     * @namespace appView
+     * @memberof source.view-logic.appViewProvider
      *
      * @description
-     * Factory statement to manage static variables for application.
+     * Factory that gets constants and models for appView services.
      */
-    function $get($q, $api) {
+    function $get() {
       return {
         $: $,
-        get: getStatics
+        get: _getFactory
       };
 
       /**
-       * @name _getStaticPromises
-       * @memberof source.static.$staticProvider.$static
+       * @name _getFactory
+       * @memberof source.view-logic.appViewProvider.appView
        *
        * @description
-       * Build an array with promises of all sources of static variables that are defined in the application.
+       * Returns appView model for Factory.
        *
-       * @returns {Array}
+       * @returns {Object}
        * @private
        */
-      function _getStaticPromises() {
-        var _isArraySource = (angular.isArray(_source));
-        var _literalPromises = [];
-        angular.forEach(_source, function(itemDir, keyDir) {
-          if (_isArraySource) {
-            var entityObject = $api.createEntityObject({
-              entityName: itemDir,
-              forceToOne: true
-            });
-            _literalPromises.push($api.getLocalEntity(entityObject));
-          } else {
-            angular.forEach(itemDir, function(itemFile) {
-              var entityObject = $api.createEntityObject({
-                entityName: keyDir + '/' + itemFile,
-                forceToOne: true
-              });
-              _literalPromises.push($api.getLocalEntity(entityObject));
-            });
-          }
-        });
-        return _literalPromises;
+      function _getFactory() {
+        return _getModelSource($.SERVICE);
       }
+    }
+  }
+})();
 
-      /**
-       * @name _getStatics
-       * @memberof source.static.$staticProvider.$static
-       *
-       * @description
-       * Create a promise with all statics processed and merged into a single object.
-       * Set statics object.
-       *
-       * @returns {Promise}
-       * @private
-       */
-      function _getStatics() {
-        var _promisesToResolve = _getStaticPromises() ;
-        var _itemObject = {};
-        var _defer = $q.defer();
-        _statics = {};
-        $q.all(_promisesToResolve).then(function(success) {
-          angular.forEach(success, function(item) {
-            if (item.hasOwnProperty('documentName') && item.hasOwnProperty('documentType')) {
-              if (!angular.isObject(_itemObject[item.documentName])) {
-                _itemObject[item.documentName] = {};
-              }
-              _itemObject[item.documentName][item.documentType] = item;
-            } else {
-              var errorText = 'No required properties are found in static files';
-              throw new TypeError(errorText + ': "documentName" or "documentType"');
-            }
-            _statics = angular.extend({}, _statics, _itemObject);
-          });
-          _defer.resolve(_statics);
-        });
-        return _defer.promise;
-      }
+(function() {
+  'use strict';
 
-      /**
-       * @name getStatics
-       * @memberof source.static.$staticProvider.$static
-       *
-       * @description
-       * Returns literals object or its promise depending on whether the static variables have been set.
-       *
-       * @param {String} property
-       * @returns {Object|Promise}
-       */
-      function getStatics(property) {
-        var _property = property || null;
-        var output = null;
-        if (_statics && _property) {
-          if (_statics.hasOwnProperty(property)) {
-            output = _statics[property];
-          } else {
-            throw new ReferenceError('Trying to get statics property that does not exist: ("' + property + '")');
-          }
-        } else if (_statics) {
-          output = _statics;
+  angular
+    .module('source.view-logic')
+    /**
+     * @namespace $appViewProvider
+     * @memberof source.view-logic
+     *
+     * @requires $toolsProvider
+     * @requires appViewModelProvider
+     *
+     * @description
+     * Provider statement for some helper methods about view presentation logic.
+     */
+    .provider('$appView', $appView);
+
+  $appView.$inject = ['$toolsProvider', 'appViewModelProvider'];
+
+  function $appView($toolsProvider, appViewModelProvider) {
+    var $ = appViewModelProvider.$;
+    var $c = appViewModelProvider.get();
+    var _domHandler = $c.schemas.domHandler;
+    var _animationEvents = $c.schemas.animationEvents;
+    var _registeredAnimations = $c.schemas.registeredAnimations;
+
+    return {
+      $: $,
+      setDomHandler: setDomHandlerProvider,
+      getDomHandler: getDomHandlerProvider,
+      setAnimationEvents: setAnimationEventsProvider,
+      getAnimationEvents: getAnimationEventsProvider,
+      createDomHandlerObject: createDomHandlerObjectProvider,
+      createAnimationObject: createAnimationObjectProvider,
+      $get: ['$filter', '$tools', $get]
+    };
+
+    /**
+     * @name _registerExternalAnimation
+     * @memberof source.view-logic.$appViewProvider
+     *
+     * @description
+     * Stores all animations different from defaults.
+     *
+     * @param animationData --> It can be an Object or String.
+     * @param {Boolean} animationMode
+     * @return {Object}
+     * @throws TypeError
+     * @private
+     */
+    function _registerExternalAnimation(animationData, animationMode) {
+      var _in = null;
+      var _out = null;
+      if (typeof animationData === 'string') {
+        if (animationMode === $.MODE_ANIMATION_IN) {
+          _in = animationData;
         } else {
-          output = _getStatics();
+          _out = animationData;
         }
-        return output;
+      } else if (angular.isObject(animationData)) {
+        _in = animationData.classAnimationShow || _in;
+        _out = animationData.classAnimationHide || _out;
+      } else {
+        throw new TypeError('Wrong type of animation data: (' + typeof animationData + ')');
+      }
+      if (_in) {
+        _registeredAnimations.in = $toolsProvider.arrayMerge(_registeredAnimations.in, [_in]);
+      }
+      if (_out) {
+        _registeredAnimations.out = $toolsProvider.arrayMerge(_registeredAnimations.out, [_out]);
+      }
+      return _registeredAnimations;
+    }
+
+    /**
+     * @name _getClassList
+     * @memberof source.view-logic.$appViewProvider
+     *
+     * @description
+     * Returns string list space separated of animation classes to apply to removeClass method.
+     *
+     * @param {Boolean} animationMode
+     * @return {String}
+     * @private
+     */
+    function _getClassList(animationMode) {
+      var _animationObject = angular.copy(_registeredAnimations);
+      var _animationList = null;
+      if (animationMode === $.MODE_ANIMATION_IN) {
+        _animationList = _animationObject.in;
+        _animationList.push(_domHandler.classToShow);
+        _animationList.push(_domHandler.classDefaultAnimationShow);
+      } else {
+        _animationList = _animationObject.out;
+        _animationList.push(_domHandler.classToHide);
+        _animationList.push(_domHandler.classDefaultAnimationHide);
+      }
+      _animationList.push($.ACTIVATE_ANIMATION_CLASS);
+      return _animationList.join(' ');
+    }
+
+    /**
+     * @name _getServiceObject
+     * @memberof source.view-logic.$appViewProvider
+     *
+     * @description
+     * Returns requested service object or one of its properties.
+     *
+     * @param {Object} serviceObject
+     * @param {String} [property]
+     * @return {*}
+     * @private
+     */
+    function _getServiceObject(serviceObject, property) {
+      return $toolsProvider.getCheckedObject(serviceObject, property);
+    }
+
+    /**
+     * @name _setDomHandler
+     * @memberof source.view-logic.$appViewProvider
+     *
+     * @description
+     * Private function to setting DOM handler configuration object (_domHandler).
+     *
+     * @param {Object} config
+     * @returns {Object}
+     * @private
+     */
+    function _setDomHandler(config) {
+      _domHandler = $toolsProvider.setObjectUsingSchema($c.schemas.domHandler, config, _domHandler);
+      return _domHandler;
+    }
+
+    /**
+     * @name _setAnimationEvents
+     * @memberof source.view-logic.$appViewProvider
+     *
+     * @description
+     * Private function to setting animation events configuration object (_animationEvents).
+     *
+     * @param {Object} config
+     * @returns {Object}
+     * @private
+     */
+    function _setAnimationEvents(config) {
+      _animationEvents = $toolsProvider.setObjectUsingSchema($c.schemas.animationEvents, config, _animationEvents);
+      return _animationEvents;
+    }
+
+    /**
+     * @name _createSchemaObject
+     * @memberof source.view-logic.$appViewProvider
+     *
+     * @description
+     * Returns an object with the same structure of given schema through given object.
+     *
+     * @param {Object} object
+     * @param {String} schema
+     * @return {Object}
+     * @throws ReferenceError
+     * @private
+     */
+    function _createSchemaObject(object, schema) {
+      if ($c.schemas.hasOwnProperty(schema)) {
+        return $toolsProvider.setObjectUsingSchema($c.schemas[schema], object);
+      } else {
+        throw new ReferenceError('Unknown given schema: (' + schema + ')');
+      }
+    }
+
+    /**
+     * @name _setDomHandlerProvider
+     * @memberof source.view-logic.$appViewProvider
+     *
+     * @description
+     * Provider function to setting DOM handler configuration object (_domHandler).
+     *
+     * @param {Object} config --> Given DOM handler configuration object.
+     * @returns {Object}
+     */
+    function setDomHandlerProvider(config) {
+      return _setDomHandler(config);
+    }
+
+    /**
+     * @name getDomHandlerProvider
+     * @memberof source.view-logic.$appViewProvider
+     *
+     * @description
+     * Provider exposed method to get _domHandler object.
+     *
+     * @param {String} [property]
+     * @return {Object|String}
+     */
+    function getDomHandlerProvider(property) {
+      return _getServiceObject(_domHandler, property);
+    }
+
+    /**
+     * @name setAnimationEventsProvider
+     * @memberof source.view-logic.$appViewProvider
+     *
+     * @description
+     * Provider function that sets received object as _animationEvents object.
+     *
+     * @param {Object} receivedObject
+     * @return {Object}
+     */
+    function setAnimationEventsProvider(receivedObject) {
+      return _setAnimationEvents(receivedObject);
+    }
+
+    /**
+     * @name getAnimationEventsProvider
+     * @memberof source.view-logic.$appViewProvider
+     *
+     * @description
+     * Provider exposed method to get _animationEvents object.
+     *
+     * @param {String} [property]
+     * @return {*}
+     */
+    function getAnimationEventsProvider(property) {
+      return _getServiceObject(_animationEvents, property);
+    }
+
+    /**
+     * @name createDomHandlerObjectProvider
+     * @memberof source.view-logic.$appViewProvider
+     *
+     * @description
+     * Provider function exposed that create DOM handler object.
+     *
+     * @param {Object} domHandlerObject
+     * @returns {Object}
+     */
+    function createDomHandlerObjectProvider(domHandlerObject) {
+      return _createSchemaObject(domHandlerObject, $.SCHEMA_DOM_HANDLER);
+    }
+
+    /**
+     * @name createAnimationObjectProvider
+     * @memberof source.view-logic.$appViewProvider
+     *
+     * @description
+     * Provider function exposed that create animation object.
+     *
+     * @param {Object} animationObject
+     * @return {Object}
+     */
+    function createAnimationObjectProvider(animationObject) {
+      return _createSchemaObject(animationObject, $.SCHEMA_ANIMATION);
+    }
+
+    /**
+     * @namespace $appView
+     * @memberof source.view-logic.$appViewProvider
+     *
+     * @requires $filter
+     *
+     * @description
+     * Factory statement for application view provider.
+     */
+    function $get($filter, $tools) {
+      return {
+        /* Global Constants */
+        $: $,
+        /* Config methods */
+        setDomHandler: setDomHandlerService,
+        getDomHandler: getDomHandlerService,
+        setAnimationEvents: setAnimationEventsService,
+        getAnimationEvents: getAnimationEventsService,
+        createDomHandlerObject: createDomHandlerObjectService,
+        createAnimationObject: createAnimationObjectService,
+        /* View tools */
+        applyFilter: applyFilter,
+        /* DOM tools */
+        checkElementByClass: checkElementByClass,
+        show: showElement,
+        hide: hideElement
+      };
+
+      /**
+       * @name _displayWayElement
+       * @memberof source.view-logic.$appViewProvider.$appView
+       *
+       * @description
+       * Apply display mode to DOM element given.
+       *
+       * @param {Object} domElement
+       * @param {Number} way
+       * @param animationData --> It can be an Object or String.
+       * @private
+       */
+      function _displayWayElement(domElement, way, animationData) {
+        way = way || $.SHOW;
+        var _isEdge = ($tools.getDeviceInfo($.DEVICE_INFO_BROWSER) === $.BROWSER_EDGE);
+        var _isIE = ($tools.getDeviceInfo($.DEVICE_INFO_BROWSER) === $.BROWSER_IE);
+        var _noAnimationBrowser = (_isEdge || _isIE);
+        var _animationEventsEndList = _animationEvents[$.ANIMATION_END].join(' ');
+        var _animationIn = _domHandler.classDefaultAnimationShow;
+        var _animationOut = _domHandler.classDefaultAnimationHide;
+        if (_noAnimationBrowser) {
+          if (way === $.SHOW_ANIMATION) {
+            way = $.SHOW;
+          } else {
+            way = $.HIDE;
+          }
+        }
+        if (animationData) {
+          if (typeof animationData === 'string') {
+            if (way === $.SHOW_ANIMATION) {
+              _animationIn = animationData;
+            } else if (way === $.HIDE_ANIMATION) {
+              _animationOut = animationData;
+            }
+          } else if (angular.isObject(animationData)) {
+            _animationIn = (animationData.classAnimationShow) ? animationData.classAnimationShow : _animationIn ;
+            _animationOut = (animationData.classAnimationHide) ? animationData.classAnimationHide : _animationOut ;
+          }
+        }
+        var _removeClassesShow = _getClassList($.MODE_ANIMATION_IN);
+        var _removeClassesHide = _getClassList($.MODE_ANIMATION_OUT);
+        switch (way) {
+          case $.SHOW:
+            domElement.removeClass(_removeClassesHide).addClass(_domHandler.classToShow);
+            break;
+          case $.HIDE:
+            domElement.removeClass(_removeClassesShow).addClass(_domHandler.classToHide);
+            break;
+          case $.SHOW_ANIMATION:
+            domElement
+              .removeClass(_removeClassesHide)
+              .addClass($.ACTIVATE_ANIMATION_CLASS + ' ' + _animationIn)
+              .one(_animationEventsEndList, function() {
+                domElement.attr('class', _domHandler.classToShow);
+              });
+            break;
+          case $.HIDE_ANIMATION:
+            domElement
+              .removeClass(_removeClassesShow)
+              .addClass($.ACTIVATE_ANIMATION_CLASS + ' ' + _animationOut)
+              .one(_animationEventsEndList, function() {
+                domElement.attr('class', _domHandler.classToHide);
+              });
+            break;
+        }
+      }
+
+      /**
+       * @name _setDomHandlerService
+       * @memberof source.view-logic.$appViewProvider.$appView
+       *
+       * @description
+       * Factory function to setting DOM handler configuration object (_domHandler).
+       *
+       * @param {Object} config --> Given DOM handler configuration object.
+       * @returns {Object}
+       */
+      function setDomHandlerService(config) {
+        return _setDomHandler(config);
+      }
+
+      /**
+       * @name getDomHandlerService
+       * @memberof source.view-logic.$appViewProvider.$appView
+       *
+       * @description
+       * Factory exposed method to get _domHandler object.
+       *
+       * @param {String} [property]
+       * @return {Object|String}
+       */
+      function getDomHandlerService(property) {
+        return _getServiceObject(_domHandler, property);
+      }
+
+      /**
+       * @name setAnimationEventsProvider
+       * @memberof source.view-logic.$appViewProvider.$appView
+       *
+       * @description
+       * Factory function that sets received object as _animationEvents object.
+       *
+       * @param {Object} receivedObject
+       * @return {Object}
+       */
+      function setAnimationEventsService(receivedObject) {
+        return _setAnimationEvents(receivedObject);
+      }
+
+      /**
+       * @name getAnimationEventsService
+       * @memberof source.view-logic.$appViewProvider.$appView
+       *
+       * @description
+       * Factory exposed method to get _animationEvents object.
+       *
+       * @param {String} [property]
+       * @return {*}
+       */
+      function getAnimationEventsService(property) {
+        return _getServiceObject(_animationEvents, property);
+      }
+
+      /**
+       * @name createDomHandlerObjectService
+       * @memberof source.view-logic.$appViewProvider.$appView
+       *
+       * @description
+       * Factory function exposed that create DOM handler object.
+       *
+       * @param {Object} domHandlerObject
+       * @returns {Object}
+       */
+      function createDomHandlerObjectService(domHandlerObject) {
+        return _createSchemaObject(domHandlerObject, $.SCHEMA_DOM_HANDLER);
+      }
+
+      /**
+       * @name createAnimationObjectService
+       * @memberof source.view-logic.$appViewProvider.$appView
+       *
+       * @description
+       * Factory function exposed that create animation object.
+       *
+       * @param {Object} animationObject
+       * @return {Object}
+       */
+      function createAnimationObjectService(animationObject) {
+        return _createSchemaObject(animationObject, $.SCHEMA_ANIMATION);
+      }
+
+      /**
+       * @name _applyFilter
+       * @memberof source.view-logic.$appViewProvider.$appView
+       *
+       * @description
+       * Returns data with given filter applied.
+       *
+       * @param {*} data
+       * @param {String} filterName
+       * @returns {*}
+       */
+      function applyFilter(data, filterName) {
+        return $filter(filterName)(data);
+      }
+
+      /**
+       * @name  _checkElementByClass
+       * @memberof source.view-logic.$appViewProvider.$appView
+       *
+       * @description
+       * Checks if the given "domElement" contains any of the classes received in parameter "classes".
+       * Parameter "classes" can be string or array of strings.
+       *
+       * @param {Object} domElement
+       * @param {String|Array} classes
+       * @returns {String|Boolean}
+       */
+      function checkElementByClass(domElement, classes) {
+        var _output = false;
+        var _classes = classes || null;
+        var _isString = (typeof _classes === 'string');
+        var _isArray = angular.isArray(_classes);
+        if (_isString || _isArray) {
+          _classes = (_isString) ? [classes] : classes ;
+          angular.forEach(_classes, function(item) {
+            if (domElement.classList.contains(item)) {
+              _output = item;
+            }
+          });
+        } else {
+          throw new TypeError('Invalid type of parameter "classes". It must be string or array.');
+        }
+        return _output;
+      }
+
+      /**
+       * @name showElement
+       * @memberof source.view-logic.$appViewProvider.$appView
+       *
+       * @description
+       * Applies CSS classes to show given DOM element.
+       *
+       * @param {Object} domElement
+       * @param {Boolean} [activateAnimation]
+       * @param {String|Object} [animationData]
+       */
+      function showElement(domElement, activateAnimation, animationData) {
+        activateAnimation = activateAnimation || false;
+        var _showWay = (activateAnimation) ? $.SHOW_ANIMATION : $.SHOW ;
+        if (animationData) {
+          _registerExternalAnimation(animationData, $.MODE_ANIMATION_IN);
+        }
+        return _displayWayElement(domElement, _showWay, animationData);
+      }
+
+      /**
+       * @name hideElement
+       * @memberof source.view-logic.$appViewProvider.$appView
+       *
+       * @description
+       * Applies CSS classes to hide given DOM element.
+       *
+       * @param {Object} domElement
+       * @param {Boolean} [activateAnimation]
+       * @param {String|Object} [animationData]
+       */
+      function hideElement(domElement, activateAnimation, animationData) {
+        activateAnimation = activateAnimation || false;
+        var _hideWay = (activateAnimation) ? $.HIDE_ANIMATION : $.HIDE ;
+        if (animationData) {
+          _registerExternalAnimation(animationData, $.MODE_ANIMATION_OUT);
+        }
+        return _displayWayElement(domElement, _hideWay, animationData);
       }
     }
   }
@@ -3011,694 +3712,6 @@
        */
       function cleanApiUrlForLocalUse(url) {
         return _cleanUrl(url, '?');
-      }
-    }
-  }
-})();
-
-(function() {
-  'use strict';
-
-  angular
-    .module('source.view-logic')
-    /**
-     * @namespace appViewModelProvider
-     * @memberof source.view-logic
-     *
-     * @requires $toolsProvider
-     *
-     * @description
-     * Provider that gets constants and models for appView services.
-     */
-    .provider('appViewModel', appViewModel);
-
-  appViewModel.$inject = ['$toolsProvider'];
-
-  function appViewModel($toolsProvider) {
-    var _constants = {
-      SCHEMA_DOM_HANDLER: 'domHandler',
-      SCHEMA_ANIMATION: 'animation',
-      SCHEMA_ANIMATION_EVENTS: 'animationEvents',
-      SCHEMA_REGISTERED_EXTERNAL_ANIMATIONS: 'registeredExternalAnimations',
-
-      DOM_HANDLER_CLASS_TO_SHOW: 'classToShow',
-      DOM_HANDLER_CLASS_TO_HIDE: 'classToHide',
-      DOM_HANDLER_CLASS_DEFAULT_ANIMATION_SHOW: 'classDefaultAnimationShow',
-      DOM_HANDLER_CLASS_DEFAULT_ANIMATION_HIDE: 'classDefaultAnimationHide',
-
-      SHOW: 1,
-      HIDE: 2,
-      SHOW_ANIMATION: 3,
-      HIDE_ANIMATION: 4,
-
-      ANIMATION: true,
-      NO_ANIMATION: false,
-
-      MODE_ANIMATION_IN: true,
-      MODE_ANIMATION_OUT: false,
-
-      ANIMATION_START: 'start',
-      ANIMATION_ITERATION: 'iteration',
-      ANIMATION_END: 'end',
-
-      ACTIVATE_ANIMATION_CLASS: 'animated'
-    };
-    var $ = angular.extend({}, _constants, $toolsProvider.$);
-
-    /**
-     * @name _providerModel
-     * @memberof source.view-logic.appViewProvider
-     *
-     * @type {Object}
-     * @property {Object} schemas
-     *
-     * @property {Object} schemas.domHandler
-     * @property {String} schemas.domHandler.classToShow
-     * @property {String} schemas.domHandler.classToHide
-     * @property {String} schemas.domHandler.classDefaultAnimationShow
-     * @property {String} schemas.domHandler.classDefaultAnimationHide
-     *
-     * @property {Object} schemas.animationEvents
-     * @property {Array} schemas.animationEvents.start
-     * @property {Array} schemas.animationEvents.iteration
-     * @property {Array} schemas.animationEvents.end
-     *
-     * @property {Object} animation
-     * @property {String} animation.classAnimationShow
-     * @property {String} animation.classAnimationHide
-     *
-     * @property {Object} registeredAnimations
-     * @property {Array} registeredAnimations.in
-     * @property {Array} registeredAnimations.out
-     * @private
-     */
-    var _providerModel = {
-      schemas: {
-        domHandler: {
-          classToShow: null,
-          classToHide: null,
-          classDefaultAnimationShow: null,
-          classDefaultAnimationHide: null
-        },
-        animationEvents: {
-          start: [],
-          iteration: [],
-          end: []
-        },
-        animation: {
-          classAnimationShow: null,
-          classAnimationHide: null
-        },
-        registeredAnimations: {
-          in: [],
-          out: []
-        }
-      }
-    };
-
-    return {
-      $: $,
-      get: _getProvider,
-      $get: [$get]
-    };
-
-    /**
-     * @name _getModelSource
-     * @memberof source.view-logic.appViewProvider
-     *
-     * @description
-     * Returns appView model depending on the applicant: Provider or Service.
-     *
-     * @param {Boolean} source
-     * @param {Object} [factoryModel = null]
-     * @returns {Object}
-     * @private
-     */
-    function _getModelSource(source, factoryModel) {
-      factoryModel = factoryModel || null;
-      return (source === $.PROVIDER) ? _providerModel : angular.extend({}, _providerModel, factoryModel) ;
-    }
-
-    /**
-     * @name _getProvider
-     * @memberof source.view-logic.appViewProvider
-     *
-     * @description
-     * Returns appView model for Provider.
-     *
-     * @returns {Object}
-     * @private
-     */
-    function _getProvider() {
-      return _getModelSource($.PROVIDER);
-    }
-
-    /**
-     * @namespace appView
-     * @memberof source.view-logic.appViewProvider
-     *
-     * @description
-     * Factory that gets constants and models for appView services.
-     */
-    function $get() {
-      return {
-        $: $,
-        get: _getFactory
-      };
-
-      /**
-       * @name _getFactory
-       * @memberof source.view-logic.appViewProvider.appView
-       *
-       * @description
-       * Returns appView model for Factory.
-       *
-       * @returns {Object}
-       * @private
-       */
-      function _getFactory() {
-        return _getModelSource($.SERVICE);
-      }
-    }
-  }
-})();
-
-(function() {
-  'use strict';
-
-  angular
-    .module('source.view-logic')
-    /**
-     * @namespace $appViewProvider
-     * @memberof source.view-logic
-     *
-     * @requires $toolsProvider
-     * @requires appViewModelProvider
-     *
-     * @description
-     * Provider statement for some helper methods about view presentation logic.
-     */
-    .provider('$appView', $appView);
-
-  $appView.$inject = ['$toolsProvider', 'appViewModelProvider'];
-
-  function $appView($toolsProvider, appViewModelProvider) {
-    var $ = appViewModelProvider.$;
-    var $c = appViewModelProvider.get();
-    var _domHandler = $c.schemas.domHandler;
-    var _animationEvents = $c.schemas.animationEvents;
-    var _registeredAnimations = $c.schemas.registeredAnimations;
-
-    return {
-      $: $,
-      setDomHandler: setDomHandlerProvider,
-      getDomHandler: getDomHandlerProvider,
-      setAnimationEvents: setAnimationEventsProvider,
-      getAnimationEvents: getAnimationEventsProvider,
-      createDomHandlerObject: createDomHandlerObjectProvider,
-      createAnimationObject: createAnimationObjectProvider,
-      $get: ['$filter', '$tools', $get]
-    };
-
-    /**
-     * @name _registerExternalAnimation
-     * @memberof source.view-logic.$appViewProvider
-     *
-     * @description
-     * Stores all animations different from defaults.
-     *
-     * @param animationData --> It can be an Object or String.
-     * @param {Boolean} animationMode
-     * @return {Object}
-     * @throws TypeError
-     * @private
-     */
-    function _registerExternalAnimation(animationData, animationMode) {
-      var _in = null;
-      var _out = null;
-      if (typeof animationData === 'string') {
-        if (animationMode === $.MODE_ANIMATION_IN) {
-          _in = animationData;
-        } else {
-          _out = animationData;
-        }
-      } else if (angular.isObject(animationData)) {
-        _in = animationData.classAnimationShow || _in;
-        _out = animationData.classAnimationHide || _out;
-      } else {
-        throw new TypeError('Wrong type of animation data: (' + typeof animationData + ')');
-      }
-      if (_in) {
-        _registeredAnimations.in = $toolsProvider.arrayMerge(_registeredAnimations.in, [_in]);
-      }
-      if (_out) {
-        _registeredAnimations.out = $toolsProvider.arrayMerge(_registeredAnimations.out, [_out]);
-      }
-      return _registeredAnimations;
-    }
-
-    /**
-     * @name _getClassList
-     * @memberof source.view-logic.$appViewProvider
-     *
-     * @description
-     * Returns string list space separated of animation classes to apply to removeClass method.
-     *
-     * @param {Boolean} animationMode
-     * @return {String}
-     * @private
-     */
-    function _getClassList(animationMode) {
-      var _animationObject = angular.copy(_registeredAnimations);
-      var _animationList = null;
-      if (animationMode === $.MODE_ANIMATION_IN) {
-        _animationList = _animationObject.in;
-        _animationList.push(_domHandler.classToShow);
-        _animationList.push(_domHandler.classDefaultAnimationShow);
-      } else {
-        _animationList = _animationObject.out;
-        _animationList.push(_domHandler.classToHide);
-        _animationList.push(_domHandler.classDefaultAnimationHide);
-      }
-      _animationList.push($.ACTIVATE_ANIMATION_CLASS);
-      return _animationList.join(' ');
-    }
-
-    /**
-     * @name _getServiceObject
-     * @memberof source.view-logic.$appViewProvider
-     *
-     * @description
-     * Returns requested service object or one of its properties.
-     *
-     * @param {Object} serviceObject
-     * @param {String} [property]
-     * @return {*}
-     * @private
-     */
-    function _getServiceObject(serviceObject, property) {
-      return $toolsProvider.getCheckedObject(serviceObject, property);
-    }
-
-    /**
-     * @name _setDomHandler
-     * @memberof source.view-logic.$appViewProvider
-     *
-     * @description
-     * Private function to setting DOM handler configuration object (_domHandler).
-     *
-     * @param {Object} config
-     * @returns {Object}
-     * @private
-     */
-    function _setDomHandler(config) {
-      _domHandler = $toolsProvider.setObjectUsingSchema($c.schemas.domHandler, config, _domHandler);
-      return _domHandler;
-    }
-
-    /**
-     * @name _setAnimationEvents
-     * @memberof source.view-logic.$appViewProvider
-     *
-     * @description
-     * Private function to setting animation events configuration object (_animationEvents).
-     *
-     * @param {Object} config
-     * @returns {Object}
-     * @private
-     */
-    function _setAnimationEvents(config) {
-      _animationEvents = $toolsProvider.setObjectUsingSchema($c.schemas.animationEvents, config, _animationEvents);
-      return _animationEvents;
-    }
-
-    /**
-     * @name _createSchemaObject
-     * @memberof source.view-logic.$appViewProvider
-     *
-     * @description
-     * Returns an object with the same structure of given schema through given object.
-     *
-     * @param {Object} object
-     * @param {String} schema
-     * @return {Object}
-     * @throws ReferenceError
-     * @private
-     */
-    function _createSchemaObject(object, schema) {
-      if ($c.schemas.hasOwnProperty(schema)) {
-        return $toolsProvider.setObjectUsingSchema($c.schemas[schema], object);
-      } else {
-        throw new ReferenceError('Unknown given schema: (' + schema + ')');
-      }
-    }
-
-    /**
-     * @name _setDomHandlerProvider
-     * @memberof source.view-logic.$appViewProvider
-     *
-     * @description
-     * Provider function to setting DOM handler configuration object (_domHandler).
-     *
-     * @param {Object} config --> Given DOM handler configuration object.
-     * @returns {Object}
-     */
-    function setDomHandlerProvider(config) {
-      return _setDomHandler(config);
-    }
-
-    /**
-     * @name getDomHandlerProvider
-     * @memberof source.view-logic.$appViewProvider
-     *
-     * @description
-     * Provider exposed method to get _domHandler object.
-     *
-     * @param {String} [property]
-     * @return {Object|String}
-     */
-    function getDomHandlerProvider(property) {
-      return _getServiceObject(_domHandler, property);
-    }
-
-    /**
-     * @name setAnimationEventsProvider
-     * @memberof source.view-logic.$appViewProvider
-     *
-     * @description
-     * Provider function that sets received object as _animationEvents object.
-     *
-     * @param {Object} receivedObject
-     * @return {Object}
-     */
-    function setAnimationEventsProvider(receivedObject) {
-      return _setAnimationEvents(receivedObject);
-    }
-
-    /**
-     * @name getAnimationEventsProvider
-     * @memberof source.view-logic.$appViewProvider
-     *
-     * @description
-     * Provider exposed method to get _animationEvents object.
-     *
-     * @param {String} [property]
-     * @return {*}
-     */
-    function getAnimationEventsProvider(property) {
-      return _getServiceObject(_animationEvents, property);
-    }
-
-    /**
-     * @name createDomHandlerObjectProvider
-     * @memberof source.view-logic.$appViewProvider
-     *
-     * @description
-     * Provider function exposed that create DOM handler object.
-     *
-     * @param {Object} domHandlerObject
-     * @returns {Object}
-     */
-    function createDomHandlerObjectProvider(domHandlerObject) {
-      return _createSchemaObject(domHandlerObject, $.SCHEMA_DOM_HANDLER);
-    }
-
-    /**
-     * @name createAnimationObjectProvider
-     * @memberof source.view-logic.$appViewProvider
-     *
-     * @description
-     * Provider function exposed that create animation object.
-     *
-     * @param {Object} animationObject
-     * @return {Object}
-     */
-    function createAnimationObjectProvider(animationObject) {
-      return _createSchemaObject(animationObject, $.SCHEMA_ANIMATION);
-    }
-
-    /**
-     * @namespace $appView
-     * @memberof source.view-logic.$appViewProvider
-     *
-     * @requires $filter
-     *
-     * @description
-     * Factory statement for application view provider.
-     */
-    function $get($filter, $tools) {
-      return {
-        /* Global Constants */
-        $: $,
-        /* Config methods */
-        setDomHandler: setDomHandlerService,
-        getDomHandler: getDomHandlerService,
-        setAnimationEvents: setAnimationEventsService,
-        getAnimationEvents: getAnimationEventsService,
-        createDomHandlerObject: createDomHandlerObjectService,
-        createAnimationObject: createAnimationObjectService,
-        /* View tools */
-        applyFilter: applyFilter,
-        /* DOM tools */
-        checkElementByClass: checkElementByClass,
-        show: showElement,
-        hide: hideElement
-      };
-
-      /**
-       * @name _displayWayElement
-       * @memberof source.view-logic.$appViewProvider.$appView
-       *
-       * @description
-       * Apply display mode to DOM element given.
-       *
-       * @param {Object} domElement
-       * @param {Number} way
-       * @param animationData --> It can be an Object or String.
-       * @private
-       */
-      function _displayWayElement(domElement, way, animationData) {
-        way = way || $.SHOW;
-        var _isEdge = ($tools.getDeviceInfo($.DEVICE_INFO_BROWSER) === $.BROWSER_EDGE);
-        var _isIE = ($tools.getDeviceInfo($.DEVICE_INFO_BROWSER) === $.BROWSER_IE);
-        var _noAnimationBrowser = (_isEdge || _isIE);
-        var _animationEventsEndList = _animationEvents[$.ANIMATION_END].join(' ');
-        var _animationIn = _domHandler.classDefaultAnimationShow;
-        var _animationOut = _domHandler.classDefaultAnimationHide;
-        if (_noAnimationBrowser) {
-          if (way === $.SHOW_ANIMATION) {
-            way = $.SHOW;
-          } else {
-            way = $.HIDE;
-          }
-        }
-        if (animationData) {
-          if (typeof animationData === 'string') {
-            if (way === $.SHOW_ANIMATION) {
-              _animationIn = animationData;
-            } else if (way === $.HIDE_ANIMATION) {
-              _animationOut = animationData;
-            }
-          } else if (angular.isObject(animationData)) {
-            _animationIn = (animationData.classAnimationShow) ? animationData.classAnimationShow : _animationIn ;
-            _animationOut = (animationData.classAnimationHide) ? animationData.classAnimationHide : _animationOut ;
-          }
-        }
-        var _removeClassesShow = _getClassList($.MODE_ANIMATION_IN);
-        var _removeClassesHide = _getClassList($.MODE_ANIMATION_OUT);
-        switch (way) {
-          case $.SHOW:
-            domElement.removeClass(_removeClassesHide).addClass(_domHandler.classToShow);
-            break;
-          case $.HIDE:
-            domElement.removeClass(_removeClassesShow).addClass(_domHandler.classToHide);
-            break;
-          case $.SHOW_ANIMATION:
-            domElement
-              .removeClass(_removeClassesHide)
-              .addClass($.ACTIVATE_ANIMATION_CLASS + ' ' + _animationIn)
-              .one(_animationEventsEndList, function() {
-                domElement.attr('class', _domHandler.classToShow);
-              });
-            break;
-          case $.HIDE_ANIMATION:
-            domElement
-              .removeClass(_removeClassesShow)
-              .addClass($.ACTIVATE_ANIMATION_CLASS + ' ' + _animationOut)
-              .one(_animationEventsEndList, function() {
-                domElement.attr('class', _domHandler.classToHide);
-              });
-            break;
-        }
-      }
-
-      /**
-       * @name _setDomHandlerService
-       * @memberof source.view-logic.$appViewProvider.$appView
-       *
-       * @description
-       * Factory function to setting DOM handler configuration object (_domHandler).
-       *
-       * @param {Object} config --> Given DOM handler configuration object.
-       * @returns {Object}
-       */
-      function setDomHandlerService(config) {
-        return _setDomHandler(config);
-      }
-
-      /**
-       * @name getDomHandlerService
-       * @memberof source.view-logic.$appViewProvider.$appView
-       *
-       * @description
-       * Factory exposed method to get _domHandler object.
-       *
-       * @param {String} [property]
-       * @return {Object|String}
-       */
-      function getDomHandlerService(property) {
-        return _getServiceObject(_domHandler, property);
-      }
-
-      /**
-       * @name setAnimationEventsProvider
-       * @memberof source.view-logic.$appViewProvider.$appView
-       *
-       * @description
-       * Factory function that sets received object as _animationEvents object.
-       *
-       * @param {Object} receivedObject
-       * @return {Object}
-       */
-      function setAnimationEventsService(receivedObject) {
-        return _setAnimationEvents(receivedObject);
-      }
-
-      /**
-       * @name getAnimationEventsService
-       * @memberof source.view-logic.$appViewProvider.$appView
-       *
-       * @description
-       * Factory exposed method to get _animationEvents object.
-       *
-       * @param {String} [property]
-       * @return {*}
-       */
-      function getAnimationEventsService(property) {
-        return _getServiceObject(_animationEvents, property);
-      }
-
-      /**
-       * @name createDomHandlerObjectService
-       * @memberof source.view-logic.$appViewProvider.$appView
-       *
-       * @description
-       * Factory function exposed that create DOM handler object.
-       *
-       * @param {Object} domHandlerObject
-       * @returns {Object}
-       */
-      function createDomHandlerObjectService(domHandlerObject) {
-        return _createSchemaObject(domHandlerObject, $.SCHEMA_DOM_HANDLER);
-      }
-
-      /**
-       * @name createAnimationObjectService
-       * @memberof source.view-logic.$appViewProvider.$appView
-       *
-       * @description
-       * Factory function exposed that create animation object.
-       *
-       * @param {Object} animationObject
-       * @return {Object}
-       */
-      function createAnimationObjectService(animationObject) {
-        return _createSchemaObject(animationObject, $.SCHEMA_ANIMATION);
-      }
-
-      /**
-       * @name _applyFilter
-       * @memberof source.view-logic.$appViewProvider.$appView
-       *
-       * @description
-       * Returns data with given filter applied.
-       *
-       * @param {*} data
-       * @param {String} filterName
-       * @returns {*}
-       */
-      function applyFilter(data, filterName) {
-        return $filter(filterName)(data);
-      }
-
-      /**
-       * @name  _checkElementByClass
-       * @memberof source.view-logic.$appViewProvider.$appView
-       *
-       * @description
-       * Checks if the given "domElement" contains any of the classes received in parameter "classes".
-       * Parameter "classes" can be string or array of strings.
-       *
-       * @param {Object} domElement
-       * @param {String|Array} classes
-       * @returns {String|Boolean}
-       */
-      function checkElementByClass(domElement, classes) {
-        var _output = false;
-        var _classes = classes || null;
-        var _isString = (typeof _classes === 'string');
-        var _isArray = angular.isArray(_classes);
-        if (_isString || _isArray) {
-          _classes = (_isString) ? [classes] : classes ;
-          angular.forEach(_classes, function(item) {
-            if (domElement.classList.contains(item)) {
-              _output = item;
-            }
-          });
-        } else {
-          throw new TypeError('Invalid type of parameter "classes". It must be string or array.');
-        }
-        return _output;
-      }
-
-      /**
-       * @name showElement
-       * @memberof source.view-logic.$appViewProvider.$appView
-       *
-       * @description
-       * Applies CSS classes to show given DOM element.
-       *
-       * @param {Object} domElement
-       * @param {Boolean} [activateAnimation]
-       * @param {String|Object} [animationData]
-       */
-      function showElement(domElement, activateAnimation, animationData) {
-        activateAnimation = activateAnimation || false;
-        var _showWay = (activateAnimation) ? $.SHOW_ANIMATION : $.SHOW ;
-        if (animationData) {
-          _registerExternalAnimation(animationData, $.MODE_ANIMATION_IN);
-        }
-        return _displayWayElement(domElement, _showWay, animationData);
-      }
-
-      /**
-       * @name hideElement
-       * @memberof source.view-logic.$appViewProvider.$appView
-       *
-       * @description
-       * Applies CSS classes to hide given DOM element.
-       *
-       * @param {Object} domElement
-       * @param {Boolean} [activateAnimation]
-       * @param {String|Object} [animationData]
-       */
-      function hideElement(domElement, activateAnimation, animationData) {
-        activateAnimation = activateAnimation || false;
-        var _hideWay = (activateAnimation) ? $.HIDE_ANIMATION : $.HIDE ;
-        if (animationData) {
-          _registerExternalAnimation(animationData, $.MODE_ANIMATION_OUT);
-        }
-        return _displayWayElement(domElement, _hideWay, animationData);
       }
     }
   }
