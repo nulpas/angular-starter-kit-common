@@ -25,6 +25,7 @@
       'source._shared',
       'source.api',
       'source.date-time',
+      'source.numbers',
       'source.router',
       'source.static',
       'source.toast',

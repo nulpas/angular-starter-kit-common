@@ -43,7 +43,13 @@
       ANIMATION_ITERATION: 'iteration',
       ANIMATION_END: 'end',
 
-      ACTIVATE_ANIMATION_CLASS: 'animated'
+      ACTIVATE_ANIMATION_CLASS: 'animated',
+
+      DATA_CONFIG_FILTER: 'filter',
+      DATA_CONFIG_FILTER_PARAMS: 'filterParams',
+      DATA_CONFIG_DISPLAY_CONCAT: 'displayConcat',
+      DATA_CONFIG_DISPLAY_PROPERTIES: 'displayProperties',
+      DATA_CONFIG_DISPLAY_PROPERTIES_NAME: 'displayPropertiesName'
     };
     var $ = angular.extend({}, _constants, $toolsProvider.$);
 
@@ -72,6 +78,13 @@
      * @property {Object} registeredAnimations
      * @property {Array} registeredAnimations.in
      * @property {Array} registeredAnimations.out
+     *
+     * @property {Object} processDataConfig
+     * @property {String} processDataConfig.filter
+     * @property {Object} processDataConfig.filterParams
+     * @property {Boolean} processDataConfig.displayConcat
+     * @property {Object} processDataConfig.displayProperties
+     * @property {Boolean} processDataConfig.displayPropertiesName
      * @private
      */
     var _providerModel = {
@@ -94,6 +107,13 @@
         registeredAnimations: {
           in: [],
           out: []
+        },
+        processDataConfig: {
+          filter: null,
+          filterParams: null,
+          displayConcat: null,
+          displayProperties: null,
+          displayPropertiesName: null
         }
       }
     };
