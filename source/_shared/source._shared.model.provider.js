@@ -38,6 +38,8 @@
       MERGE: true,
       NO_MERGE: false,
 
+      NO_EXCEPTIONS: 'noExceptions',
+
       KEY: {
         ESCAPE: {
           NAME: 'Escape',

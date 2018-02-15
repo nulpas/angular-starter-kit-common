@@ -83,7 +83,7 @@
      * @property {String} processDataConfig.filter
      * @property {Object} processDataConfig.filterParams
      * @property {Boolean} processDataConfig.displayConcat
-     * @property {Object} processDataConfig.displayProperties
+     * @property {Array} processDataConfig.displayProperties
      * @property {Boolean} processDataConfig.displayPropertiesName
      * @private
      */
@@ -111,9 +111,9 @@
         processDataConfig: {
           filter: null,
           filterParams: null,
-          displayConcat: null,
+          displayConcat: false,
           displayProperties: null,
-          displayPropertiesName: null
+          displayPropertiesName: false
         }
       }
     };

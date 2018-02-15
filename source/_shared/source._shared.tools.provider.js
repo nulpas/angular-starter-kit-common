@@ -302,15 +302,16 @@
      * @param {Object} objectSettings
      * @param {Boolean|Object} mergeOption --> If Boolean: true to merge with schema, false no merge with schema.
      *                                     --> If Object, merge with given object.
+     * @param {Array} options --> "noExceptions": to prevent exceptions.
      * @returns {Object}
      * @private
      */
-    function _setObjectUsingSchema(objectSchema, objectSettings, mergeOption) {
+    function _setObjectUsingSchema(objectSchema, objectSettings, mergeOption, options) {
       var output = {};
       angular.forEach(objectSettings, function(item, key) {
         if (objectSchema.hasOwnProperty(key)) {
           output[key] = item;
-        } else {
+        } else if (options.indexOf($.NO_EXCEPTIONS) < 0) {
           throw new Error('Trying to set an unknown property ("' + key + '") in target object.');
         }
       });
@@ -462,11 +463,13 @@
      * @param {Object} objectSettings
      * @param {Boolean|Object} [mergeOption = false] --> If Boolean: true to merge schema, false no merge with schema.
      *                                               --> If Object, merge with given object.
+     * @param {Array} [options = []] --> "noExceptions": to prevent exceptions.
      * @returns {Object}
      */
-    function setObjectUsingSchemaProvider(objectSchema, objectSettings, mergeOption) {
+    function setObjectUsingSchemaProvider(objectSchema, objectSettings, mergeOption, options) {
       mergeOption = mergeOption || $.NO_MERGE;
-      return _setObjectUsingSchema(objectSchema, objectSettings, mergeOption);
+      options = options || [];
+      return _setObjectUsingSchema(objectSchema, objectSettings, mergeOption, options);
     }
 
     /**
@@ -753,11 +756,13 @@
        * @param {Object} objectSettings
        * @param {Boolean|Object} [mergeOption = true] --> If Boolean: true to merge schema, false no merge with schema.
        *                                              --> If Object, merge with given object.
+       * @param {Array} [options = []] --> "noExceptions": to prevent exceptions.
        * @returns {Object}
        */
-      function setObjectUsingSchema(objectSchema, objectSettings, mergeOption) {
+      function setObjectUsingSchema(objectSchema, objectSettings, mergeOption, options) {
         mergeOption = mergeOption || $.NO_MERGE;
-        return _setObjectUsingSchema(objectSchema, objectSettings, mergeOption);
+        options = options || [];
+        return _setObjectUsingSchema(objectSchema, objectSettings, mergeOption, options);
       }
 
       /**

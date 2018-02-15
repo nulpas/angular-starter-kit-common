@@ -470,7 +470,13 @@
        */
       function _processData(data, config) {
         if (angular.isObject(config) && Object.keys(config).length) {
-          var _config = $tools.setObjectUsingSchema($c.schemas.processDataConfig, config, {});
+          var _config = $tools.setObjectUsingSchema($c.schemas.processDataConfig, config, $.MERGE, [$.NO_EXCEPTIONS]);
+          var _filter = _config[$.DATA_CONFIG_FILTER];
+          var _filterParams = _config[$.DATA_CONFIG_FILTER_PARAMS];
+          var _concat = _config[$.DATA_CONFIG_DISPLAY_CONCAT];
+          var _properties = _config[$.DATA_CONFIG_DISPLAY_PROPERTIES];
+          var _propertiesName = _config[$.DATA_CONFIG_DISPLAY_PROPERTIES_NAME];
+
           console.log(_config);
           if (angular.isObject(data)) {
             //Puede ser dot.case, entonces no lleva displayProperties o se ignora
