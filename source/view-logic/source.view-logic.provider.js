@@ -32,7 +32,7 @@
       getAnimationEvents: getAnimationEventsProvider,
       createDomHandlerObject: createDomHandlerObjectProvider,
       createAnimationObject: createAnimationObjectProvider,
-      $get: ['$filter', '$tools', $get]
+      $get: ['$filter', '$injector', '$tools', $get]
     };
 
     /**
@@ -257,11 +257,13 @@
      * @memberof source.view-logic.$appViewProvider
      *
      * @requires $filter
+     * @requires $injector
+     * @requires $tools
      *
      * @description
      * Factory statement for application view provider.
      */
-    function $get($filter, $tools) {
+    function $get($filter, $injector, $tools) {
       return {
         /* Global Constants */
         $: $,
@@ -273,7 +275,8 @@
         createDomHandlerObject: createDomHandlerObjectService,
         createAnimationObject: createAnimationObjectService,
         /* View tools */
-        applyFilter: applyFilter,
+        applyFilter: _applyFilter,
+        processData: _processData,
         /* DOM tools */
         checkElementByClass: checkElementByClass,
         show: showElement,
@@ -440,10 +443,70 @@
        *
        * @param {*} data
        * @param {String} filterName
+       * @param {Object} [filterParams]
        * @returns {*}
+       * @throws ReferenceError
+       * @private
        */
-      function applyFilter(data, filterName) {
-        return $filter(filterName)(data);
+      function _applyFilter(data, filterName, filterParams) {
+        if ($injector.has(filterName + 'Filter')) {
+          return $filter(filterName)(data, filterParams);
+        } else {
+          throw new ReferenceError('Unknown filter: "' + filterName + '".');
+        }
+      }
+
+      /**
+       * @name _processData
+       * @memberof source.view-logic.$appViewProvider.$appView
+       *
+       * @description
+       * Processing data to show filtered or formatted.
+       *
+       * @param {*} data
+       * @param {Object} config
+       * @returns {String}
+       * @private
+       */
+      function _processData(data, config) {
+        if (angular.isObject(config) && Object.keys(config).length) {
+          // var _config = $tools.setObjectUsingSchema($c.schemas.dataConfig, config, $.NO_MERGE, [$.NO_EXCEPTIONS]);
+          // var _filterCondition = (_config.hasOwnProperty($.DATA_CONFIG_FILTER));
+          // var _filterParamsCondition = (_config.hasOwnProperty($.DATA_CONFIG_FILTER_PARAMS));
+          // var _concatCondition = (_config.hasOwnProperty($.DATA_CONFIG_DISPLAY_CONCAT));
+          // var _propertiesCondition = (_config.hasOwnProperty($.DATA_CONFIG_DISPLAY_PROPERTIES));
+          // var _propertiesNameCondition = (_config.hasOwnProperty($.DATA_CONFIG_DISPLAY_PROPERTIES_NAME));
+          // var _filter = (_filterCondition) ? _config[$.DATA_CONFIG_FILTER] : undefined ;
+          // var _filterParams = (_filterParamsCondition) ? _config[$.DATA_CONFIG_FILTER_PARAMS] : undefined ;
+          // var _concat = (_concatCondition) ? _config[$.DATA_CONFIG_DISPLAY_CONCAT] : false ;
+          // var _properties = (_propertiesCondition) ? _config[$.DATA_CONFIG_DISPLAY_PROPERTIES] : undefined ;
+          // var _propertiesName = (_propertiesNameCondition) ? _config[$.DATA_CONFIG_DISPLAY_PROPERTIES_NAME] : false ;
+          //
+          // console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
+          // console.log('##############################################');
+          // console.log(_filter);
+          // console.log(_filterParams);
+          // console.log(_concat);
+          // console.log(_properties);
+          // console.log(_propertiesName);
+          // console.log('##############################################');
+          // console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
+          if (angular.isObject(data)) {
+            //Puede ser dot.case, entonces no lleva displayProperties o se ignora
+
+            //Puede ser displayProperties, entonces se pintan esas properties
+
+            //Puede llevar displayConcat
+            //Puede llevar diaplayPropertiesNames
+
+            //No lleva ni displayProperties ni dot.case, entonces se pinta el object entero
+
+            //Si lleva displayPropertiesNames se pintan los names, si no no se pintan
+            //Si lleva displayConcat se pinta concatenado separado por comas, si no se pinta con saltos de línea
+          }
+        } else {
+          throw new Error('Configuration given is not an Object or configuration Object is void.');
+        }
       }
 
       /**

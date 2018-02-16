@@ -25,6 +25,7 @@
       'source._shared',
       'source.api',
       'source.date-time',
+      'source.numbers',
       'source.router',
       'source.static',
       'source.toast',
@@ -63,9 +64,23 @@
      * @memberof source
      *
      * @description
-     * Definition of module "date time" for several tools and filters with datetime data.
+     * Definition of module "date time" for several tools and filters about datetime data.
      */
     .module('source.date-time', []);
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    /**
+     * @namespace source.numbers
+     * @memberof source
+     *
+     * @description
+     * Definition of module "numbers" for several tools and filters about numbers and currency data.
+     */
+    .module('source.numbers', []);
 })();
 
 (function() {
@@ -98,6 +113,20 @@
 
   angular
     /**
+     * @namespace static
+     * @memberof source
+     *
+     * @description
+     * Module static definition for manage static data in application like literals or config variables.
+     */
+    .module('source.static', []);
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    /**
      * @namespace toast
      * @memberof source
      *
@@ -108,20 +137,6 @@
       /* External Modules */
       'toastr'
     ]);
-})();
-
-(function() {
-  'use strict';
-
-  angular
-    /**
-     * @namespace static
-     * @memberof source
-     *
-     * @description
-     * Module static definition for manage static data in application like literals or config variables.
-     */
-    .module('source.static', []);
 })();
 
 (function() {
@@ -1289,6 +1304,221 @@
   'use strict';
 
   angular
+    .module('source.numbers')
+    /**
+     * @namespace $numbers
+     * @memberof source.numbers
+     *
+     * @requires $tools
+     * @requires numbersModel
+     *
+     * @description
+     * Helper service to numbers module.
+     */
+    .factory('$numbers', $numbers);
+
+  $numbers.$inject = ['$tools', 'numbersModel'];
+
+  function $numbers($tools, numbersModel) {
+    var $ = angular.extend({}, numbersModel.constants, $tools.$);
+
+    return {
+      $: $,
+      setParams: _setParams
+    };
+
+    /**
+     * @name _setParams
+     * @memberof source.numbers.$numbers
+     *
+     * @description
+     * Set the filter params to define several numeric filter configurations.
+     *
+     * @param {Object} filterParams
+     * @param {String} [paramsMode]
+     * @return {Object}
+     * @private
+     */
+    function _setParams(filterParams, paramsMode) {
+      filterParams = filterParams || {};
+      paramsMode = paramsMode || $.NUMBER;
+      var _output = {};
+      if (numbersModel.schemas.hasOwnProperty(paramsMode)) {
+        if (filterParams && angular.isObject(filterParams)) {
+          var _params = $tools.setObjectUsingSchema(numbersModel.schemas[paramsMode], filterParams, {});
+          angular.forEach(_params, function(value, property) {
+            var _condition = (filterParams.hasOwnProperty(property) && value);
+            _output[property] = (_condition) ? value : undefined ;
+          });
+          _output[$.SYMBOL] = (_output[$.SYMBOL]) ? ' ' + _output[$.SYMBOL] : undefined ;
+          _output[$.COMPOUND] = (_output[$.COMPOUND]) ? _output[$.COMPOUND] : '' ;
+        }
+        return _output;
+      } else {
+        throw new ReferenceError('Unknown numeric params mode: ' + paramsMode);
+      }
+    }
+  }
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    .module('source.numbers')
+    /**
+     * @namespace money
+     * @memberof source.numbers
+     *
+     * @requires $filter
+     * @requires $numbers
+     *
+     * @description
+     * Filter that shows numbers as currency format with currency symbol.
+     */
+    .filter('money', money)
+
+    /**
+     * @namespace numeric
+     * @memberof source.numbers
+     *
+     * @requires $filter
+     * @requires $tools
+     *
+     * @description
+     * Filter that shows numbers as numeric format.
+     */
+    .filter('numeric', numeric);
+
+  money.$inject = ['$filter', '$numbers'];
+
+  function money($filter, $numbers) {
+    return _money;
+
+    /**
+     * @name _money
+     * @memberof source.numbers.money
+     *
+     * @description
+     * Private function for "money" filter.
+     * Returns data formatted if variable "data" is a valid number or returns the same input data.
+     *
+     * @param {*} data
+     * @param {Object} [filterParams]
+     * @returns {String|*}
+     * @private
+     */
+    function _money(data, filterParams) {
+      var _output = data;
+      if (angular.isNumber(data)) {
+        var _params = $numbers.setParams(filterParams, $numbers.$.CURRENCY);
+        _output = $filter('currency')(data, _params[$numbers.$.SYMBOL], _params[$numbers.$.FRACTION]);
+        _output += (_params[$numbers.$.COMPOUND]) ? ' ' + _params[$numbers.$.COMPOUND] : '' ;
+      }
+      return _output;
+    }
+  }
+
+  numeric.$inject = ['$filter', '$numbers'];
+
+  function numeric($filter, $numbers) {
+    return _numeric;
+
+    /**
+     * @name _numeric
+     * @memberof source.numbers.numeric
+     *
+     * @description
+     * Private function for "numeric" filter.
+     * Returns data formatted if variable "data" is a valid number or returns the same input data.
+     *
+     * @param {*} data
+     * @param {Object} [filterParams]
+     * @returns {String|*}
+     * @private
+     */
+    function _numeric(data, filterParams) {
+      var _output = data;
+      if (angular.isNumber(data)) {
+        var _params = $numbers.setParams(filterParams, $numbers.$.CURRENCY);
+        _output = $filter('number')(data, _params[$numbers.$.FRACTION]);
+        _output += (_params[$numbers.$.SYMBOL]) ? _params[$numbers.$.SYMBOL] : '' ;
+        _output += (_params[$numbers.$.COMPOUND]) ? ' ' + _params[$numbers.$.COMPOUND] : '' ;
+      }
+      return _output;
+    }
+  }
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    .module('source.numbers')
+    /**
+     * @namespace numbersModel
+     * @memberof source.numbers
+     *
+     * @description
+     * Service that defines constants and schemas for numbers module.
+     */
+    .service('numbersModel', numbersModel);
+
+  function numbersModel() {
+    /* jshint validthis: true */
+    /**
+     * @name constants
+     * @memberof source.numbers.numbersModel
+     *
+     * @type {Object}
+     * @property {String} CURRENCY
+     * @property {String} NUMBER
+     * @property {String} SYMBOL
+     * @property {String} FRACTION
+     * @property {String} COMPOUND
+     */
+    this.constants = {
+      CURRENCY: 'currency',
+      NUMBER: 'number',
+
+      SYMBOL: 'symbol',
+      FRACTION: 'fractionSize',
+      COMPOUND: 'compound'
+    };
+
+    /**
+     * @name schemas
+     * @memberof source.numbers.numbersModel
+     *
+     * @type {Object}
+     * @property {Object} currency
+     * @property {String} currency.symbol
+     * @property {Number} currency.fractionSize
+     * @property {Number|String} currency.compound
+     * @property {Object} number
+     * @property {String} number.symbol
+     * @property {Number} number.fractionSize
+     * @property {Number|String} number.compound
+     */
+    this.schemas = {
+      currency: {
+        symbol: null,
+        fractionSize: null,
+        compound: null
+      },
+      number: {
+        symbol: null,
+        fractionSize: null,
+        compound: null
+      }
+    };
+  }
+})();
+
+(function() {
+  'use strict';
+
+  angular
   .module('source.router')
   /**
    * @namespace $router
@@ -1337,6 +1567,192 @@
      */
     function resolveStateGo(stateName) {
       _resolveStateGo(stateName);
+    }
+  }
+})();
+
+(function() {
+  'use strict';
+
+  /**
+   * @type Object
+   * @property {String} documentName
+   * @property {String} documentType
+   */
+
+  angular
+    .module('source.static')
+    /**
+     * @namespace $staticProvider
+     * @memberof source.static
+     *
+     * @requires globalConstantsProvider
+     *
+     * @description
+     * Provider statement to manage static variables for application.
+     */
+    .provider('$static', $static);
+
+  $static.$inject = ['globalConstantsProvider'];
+
+  function $static(globalConstantsProvider) {
+    var $ = globalConstantsProvider.get();
+    var _source = null;
+    var _statics = null;
+
+    return {
+      /* Global Constants */
+      $: $,
+      /* Provider LITERALS tools */
+      setSource: setProviderSource,
+      /* API Factory */
+      $get: ['$q', '$api', $get]
+    };
+
+    /**
+     * @name _setSource
+     * @memberof source.static.$staticProvider
+     *
+     * @description
+     * Private method to set JSON source files containing the application static variables.
+     *
+     * @param {String|Array|Object} source
+     * @returns {Array|Object}
+     * @private
+     */
+    function _setSource(source) {
+      var _isStringSource = (typeof source === 'string');
+      if (_isStringSource || angular.isObject(source)) {
+        _source = (_isStringSource) ? [source] : source ;
+      } else {
+        throw new TypeError('Wrong type argument: Static source must be string or array or object.');
+      }
+      return _source;
+    }
+
+    /**
+     * @name setProviderSource
+     * @memberof source.static.$staticProvider
+     *
+     * @description
+     * Provider public function to set JSON source files containing the application static variables.
+     *
+     * @param {String|Array|Object} source
+     * @returns {Array|Object}
+     */
+    function setProviderSource(source) {
+      return _setSource(source);
+    }
+
+    /**
+     * @namespace $static
+     * @memberof source.static.$staticProvider
+     *
+     * @requires $q
+     * @requires $api
+     *
+     * @description
+     * Factory statement to manage static variables for application.
+     */
+    function $get($q, $api) {
+      return {
+        $: $,
+        get: getStatics
+      };
+
+      /**
+       * @name _getStaticPromises
+       * @memberof source.static.$staticProvider.$static
+       *
+       * @description
+       * Build an array with promises of all sources of static variables that are defined in the application.
+       *
+       * @returns {Array}
+       * @private
+       */
+      function _getStaticPromises() {
+        var _isArraySource = (angular.isArray(_source));
+        var _literalPromises = [];
+        angular.forEach(_source, function(itemDir, keyDir) {
+          if (_isArraySource) {
+            var entityObject = $api.createEntityObject({
+              entityName: itemDir,
+              forceToOne: true
+            });
+            _literalPromises.push($api.getLocalEntity(entityObject));
+          } else {
+            angular.forEach(itemDir, function(itemFile) {
+              var entityObject = $api.createEntityObject({
+                entityName: keyDir + '/' + itemFile,
+                forceToOne: true
+              });
+              _literalPromises.push($api.getLocalEntity(entityObject));
+            });
+          }
+        });
+        return _literalPromises;
+      }
+
+      /**
+       * @name _getStatics
+       * @memberof source.static.$staticProvider.$static
+       *
+       * @description
+       * Create a promise with all statics processed and merged into a single object.
+       * Set statics object.
+       *
+       * @returns {Promise}
+       * @private
+       */
+      function _getStatics() {
+        var _promisesToResolve = _getStaticPromises() ;
+        var _itemObject = {};
+        var _defer = $q.defer();
+        _statics = {};
+        $q.all(_promisesToResolve).then(function(success) {
+          angular.forEach(success, function(item) {
+            if (item.hasOwnProperty('documentName') && item.hasOwnProperty('documentType')) {
+              if (!angular.isObject(_itemObject[item.documentName])) {
+                _itemObject[item.documentName] = {};
+              }
+              _itemObject[item.documentName][item.documentType] = item;
+            } else {
+              var errorText = 'No required properties are found in static files';
+              throw new TypeError(errorText + ': "documentName" or "documentType"');
+            }
+            _statics = angular.extend({}, _statics, _itemObject);
+          });
+          _defer.resolve(_statics);
+        });
+        return _defer.promise;
+      }
+
+      /**
+       * @name getStatics
+       * @memberof source.static.$staticProvider.$static
+       *
+       * @description
+       * Returns literals object or its promise depending on whether the static variables have been set.
+       *
+       * @param {String} property
+       * @returns {Object|Promise}
+       */
+      function getStatics(property) {
+        var _property = property || null;
+        var output = null;
+        if (_statics && _property) {
+          if (_statics.hasOwnProperty(property)) {
+            output = _statics[property];
+          } else {
+            throw new ReferenceError('Trying to get statics property that does not exist: ("' + property + '")');
+          }
+        } else if (_statics) {
+          output = _statics;
+        } else {
+          output = _getStatics();
+        }
+        return output;
+      }
     }
   }
 })();
@@ -1554,192 +1970,6 @@
        */
       function error(message, title, duration) {
         _launchToast(toastFactoryModel, message, $.ERROR, title, duration);
-      }
-    }
-  }
-})();
-
-(function() {
-  'use strict';
-
-  /**
-   * @type Object
-   * @property {String} documentName
-   * @property {String} documentType
-   */
-
-  angular
-    .module('source.static')
-    /**
-     * @namespace $staticProvider
-     * @memberof source.static
-     *
-     * @requires globalConstantsProvider
-     *
-     * @description
-     * Provider statement to manage static variables for application.
-     */
-    .provider('$static', $static);
-
-  $static.$inject = ['globalConstantsProvider'];
-
-  function $static(globalConstantsProvider) {
-    var $ = globalConstantsProvider.get();
-    var _source = null;
-    var _statics = null;
-
-    return {
-      /* Global Constants */
-      $: $,
-      /* Provider LITERALS tools */
-      setSource: setProviderSource,
-      /* API Factory */
-      $get: ['$q', '$api', $get]
-    };
-
-    /**
-     * @name _setSource
-     * @memberof source.static.$staticProvider
-     *
-     * @description
-     * Private method to set JSON source files containing the application static variables.
-     *
-     * @param {String|Array|Object} source
-     * @returns {Array|Object}
-     * @private
-     */
-    function _setSource(source) {
-      var _isStringSource = (typeof source === 'string');
-      if (_isStringSource || angular.isObject(source)) {
-        _source = (_isStringSource) ? [source] : source ;
-      } else {
-        throw new TypeError('Wrong type argument: Static source must be string or array or object.');
-      }
-      return _source;
-    }
-
-    /**
-     * @name setProviderSource
-     * @memberof source.static.$staticProvider
-     *
-     * @description
-     * Provider public function to set JSON source files containing the application static variables.
-     *
-     * @param {String|Array|Object} source
-     * @returns {Array|Object}
-     */
-    function setProviderSource(source) {
-      return _setSource(source);
-    }
-
-    /**
-     * @namespace $static
-     * @memberof source.static.$staticProvider
-     *
-     * @requires $q
-     * @requires $api
-     *
-     * @description
-     * Factory statement to manage static variables for application.
-     */
-    function $get($q, $api) {
-      return {
-        $: $,
-        get: getStatics
-      };
-
-      /**
-       * @name _getStaticPromises
-       * @memberof source.static.$staticProvider.$static
-       *
-       * @description
-       * Build an array with promises of all sources of static variables that are defined in the application.
-       *
-       * @returns {Array}
-       * @private
-       */
-      function _getStaticPromises() {
-        var _isArraySource = (angular.isArray(_source));
-        var _literalPromises = [];
-        angular.forEach(_source, function(itemDir, keyDir) {
-          if (_isArraySource) {
-            var entityObject = $api.createEntityObject({
-              entityName: itemDir,
-              forceToOne: true
-            });
-            _literalPromises.push($api.getLocalEntity(entityObject));
-          } else {
-            angular.forEach(itemDir, function(itemFile) {
-              var entityObject = $api.createEntityObject({
-                entityName: keyDir + '/' + itemFile,
-                forceToOne: true
-              });
-              _literalPromises.push($api.getLocalEntity(entityObject));
-            });
-          }
-        });
-        return _literalPromises;
-      }
-
-      /**
-       * @name _getStatics
-       * @memberof source.static.$staticProvider.$static
-       *
-       * @description
-       * Create a promise with all statics processed and merged into a single object.
-       * Set statics object.
-       *
-       * @returns {Promise}
-       * @private
-       */
-      function _getStatics() {
-        var _promisesToResolve = _getStaticPromises() ;
-        var _itemObject = {};
-        var _defer = $q.defer();
-        _statics = {};
-        $q.all(_promisesToResolve).then(function(success) {
-          angular.forEach(success, function(item) {
-            if (item.hasOwnProperty('documentName') && item.hasOwnProperty('documentType')) {
-              if (!angular.isObject(_itemObject[item.documentName])) {
-                _itemObject[item.documentName] = {};
-              }
-              _itemObject[item.documentName][item.documentType] = item;
-            } else {
-              var errorText = 'No required properties are found in static files';
-              throw new TypeError(errorText + ': "documentName" or "documentType"');
-            }
-            _statics = angular.extend({}, _statics, _itemObject);
-          });
-          _defer.resolve(_statics);
-        });
-        return _defer.promise;
-      }
-
-      /**
-       * @name getStatics
-       * @memberof source.static.$staticProvider.$static
-       *
-       * @description
-       * Returns literals object or its promise depending on whether the static variables have been set.
-       *
-       * @param {String} property
-       * @returns {Object|Promise}
-       */
-      function getStatics(property) {
-        var _property = property || null;
-        var output = null;
-        if (_statics && _property) {
-          if (_statics.hasOwnProperty(property)) {
-            output = _statics[property];
-          } else {
-            throw new ReferenceError('Trying to get statics property that does not exist: ("' + property + '")');
-          }
-        } else if (_statics) {
-          output = _statics;
-        } else {
-          output = _getStatics();
-        }
-        return output;
       }
     }
   }
@@ -2126,7 +2356,13 @@
       ANIMATION_ITERATION: 'iteration',
       ANIMATION_END: 'end',
 
-      ACTIVATE_ANIMATION_CLASS: 'animated'
+      ACTIVATE_ANIMATION_CLASS: 'animated',
+
+      DATA_CONFIG_FILTER: 'filter',
+      DATA_CONFIG_FILTER_PARAMS: 'filterParams',
+      DATA_CONFIG_DISPLAY_CONCAT: 'displayConcat',
+      DATA_CONFIG_DISPLAY_PROPERTIES: 'displayProperties',
+      DATA_CONFIG_DISPLAY_PROPERTIES_NAME: 'displayPropertiesName'
     };
     var $ = angular.extend({}, _constants, $toolsProvider.$);
 
@@ -2155,6 +2391,13 @@
      * @property {Object} registeredAnimations
      * @property {Array} registeredAnimations.in
      * @property {Array} registeredAnimations.out
+     *
+     * @property {Object} dataConfig
+     * @property {String} dataConfig.filter
+     * @property {Object} dataConfig.filterParams
+     * @property {Boolean} dataConfig.displayConcat
+     * @property {Array} dataConfig.displayProperties
+     * @property {Boolean} dataConfig.displayPropertiesName
      * @private
      */
     var _providerModel = {
@@ -2177,6 +2420,13 @@
         registeredAnimations: {
           in: [],
           out: []
+        },
+        dataConfig: {
+          filter: null,
+          filterParams: null,
+          displayConcat: null,
+          displayProperties: null,
+          displayPropertiesName: null
         }
       }
     };
@@ -2282,7 +2532,7 @@
       getAnimationEvents: getAnimationEventsProvider,
       createDomHandlerObject: createDomHandlerObjectProvider,
       createAnimationObject: createAnimationObjectProvider,
-      $get: ['$filter', '$tools', $get]
+      $get: ['$filter', '$injector', '$tools', $get]
     };
 
     /**
@@ -2507,11 +2757,13 @@
      * @memberof source.view-logic.$appViewProvider
      *
      * @requires $filter
+     * @requires $injector
+     * @requires $tools
      *
      * @description
      * Factory statement for application view provider.
      */
-    function $get($filter, $tools) {
+    function $get($filter, $injector, $tools) {
       return {
         /* Global Constants */
         $: $,
@@ -2523,7 +2775,8 @@
         createDomHandlerObject: createDomHandlerObjectService,
         createAnimationObject: createAnimationObjectService,
         /* View tools */
-        applyFilter: applyFilter,
+        applyFilter: _applyFilter,
+        processData: _processData,
         /* DOM tools */
         checkElementByClass: checkElementByClass,
         show: showElement,
@@ -2690,10 +2943,70 @@
        *
        * @param {*} data
        * @param {String} filterName
+       * @param {Object} [filterParams]
        * @returns {*}
+       * @throws ReferenceError
+       * @private
        */
-      function applyFilter(data, filterName) {
-        return $filter(filterName)(data);
+      function _applyFilter(data, filterName, filterParams) {
+        if ($injector.has(filterName + 'Filter')) {
+          return $filter(filterName)(data, filterParams);
+        } else {
+          throw new ReferenceError('Unknown filter: "' + filterName + '".');
+        }
+      }
+
+      /**
+       * @name _processData
+       * @memberof source.view-logic.$appViewProvider.$appView
+       *
+       * @description
+       * Processing data to show filtered or formatted.
+       *
+       * @param {*} data
+       * @param {Object} config
+       * @returns {String}
+       * @private
+       */
+      function _processData(data, config) {
+        if (angular.isObject(config) && Object.keys(config).length) {
+          // var _config = $tools.setObjectUsingSchema($c.schemas.dataConfig, config, $.NO_MERGE, [$.NO_EXCEPTIONS]);
+          // var _filterCondition = (_config.hasOwnProperty($.DATA_CONFIG_FILTER));
+          // var _filterParamsCondition = (_config.hasOwnProperty($.DATA_CONFIG_FILTER_PARAMS));
+          // var _concatCondition = (_config.hasOwnProperty($.DATA_CONFIG_DISPLAY_CONCAT));
+          // var _propertiesCondition = (_config.hasOwnProperty($.DATA_CONFIG_DISPLAY_PROPERTIES));
+          // var _propertiesNameCondition = (_config.hasOwnProperty($.DATA_CONFIG_DISPLAY_PROPERTIES_NAME));
+          // var _filter = (_filterCondition) ? _config[$.DATA_CONFIG_FILTER] : undefined ;
+          // var _filterParams = (_filterParamsCondition) ? _config[$.DATA_CONFIG_FILTER_PARAMS] : undefined ;
+          // var _concat = (_concatCondition) ? _config[$.DATA_CONFIG_DISPLAY_CONCAT] : false ;
+          // var _properties = (_propertiesCondition) ? _config[$.DATA_CONFIG_DISPLAY_PROPERTIES] : undefined ;
+          // var _propertiesName = (_propertiesNameCondition) ? _config[$.DATA_CONFIG_DISPLAY_PROPERTIES_NAME] : false ;
+          //
+          // console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
+          // console.log('##############################################');
+          // console.log(_filter);
+          // console.log(_filterParams);
+          // console.log(_concat);
+          // console.log(_properties);
+          // console.log(_propertiesName);
+          // console.log('##############################################');
+          // console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
+          if (angular.isObject(data)) {
+            //Puede ser dot.case, entonces no lleva displayProperties o se ignora
+
+            //Puede ser displayProperties, entonces se pintan esas properties
+
+            //Puede llevar displayConcat
+            //Puede llevar diaplayPropertiesNames
+
+            //No lleva ni displayProperties ni dot.case, entonces se pinta el object entero
+
+            //Si lleva displayPropertiesNames se pintan los names, si no no se pintan
+            //Si lleva displayConcat se pinta concatenado separado por comas, si no se pinta con saltos de línea
+          }
+        } else {
+          throw new Error('Configuration given is not an Object or configuration Object is void.');
+        }
       }
 
       /**
@@ -2808,6 +3121,8 @@
 
       MERGE: true,
       NO_MERGE: false,
+
+      NO_EXCEPTIONS: 'noExceptions',
 
       KEY: {
         ESCAPE: {
@@ -3213,15 +3528,16 @@
      * @param {Object} objectSettings
      * @param {Boolean|Object} mergeOption --> If Boolean: true to merge with schema, false no merge with schema.
      *                                     --> If Object, merge with given object.
+     * @param {Array} options --> "noExceptions": to prevent exceptions.
      * @returns {Object}
      * @private
      */
-    function _setObjectUsingSchema(objectSchema, objectSettings, mergeOption) {
+    function _setObjectUsingSchema(objectSchema, objectSettings, mergeOption, options) {
       var output = {};
       angular.forEach(objectSettings, function(item, key) {
         if (objectSchema.hasOwnProperty(key)) {
           output[key] = item;
-        } else {
+        } else if (options.indexOf($.NO_EXCEPTIONS) < 0) {
           throw new Error('Trying to set an unknown property ("' + key + '") in target object.');
         }
       });
@@ -3373,11 +3689,13 @@
      * @param {Object} objectSettings
      * @param {Boolean|Object} [mergeOption = false] --> If Boolean: true to merge schema, false no merge with schema.
      *                                               --> If Object, merge with given object.
+     * @param {Array} [options = []] --> "noExceptions": to prevent exceptions.
      * @returns {Object}
      */
-    function setObjectUsingSchemaProvider(objectSchema, objectSettings, mergeOption) {
+    function setObjectUsingSchemaProvider(objectSchema, objectSettings, mergeOption, options) {
       mergeOption = mergeOption || $.NO_MERGE;
-      return _setObjectUsingSchema(objectSchema, objectSettings, mergeOption);
+      options = options || [];
+      return _setObjectUsingSchema(objectSchema, objectSettings, mergeOption, options);
     }
 
     /**
@@ -3664,11 +3982,13 @@
        * @param {Object} objectSettings
        * @param {Boolean|Object} [mergeOption = true] --> If Boolean: true to merge schema, false no merge with schema.
        *                                              --> If Object, merge with given object.
+       * @param {Array} [options = []] --> "noExceptions": to prevent exceptions.
        * @returns {Object}
        */
-      function setObjectUsingSchema(objectSchema, objectSettings, mergeOption) {
+      function setObjectUsingSchema(objectSchema, objectSettings, mergeOption, options) {
         mergeOption = mergeOption || $.NO_MERGE;
-        return _setObjectUsingSchema(objectSchema, objectSettings, mergeOption);
+        options = options || [];
+        return _setObjectUsingSchema(objectSchema, objectSettings, mergeOption, options);
       }
 
       /**
