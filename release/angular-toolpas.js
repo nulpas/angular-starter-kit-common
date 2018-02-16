@@ -2392,12 +2392,12 @@
      * @property {Array} registeredAnimations.in
      * @property {Array} registeredAnimations.out
      *
-     * @property {Object} processDataConfig
-     * @property {String} processDataConfig.filter
-     * @property {Object} processDataConfig.filterParams
-     * @property {Boolean} processDataConfig.displayConcat
-     * @property {Object} processDataConfig.displayProperties
-     * @property {Boolean} processDataConfig.displayPropertiesName
+     * @property {Object} dataConfig
+     * @property {String} dataConfig.filter
+     * @property {Object} dataConfig.filterParams
+     * @property {Boolean} dataConfig.displayConcat
+     * @property {Array} dataConfig.displayProperties
+     * @property {Boolean} dataConfig.displayPropertiesName
      * @private
      */
     var _providerModel = {
@@ -2421,7 +2421,7 @@
           in: [],
           out: []
         },
-        processDataConfig: {
+        dataConfig: {
           filter: null,
           filterParams: null,
           displayConcat: null,
@@ -2970,8 +2970,27 @@
        */
       function _processData(data, config) {
         if (angular.isObject(config) && Object.keys(config).length) {
-          var _config = $tools.setObjectUsingSchema($c.schemas.processDataConfig, config, $.MERGE, [$.NO_EXCEPTIONS]);
-          console.log(_config);
+          // var _config = $tools.setObjectUsingSchema($c.schemas.dataConfig, config, $.NO_MERGE, [$.NO_EXCEPTIONS]);
+          // var _filterCondition = (_config.hasOwnProperty($.DATA_CONFIG_FILTER));
+          // var _filterParamsCondition = (_config.hasOwnProperty($.DATA_CONFIG_FILTER_PARAMS));
+          // var _concatCondition = (_config.hasOwnProperty($.DATA_CONFIG_DISPLAY_CONCAT));
+          // var _propertiesCondition = (_config.hasOwnProperty($.DATA_CONFIG_DISPLAY_PROPERTIES));
+          // var _propertiesNameCondition = (_config.hasOwnProperty($.DATA_CONFIG_DISPLAY_PROPERTIES_NAME));
+          // var _filter = (_filterCondition) ? _config[$.DATA_CONFIG_FILTER] : undefined ;
+          // var _filterParams = (_filterParamsCondition) ? _config[$.DATA_CONFIG_FILTER_PARAMS] : undefined ;
+          // var _concat = (_concatCondition) ? _config[$.DATA_CONFIG_DISPLAY_CONCAT] : false ;
+          // var _properties = (_propertiesCondition) ? _config[$.DATA_CONFIG_DISPLAY_PROPERTIES] : undefined ;
+          // var _propertiesName = (_propertiesNameCondition) ? _config[$.DATA_CONFIG_DISPLAY_PROPERTIES_NAME] : false ;
+          //
+          // console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
+          // console.log('##############################################');
+          // console.log(_filter);
+          // console.log(_filterParams);
+          // console.log(_concat);
+          // console.log(_properties);
+          // console.log(_propertiesName);
+          // console.log('##############################################');
+          // console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
           if (angular.isObject(data)) {
             //Puede ser dot.case, entonces no lleva displayProperties o se ignora
 

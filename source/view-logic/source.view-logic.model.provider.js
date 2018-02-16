@@ -79,12 +79,12 @@
      * @property {Array} registeredAnimations.in
      * @property {Array} registeredAnimations.out
      *
-     * @property {Object} processDataConfig
-     * @property {String} processDataConfig.filter
-     * @property {Object} processDataConfig.filterParams
-     * @property {Boolean} processDataConfig.displayConcat
-     * @property {Array} processDataConfig.displayProperties
-     * @property {Boolean} processDataConfig.displayPropertiesName
+     * @property {Object} dataConfig
+     * @property {String} dataConfig.filter
+     * @property {Object} dataConfig.filterParams
+     * @property {Boolean} dataConfig.displayConcat
+     * @property {Array} dataConfig.displayProperties
+     * @property {Boolean} dataConfig.displayPropertiesName
      * @private
      */
     var _providerModel = {
@@ -108,12 +108,12 @@
           in: [],
           out: []
         },
-        processDataConfig: {
+        dataConfig: {
           filter: null,
           filterParams: null,
-          displayConcat: false,
+          displayConcat: null,
           displayProperties: null,
-          displayPropertiesName: false
+          displayPropertiesName: null
         }
       }
     };
