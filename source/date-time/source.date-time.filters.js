@@ -57,7 +57,16 @@
      * @description
      * Filter that shows complete date and complete hour.
      */
-    .filter('completeDateHour', completeDateHour);
+    .filter('completeDateHour', completeDateHour)
+
+    /**
+     * @namespace onlyDate
+     * @memberof source.date-time
+     *
+     * @description
+     * Filter that shows only date without hour.
+     */
+    .filter('onlyDate', onlyDate);
 
   function onlyHour() {
     return _onlyHour;
@@ -176,7 +185,26 @@
      * @private
      */
     function _completeDateHour(date) {
-      return (Date.parse(date)) ? moment(date).format('D/MM/YYYY HH:mm:ss') : date ;
+      return (Date.parse(date)) ? moment(date).format('DD/MM/YYYY HH:mm:ss') : date ;
+    }
+  }
+
+  function onlyDate() {
+    return _onlyDate;
+
+    /**
+     * @name _onlyDate
+     * @memberof source.date-time.onlyDate
+     *
+     * @description
+     * Returns only date without hour.
+     *
+     * @param {*} date
+     * @returns {String|*}
+     * @private
+     */
+    function _onlyDate(date) {
+      return (Date.parse(date)) ? moment(date).format('DD/MM/YYYY') : date ;
     }
   }
 })();

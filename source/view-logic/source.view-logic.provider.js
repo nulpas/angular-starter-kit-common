@@ -275,8 +275,8 @@
         createDomHandlerObject: createDomHandlerObjectService,
         createAnimationObject: createAnimationObjectService,
         /* View tools */
-        applyFilter: _applyFilter,
-        processData: _processData,
+        applyFilter: applyFilter,
+        processData: processData,
         /* DOM tools */
         checkElementByClass: checkElementByClass,
         show: showElement,
@@ -347,6 +347,85 @@
                 domElement.attr('class', _domHandler.classToHide);
               });
             break;
+        }
+      }
+
+      /**
+       * @name _setConcatWay
+       * @memberof source.view-logic.$appViewProvider.$appView
+       *
+       * @description
+       * Setting "glue" to concat array as string.
+       * This is an auxiliary method for processData and _processDataObject.
+       *
+       * @param {Boolean|String} concatWay
+       * @returns {String}
+       * @private
+       */
+      function _setConcatWay(concatWay) {
+        var output = '<br>';
+        if ((typeof concatWay === 'boolean') && concatWay) {
+          output = ', ';
+        } else if (angular.isString(concatWay)) {
+          output = concatWay;
+        }
+        return output;
+      }
+
+      /**
+       * @name _processDataObject
+       * @memberof source.view-logic.$appViewProvider.$appView
+       *
+       * @description
+       * Processing data (only objects) to show filtered or formatted.
+       * This is an auxiliary method for processData.
+       *
+       * @param {Object} data
+       * @param {Object} config
+       * @param {Object} completeRowData
+       * @returns {String}
+       * @throws TypeError
+       * @private
+       */
+      function _processDataObject(data, config, completeRowData) {
+        if (angular.isObject(data)) {
+          var _outputAux = [];
+          var _outputNamesAux = [];
+          if (config[$.DATA_CONFIG_NAME].indexOf('.') > -1) {
+            _outputAux.push($tools.getValueFromDotedKey(completeRowData, config[$.DATA_CONFIG_NAME]));
+            var _arrayAux = config[$.DATA_CONFIG_NAME].split('.');
+            _outputNamesAux.push(_arrayAux.pop());
+          } else if (config[$.DATA_CONFIG_DISPLAY_PROPERTIES]) {
+            var _auxDisplayProperties = config[$.DATA_CONFIG_DISPLAY_PROPERTIES];
+            if (typeof _auxDisplayProperties === 'string') {
+              _auxDisplayProperties = _auxDisplayProperties.split(',').map(function(element) {
+                return element.trim();
+              });
+            }
+            angular.forEach(_auxDisplayProperties, function(value) {
+              if (data.hasOwnProperty(value)) {
+                _outputAux.push(data[value]);
+                _outputNamesAux.push(value);
+              }
+            });
+          } else {
+            angular.forEach(data, function(value, key) {
+              _outputAux.push(value);
+              _outputNamesAux.push(key);
+            });
+          }
+
+          var _outputArrayAux = [];
+          angular.forEach(_outputAux, function(value, key) {
+            var _filtered = applyFilter(value, config[$.DATA_CONFIG_FILTER], config[$.DATA_CONFIG_FILTER_PARAMS]);
+            var _filteredOk = (_filtered) ? _filtered : '' ;
+            var _names = (config[$.DATA_CONFIG_DISPLAY_PROPERTIES_NAME]) ? _outputNamesAux[key] + ': ' : '' ;
+            _outputArrayAux.push(_names + _filteredOk);
+          });
+
+          return _outputArrayAux.join(_setConcatWay(config[$.DATA_CONFIG_DISPLAY_CONCAT]));
+        } else {
+          throw new TypeError('Data given is not an object: ("' + data + '")');
         }
       }
 
@@ -435,7 +514,7 @@
       }
 
       /**
-       * @name _applyFilter
+       * @name applyFilter
        * @memberof source.view-logic.$appViewProvider.$appView
        *
        * @description
@@ -446,18 +525,21 @@
        * @param {Object} [filterParams]
        * @returns {*}
        * @throws ReferenceError
-       * @private
        */
-      function _applyFilter(data, filterName, filterParams) {
-        if ($injector.has(filterName + 'Filter')) {
-          return $filter(filterName)(data, filterParams);
-        } else {
-          throw new ReferenceError('Unknown filter: "' + filterName + '".');
+      function applyFilter(data, filterName, filterParams) {
+        var output = data;
+        if (data && filterName) {
+          if ($injector.has(filterName + 'Filter')) {
+            output = $filter(filterName)(data, filterParams);
+          } else {
+            throw new ReferenceError('Unknown filter: "' + filterName + '".');
+          }
         }
+        return output;
       }
 
       /**
-       * @name _processData
+       * @name processData
        * @memberof source.view-logic.$appViewProvider.$appView
        *
        * @description
@@ -465,44 +547,41 @@
        *
        * @param {*} data
        * @param {Object} config
+       * @param {Object} [completeDataRow]
+       * @throws Error
+       * @throws ReferenceError
        * @returns {String}
-       * @private
        */
-      function _processData(data, config) {
+      function processData(data, config, completeDataRow) {
+        if (config[$.DATA_CONFIG_NAME].indexOf('.') > -1) {
+          data = $tools.getValueFromDotedKey(completeDataRow, config[$.DATA_CONFIG_NAME]);
+        }
         if (angular.isObject(config) && Object.keys(config).length) {
-          // var _config = $tools.setObjectUsingSchema($c.schemas.dataConfig, config, $.NO_MERGE, [$.NO_EXCEPTIONS]);
-          // var _filterCondition = (_config.hasOwnProperty($.DATA_CONFIG_FILTER));
-          // var _filterParamsCondition = (_config.hasOwnProperty($.DATA_CONFIG_FILTER_PARAMS));
-          // var _concatCondition = (_config.hasOwnProperty($.DATA_CONFIG_DISPLAY_CONCAT));
-          // var _propertiesCondition = (_config.hasOwnProperty($.DATA_CONFIG_DISPLAY_PROPERTIES));
-          // var _propertiesNameCondition = (_config.hasOwnProperty($.DATA_CONFIG_DISPLAY_PROPERTIES_NAME));
-          // var _filter = (_filterCondition) ? _config[$.DATA_CONFIG_FILTER] : undefined ;
-          // var _filterParams = (_filterParamsCondition) ? _config[$.DATA_CONFIG_FILTER_PARAMS] : undefined ;
-          // var _concat = (_concatCondition) ? _config[$.DATA_CONFIG_DISPLAY_CONCAT] : false ;
-          // var _properties = (_propertiesCondition) ? _config[$.DATA_CONFIG_DISPLAY_PROPERTIES] : undefined ;
-          // var _propertiesName = (_propertiesNameCondition) ? _config[$.DATA_CONFIG_DISPLAY_PROPERTIES_NAME] : false ;
-          //
-          // console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
-          // console.log('##############################################');
-          // console.log(_filter);
-          // console.log(_filterParams);
-          // console.log(_concat);
-          // console.log(_properties);
-          // console.log(_propertiesName);
-          // console.log('##############################################');
-          // console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
-          if (angular.isObject(data)) {
-            //Puede ser dot.case, entonces no lleva displayProperties o se ignora
+          if (config.hasOwnProperty($.DATA_CONFIG_NAME)) {
+            completeDataRow = completeDataRow || null;
+            var _config = $tools.setObjectUsingSchema($c.schemas.dataConfig, config, $.NO_MERGE, [$.NO_EXCEPTIONS]);
+            var _filter = _config[$.DATA_CONFIG_FILTER];
+            var _filterParams = _config[$.DATA_CONFIG_FILTER_PARAMS];
 
-            //Puede ser displayProperties, entonces se pintan esas properties
-
-            //Puede llevar displayConcat
-            //Puede llevar diaplayPropertiesNames
-
-            //No lleva ni displayProperties ni dot.case, entonces se pinta el object entero
-
-            //Si lleva displayPropertiesNames se pintan los names, si no no se pintan
-            //Si lleva displayConcat se pinta concatenado separado por comas, si no se pinta con saltos de línea
+            var output = '';
+            if (angular.isArray(data)) {
+              var _outputArrayAux = [];
+              angular.forEach(data, function(value) {
+                if (angular.isObject(value)) {
+                  _outputArrayAux.push(_processDataObject(value, _config, completeDataRow));
+                } else {
+                  _outputArrayAux.push(applyFilter(value, _filter, _filterParams));
+                }
+              });
+              output = _outputArrayAux.join(_setConcatWay(_config[$.DATA_CONFIG_DISPLAY_CONCAT]));
+            } else if (angular.isObject(data)) {
+              output = _processDataObject(data, _config, completeDataRow);
+            } else {
+              output = applyFilter(data, _filter, _filterParams);
+            }
+            return (output) ? output : '' ;
+          } else {
+            throw new ReferenceError('Name is not defined for data field ("' + data + '") in configuration object.');
           }
         } else {
           throw new Error('Configuration given is not an Object or configuration Object is void.');

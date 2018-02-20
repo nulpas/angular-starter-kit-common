@@ -45,6 +45,7 @@
 
       ACTIVATE_ANIMATION_CLASS: 'animated',
 
+      DATA_CONFIG_NAME: 'name',
       DATA_CONFIG_FILTER: 'filter',
       DATA_CONFIG_FILTER_PARAMS: 'filterParams',
       DATA_CONFIG_DISPLAY_CONCAT: 'displayConcat',
@@ -109,6 +110,7 @@
           out: []
         },
         dataConfig: {
+          name: null,
           filter: null,
           filterParams: null,
           displayConcat: null,
