@@ -18,7 +18,7 @@
     moment.tz.setDefault(moment.tz.guess());
 
     $mdDateLocaleProvider.formatDate = function(date) {
-      return moment(date).format('DD/MM/YYYY');
+      return (date) ? moment(date).format('DD/MM/YYYY') : '' ;
     };
   }
 })();

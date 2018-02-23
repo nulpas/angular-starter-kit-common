@@ -67,7 +67,13 @@
 
       BROWSER_IE: 'ie',
       BROWSER_EDGE: 'ms-edge',
-      BROWSER_CHROME: 'chrome'
+      BROWSER_CHROME: 'chrome',
+
+      UNIQUE_ELEMENTS: true,
+      REPEATED_ELEMENTS: false,
+
+      TYPE_STRING: 'string',
+      TYPE_LIST: 'list'
     };
 
     return {

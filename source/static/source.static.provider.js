@@ -98,10 +98,9 @@
        * @private
        */
       function _getStaticPromises() {
-        var _isArraySource = (angular.isArray(_source));
         var _literalPromises = [];
         angular.forEach(_source, function(itemDir, keyDir) {
-          if (_isArraySource) {
+          if (angular.isArray(_source)) {
             var entityObject = $api.createEntityObject({
               entityName: itemDir,
               forceToOne: true

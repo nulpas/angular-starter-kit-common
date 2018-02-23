@@ -7,31 +7,31 @@
      * @namespace $translateProvider
      * @memberof source.translate
      *
+     * @requires $toolsProvider
      * @requires $apiProvider
+     * @requires translateModelProvider
      *
      * @description
      * Provider definition for translation labels.
      */
     .provider('$translate', $translate);
 
-  $translate.$inject = ['$apiProvider'];
+  $translate.$inject = ['$toolsProvider', '$apiProvider', 'translateModelProvider'];
 
-  function $translate($apiProvider) {
-    var _translateConfig = {
-      apiTranslationSource: null,
-      apiTranslationSections: null,
-      localTranslationSource: null,
-      localTranslationSections: null,
-      preferredDefaultLanguage: null
-    };
+  function $translate($toolsProvider, $apiProvider, translateModelProvider) {
+    var $ = translateModelProvider.$;
+    var $c = translateModelProvider.get();
+    var _translateConfig = $c.schemas.translateConfig;
 
     return {
+      $: $,
       setApiTranslationSource: setApiTranslationSource,
       setApiTranslationSections: setApiTranslationSections,
       setLocalTranslationSource: setLocalTranslationSource,
       setLocalTranslationSections: setLocalTranslationSections,
+      setTranslationsPath: setTranslationsPath,
       setPreferredLanguage: setPreferredLanguage,
-      $get: ['$api', 'availableLanguages', $get]
+      $get: ['$api', 'translateModel', $get]
     };
 
     /**
@@ -42,17 +42,43 @@
      * Set configurations for _translateConfig object.
      *
      * @param {String} configKey
-     * @param {String|Object} value
+     * @param {String|Object|Array} value
+     * @param {String|Array} valueProperties
+     * @param {String} valueType
      * @returns {Object}
      * @private
      */
-    function _setTranslationConfigProperty(configKey, value) {
-      value = (typeof value === 'string') ? $apiProvider.createEntityObject({ entityName: value }) : value ;
-      if (value && typeof value === 'object') {
-        _translateConfig[configKey] = value;
-        return _translateConfig;
+    function _setTranslationConfigProperty(configKey, value, valueProperties, valueType) {
+      if (configKey && typeof configKey === 'string') {
+        if (_translateConfig.hasOwnProperty(configKey)) {
+          switch (valueType) {
+            case $.TYPE_STRING:
+              if (value && typeof value === 'string') {
+                _translateConfig[configKey] = value;
+              } else {
+                throw new Error('Value for ' + configKey + ' is missing or type does not match: (' + value + ').');
+              }
+              break;
+            case $.TYPE_LIST:
+              _translateConfig[configKey] = $toolsProvider.readStringListUnique(value, valueProperties);
+              break;
+            default:
+              throw new Error('Unknown value type: (' + valueType + ').');
+          }
+          return _translateConfig;
+        } else {
+          var _referenceError = [
+            'Trying to set an unknown property ("' + configKey + '")',
+            'into translate configuration object.'
+          ];
+          throw new ReferenceError(_referenceError.join(' '));
+        }
       } else {
-        throw new Error('Lost parameter or type parameter wrong');
+        var _error = [
+          'Key of translate configuration object is missing',
+          'or type does not match: (' + configKey + ').'
+        ];
+        throw new Error(_error.join(' '));
       }
     }
 
@@ -61,13 +87,15 @@
      * @memberof source.translate.$translateProvider
      *
      * @description
-     * Set entity name for calling API to return translation labels.
+     * Set list of API entity names to calling translations for external resources.
      *
-     * @param {String} entityName
+     * @param {String|Array|Object} value
+     * @param {String|Array} [valueProperties = null]
      * @returns {Object}
      */
-    function setApiTranslationSource(entityName) {
-      return _setTranslationConfigProperty('apiTranslationSource', entityName);
+    function setApiTranslationSource(value, valueProperties) {
+      valueProperties = valueProperties || null;
+      return _setTranslationConfigProperty($.API_TRANSLATION_SOURCE, value, valueProperties, $.TYPE_LIST);
     }
 
     /**
@@ -77,11 +105,13 @@
      * @description
      * Set sections from API response where will be found translations labels.
      *
-     * @param {Object} sections
+     * @param {String|Array|Object} value
+     * @param {String|Array} [valueProperties = null]
      * @returns {Object}
      */
-    function setApiTranslationSections(sections) {
-      return _setTranslationConfigProperty('apiTranslationSections', sections);
+    function setApiTranslationSections(value, valueProperties) {
+      valueProperties = valueProperties || null;
+      return _setTranslationConfigProperty($.API_TRANSLATION_SECTIONS, value, valueProperties, $.TYPE_LIST);
     }
 
     /**
@@ -89,13 +119,15 @@
      * @memberof source.translate.$translateProvider
      *
      * @description
-     * Set file name for local JSON file where we will be found translation labels.
+     * Set files names list for local JSON files where we will be found translation labels.
      *
-     * @param {String} jsonFileName
+     * @param {String|Array|Object} value
+     * @param {String|Array} [valueProperties = null]
      * @returns {Object}
      */
-    function setLocalTranslationSource(jsonFileName) {
-      return _setTranslationConfigProperty('localTranslationSource', jsonFileName);
+    function setLocalTranslationSource(value, valueProperties) {
+      valueProperties = valueProperties || null;
+      return _setTranslationConfigProperty($.LOCAL_TRANSLATION_SOURCE, value, valueProperties, $.TYPE_LIST);
     }
 
     /**
@@ -105,11 +137,27 @@
      * @description
      * Set sections from local JSON file where will be found translations labels.
      *
-     * @param {Object} sections
+     * @param {String|Array|Object} value
+     * @param {String|Array} [valueProperties = null]
      * @returns {Object}
      */
-    function setLocalTranslationSections(sections) {
-      return _setTranslationConfigProperty('localTranslationSections', sections);
+    function setLocalTranslationSections(value, valueProperties) {
+      valueProperties = valueProperties || null;
+      return _setTranslationConfigProperty($.LOCAL_TRANSLATION_SECTIONS, value, valueProperties, $.TYPE_LIST);
+    }
+
+    /**
+     * @name setTranslationsPath
+     * @memberof source.translate.$translateProvider
+     *
+     * @description
+     * Set directory path to local JSON files that contains translations.
+     *
+     * @param {String} pathToTranslations
+     * @returns {Object}
+     */
+    function setTranslationsPath(pathToTranslations) {
+      return _setTranslationConfigProperty($.LOCAL_TRANSLATIONS_PATH, pathToTranslations, undefined, $.TYPE_STRING);
     }
 
     /**
@@ -123,8 +171,7 @@
      * @returns {Object}
      */
     function setPreferredLanguage(preferredLocale) {
-      _translateConfig.preferredDefaultLanguage = preferredLocale;
-      return _translateConfig;
+      return _setTranslationConfigProperty($.DEFAULT_LANGUAGE_CLIENT, preferredLocale, undefined, $.TYPE_STRING);
     }
 
     /**
@@ -132,62 +179,104 @@
      * @memberof source.translate.$translateProvider
      *
      * @requires $api
-     * @requires availableLanguages
+     * @requires translateModel
      *
      * @description
      * Factory definition for translation labels.
      */
-    function $get($api, availableLanguages) {
-      var _translations = {};
+    function $get($api, translateModel) {
+      var $ = translateModel.$;
       var _appLanguage = null;
-
-      var $apiConstants = $api.$;
+      var _appTranslations = {};
 
       return {
+        $: $,
         initTranslationModule: initTranslationModule,
         getTranslations: getTranslations,
-        getActualLanguage: getActualLanguage,
+        getCurrentLanguage: getCurrentLanguage,
         getAvailableLanguages: getAvailableLanguages
       };
 
       /**
-       * @name _initTranslationModule
+       * @name _setCurrentLanguage
        * @memberof source.translate.$translateProvider.$translate
        *
        * @description
-       * Search for translation labels in source given by "source" parameter.
+       * Method to setting current language of application.
+       * If "languageLocale" is not defined, method try to set translate config "defaultLanguageClient".
+       * Otherwise default language constant is set as current language.
        *
-       * @param {String} source --> Can be LOCAL or SERVER
-       * @returns {Promise|Null}
+       * @param {String} [languageLocale]
+       * @returns {Object}
+       * @throws ReferenceError
+       * @throws TypeError
        * @private
        */
-      function _initTranslationModule(source) {
-        var config = {
-          source: _translateConfig.apiTranslationSource,
-          sections: _translateConfig.apiTranslationSections,
-          process: $api.getEntity
-        };
-        if (source === $apiConstants.API_LOCAL) {
-          config.source = _translateConfig.localTranslationSource;
-          config.sections = _translateConfig.localTranslationSections;
-          config.process = $api.getLocalEntity;
-        }
-        if (config.source) {
-          return config.process(config.source, function(success) {
-            var localTranslations = success.data;
-            if (config.sections) {
-              angular.forEach(config.sections, function(item) {
-                if (localTranslations.hasOwnProperty(item) && typeof localTranslations[item] === 'object') {
-                  _translations = angular.extend({}, _translations, localTranslations[item]);
-                }
-              });
+      function _setCurrentLanguage(languageLocale) {
+        languageLocale = languageLocale || null;
+        var _localeToSet = (languageLocale) ?  languageLocale : _translateConfig[$.DEFAULT_LANGUAGE_CLIENT] ;
+        if (_localeToSet) {
+          if (typeof _localeToSet === 'string') {
+            if ($.AVAILABLE_LANGUAGES.hasOwnProperty(_localeToSet)) {
+              _appLanguage = $.AVAILABLE_LANGUAGES[_localeToSet];
             } else {
-              _translations = angular.extend({}, _translations, localTranslations);
+              throw new ReferenceError('Trying to set an unknown language: "' + _localeToSet + '".');
             }
+          } else {
+            throw new TypeError('Language locale type does not match: (' + typeof _localeToSet + ').');
+          }
+        } else {
+          _appLanguage = $.DEFAULT_LANGUAGE;
+          var _referenceError = [
+            'Local code is not defined. Setting ' + _appLanguage.name,
+            '(' + _appLanguage.locale + ') automatically. Please, revise config statement.'
+          ];
+          console.error(ReferenceError(_referenceError.join(' ')));
+        }
+        return _appLanguage;
+      }
+
+      /**
+       * @name _getTranslationsPromises
+       * @memberof source.translate.$translateProvider.$translate
+       *
+       * @description
+       * Search for translation locations for language defined with "locale" variable and returns array of promises.
+       * WARNING: This method set "_appLanguage" factory variable, therefore "_getTranslationsPromises" should be
+       * called just once at the beginning of the application and each time the application language is changed.
+       *
+       * @param {String} [locale]
+       * @returns {Array}
+       * @throws Error
+       * @private
+       */
+      function _getTranslationsPromises(locale) {
+        var output = [];
+        var _apiTranslationSource = _translateConfig[$.API_TRANSLATION_SOURCE];
+        var _localTranslationSource = _translateConfig[$.LOCAL_TRANSLATION_SOURCE];
+        var _localTranslationsPath = _translateConfig[$.LOCAL_TRANSLATIONS_PATH];
+        var _defaultLanguage = _setCurrentLanguage(locale);
+        if (_apiTranslationSource && _apiTranslationSource.length) {
+          angular.forEach(_apiTranslationSource, function(element) {
+            var _entityObject = $api.createEntityObject({ entityName: _defaultLanguage.locale + '/' + element });
+            output.push($api.getEntity(_entityObject));
           });
         }
-
-        return null;
+        if (_localTranslationSource && _localTranslationSource.length) {
+          var _localTranslationsPathSource = (_localTranslationsPath) ? _localTranslationsPath + '/' : '' ;
+          angular.forEach(_localTranslationSource, function(element) {
+            var _entityObject = $api.createEntityObject({
+              entityName: _localTranslationsPathSource + _defaultLanguage.locale + '/' + element,
+              forceToOne: true
+            });
+            output.push($api.getLocalEntity(_entityObject));
+          });
+        }
+        if (output.length) {
+          return output;
+        } else {
+          throw new Error('No local or remote translations have been defined. Revise config statement');
+        }
       }
 
       /**
@@ -197,26 +286,11 @@
        * @description
        * Search for translation labels in both sources: LOCAL and SERVER.
        *
+       * @param {String} [languageLocale]
        * @returns {Array}
        */
-      function initTranslationModule() {
-        var translationsModules = [
-          _initTranslationModule($apiConstants.API_LOCAL),
-          _initTranslationModule($apiConstants.API_SERVER)
-        ];
-        var terms = {
-          one: _translateConfig.preferredDefaultLanguage,
-          two: typeof _translateConfig.preferredDefaultLanguage === 'string',
-          three: availableLanguages.languages.hasOwnProperty(_translateConfig.preferredDefaultLanguage)
-        };
-        if (terms.one && terms.two && terms.three) {
-          _appLanguage = availableLanguages.languages[_translateConfig.preferredDefaultLanguage];
-        } else {
-          _appLanguage = availableLanguages.default;
-          throw new Error('Locale code not found. Setting "en" automatically. Please, revise config statement.');
-        }
-
-        return translationsModules;
+      function initTranslationModule(languageLocale) {
+        return _getTranslationsPromises(languageLocale);
       }
 
       /**
@@ -229,19 +303,19 @@
        * @returns {Object}
        */
       function getTranslations() {
-        return _translations;
+        return _appTranslations;
       }
 
       /**
-       * @name getActualLanguage
+       * @name getCurrentLanguage
        * @memberof source.translate.$translateProvider.$translate
        *
        * @description
-       * Catch actual defined language variable: "_appLanguage"
+       * Catch current defined language variable: "_appLanguage"
        *
        * @returns {Object}
        */
-      function getActualLanguage() {
+      function getCurrentLanguage() {
         return _appLanguage;
       }
 
@@ -255,7 +329,7 @@
        * @returns {Object}
        */
       function getAvailableLanguages() {
-        return availableLanguages.languages;
+        return $.AVAILABLE_LANGUAGES;
       }
     }
   }
