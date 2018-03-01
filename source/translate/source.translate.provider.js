@@ -31,7 +31,7 @@
       setLocalTranslationSections: setLocalTranslationSections,
       setTranslationsPath: setTranslationsPath,
       setPreferredLanguage: setPreferredLanguage,
-      $get: ['$api', 'translateModel', $get]
+      $get: ['$q', '$api', 'translateModel', $get]
     };
 
     /**
@@ -178,13 +178,14 @@
      * @namespace $translate
      * @memberof source.translate.$translateProvider
      *
+     * @requires $q
      * @requires $api
      * @requires translateModel
      *
      * @description
      * Factory definition for translation labels.
      */
-    function $get($api, translateModel) {
+    function $get($q, $api, translateModel) {
       var $ = translateModel.$;
       var _appLanguage = null;
       var _appTranslations = {};
@@ -280,6 +281,30 @@
       }
 
       /**
+       * @name _initTranslationModule
+       * @memberof source.translate.$translateProvider.$translate
+       *
+       * @description
+       * Resolve array of translation promises to set "_appTranslations" variable
+       * and returns promise by $q.all method.
+       *
+       * @param {String} locale
+       * @returns {Promise}
+       * @private
+       */
+      function _initTranslationModule(locale) {
+        var _promises = _getTranslationsPromises(locale);
+        _appTranslations = {};
+        return $q.all(_promises).then(function(success) {
+          var _arrayMerged = [];
+          angular.forEach(success, function(value) {
+            _arrayMerged = _.merge(_arrayMerged, value);
+          });
+          _appTranslations = _arrayMerged;
+        });
+      }
+
+      /**
        * @name initTranslationModule
        * @memberof source.translate.$translateProvider.$translate
        *
@@ -287,10 +312,10 @@
        * Search for translation labels in both sources: LOCAL and SERVER.
        *
        * @param {String} [languageLocale]
-       * @returns {Array}
+       * @returns {Promise}
        */
       function initTranslationModule(languageLocale) {
-        return _getTranslationsPromises(languageLocale);
+        return _initTranslationModule(languageLocale);
       }
 
       /**
