@@ -34,22 +34,26 @@
         es: {
           locale: 'es',
           name: 'Spanish',
-          sourceName: 'Español'
+          sourceName: 'Español',
+          firstDayOfWeek: 1
         },
         fr: {
           locale: 'fr',
           name: 'French',
-          sourceName: 'Français'
+          sourceName: 'Français',
+          firstDayOfWeek: 1
         },
         de: {
           locale: 'de',
           name: 'German',
-          sourceName: 'Deutsch'
+          sourceName: 'Deutsch',
+          firstDayOfWeek: 1
         },
         pt: {
           locale: 'pt',
           name: 'Portuguese',
-          sourceName: 'Português'
+          sourceName: 'Português',
+          firstDayOfWeek: 1
         }
       }
     };

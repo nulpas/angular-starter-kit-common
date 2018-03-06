@@ -72,6 +72,20 @@
 (function() {
   'use strict';
 
+  angular
+    /**
+     * @namespace source.numbers
+     * @memberof source
+     *
+     * @description
+     * Definition of module "numbers" for several tools and filters about numbers and currency data.
+     */
+    .module('source.numbers', []);
+})();
+
+(function() {
+  'use strict';
+
   /**
    * @namespace $urlRouterProvider
    * @memberof ui.router
@@ -92,20 +106,6 @@
       /* External Modules */
       'ui.router'
     ]);
-})();
-
-(function() {
-  'use strict';
-
-  angular
-    /**
-     * @namespace source.numbers
-     * @memberof source
-     *
-     * @description
-     * Definition of module "numbers" for several tools and filters about numbers and currency data.
-     */
-    .module('source.numbers', []);
 })();
 
 (function() {
@@ -1332,55 +1332,15 @@
   'use strict';
 
   angular
-  .module('source.router')
-  /**
-   * @namespace $router
-   * @memberof source.router
-   *
-   * @requires $state
-   * @requires $timeout
-   *
-   * @description
-   * Provider statement manage routing of the application.
-   */
-  .factory('$router', $router);
+    .module('source.date-time')
+    .run(dateTimeRun);
 
-  $router.$inject = ['$state', '$timeout'];
+  dateTimeRun.$inject = ['$mdDateLocale', '$translate'];
 
-  function $router($state, $timeout) {
-
-    return {
-      $state: $state,
-      resolveStateGo: resolveStateGo
-    };
-
-    /**
-     * @name _resolveStateGo
-     * @memberof source.router.$router
-     *
-     * @description
-     * Executes $state.go function into $timeout for use into state resolve.
-     *
-     * @param {String} stateName
-     */
-    function _resolveStateGo(stateName) {
-      $timeout(function() {
-        $state.go(stateName);
-      });
-    }
-
-    /**
-     * @name resolveStateGo
-     * @memberof source.router.$router
-     *
-     * @description
-     * Executes _resolveStateGo function.
-     *
-     * @param {String} stateName
-     */
-    function resolveStateGo(stateName) {
-      _resolveStateGo(stateName);
-    }
+  function dateTimeRun($mdDateLocale, $translate) {
+    console.log('#################################################');
+    console.log($mdDateLocale);
+    console.log($translate.getCurrentLanguage());
   }
 })();
 
@@ -1596,6 +1556,62 @@
         compound: null
       }
     };
+  }
+})();
+
+(function() {
+  'use strict';
+
+  angular
+  .module('source.router')
+  /**
+   * @namespace $router
+   * @memberof source.router
+   *
+   * @requires $state
+   * @requires $timeout
+   *
+   * @description
+   * Provider statement manage routing of the application.
+   */
+  .factory('$router', $router);
+
+  $router.$inject = ['$state', '$timeout'];
+
+  function $router($state, $timeout) {
+
+    return {
+      $state: $state,
+      resolveStateGo: resolveStateGo
+    };
+
+    /**
+     * @name _resolveStateGo
+     * @memberof source.router.$router
+     *
+     * @description
+     * Executes $state.go function into $timeout for use into state resolve.
+     *
+     * @param {String} stateName
+     */
+    function _resolveStateGo(stateName) {
+      $timeout(function() {
+        $state.go(stateName);
+      });
+    }
+
+    /**
+     * @name resolveStateGo
+     * @memberof source.router.$router
+     *
+     * @description
+     * Executes _resolveStateGo function.
+     *
+     * @param {String} stateName
+     */
+    function resolveStateGo(stateName) {
+      _resolveStateGo(stateName);
+    }
   }
 })();
 
@@ -2063,22 +2079,26 @@
         es: {
           locale: 'es',
           name: 'Spanish',
-          sourceName: 'Español'
+          sourceName: 'Español',
+          firstDayOfWeek: 1
         },
         fr: {
           locale: 'fr',
           name: 'French',
-          sourceName: 'Français'
+          sourceName: 'Français',
+          firstDayOfWeek: 1
         },
         de: {
           locale: 'de',
           name: 'German',
-          sourceName: 'Deutsch'
+          sourceName: 'Deutsch',
+          firstDayOfWeek: 1
         },
         pt: {
           locale: 'pt',
           name: 'Portuguese',
-          sourceName: 'Português'
+          sourceName: 'Português',
+          firstDayOfWeek: 1
         }
       }
     };
