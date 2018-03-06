@@ -26,6 +26,9 @@
       /* Config methods */
       setDeviceInfo: setDeviceInfoProvider,
       getDeviceInfo: getDeviceInfoProvider,
+      /* String tools */
+      readStringList: readStringListProvider,
+      readStringListUnique: readStringListUniqueProvider,
       /* Array tools */
       arrayMerge: arrayMergeProvider,
       /* Object tools */
@@ -126,6 +129,110 @@
         output += possibilities.charAt(Math.floor(Math.random() * possibilities.length));
       }
       return output;
+    }
+
+    /**
+     * @name _readStringListStrict
+     * @memberof source._shared.$toolsProvider
+     *
+     * @description
+     * This method catch a list of elements as string separated comma or array of strings
+     * and returns clean array only with string type elements.
+     * If variable "uniqueElements" is defined as "true", de returned array will contain only
+     * unique elements, no repeated elements.
+     *
+     * @param {String|Array} list
+     * @param {Boolean} uniqueElements
+     * @returns {Array}
+     * @throws ReferenceError
+     * @throws TypeError
+     * @private
+     */
+    function _readStringListStrict(list, uniqueElements) {
+      if (angular.isArray(list) || typeof list === 'string') {
+        if (list.length) {
+          list = (typeof list === 'string') ? list.split(',') : list ;
+          var output = [];
+          angular.forEach(list, function(element) {
+            if (typeof element === 'string') {
+              var _parsedElement = element.trim();
+              var _conditionUnique = (uniqueElements && output.indexOf(_parsedElement) < 0);
+              if (_conditionUnique || !uniqueElements) {
+                output.push(_parsedElement);
+              }
+            }
+          });
+          if (output.length) {
+            return output;
+          } else {
+            throw new ReferenceError('If given list is array type it must contain some string element.');
+          }
+        } else {
+          throw new ReferenceError('Given variable "list" must be defined. Not void content.');
+        }
+      } else {
+        throw new TypeError('Given list must be string type or array type. Received: "' + typeof list + '".');
+      }
+    }
+
+    /**
+     * @name _readStringList
+     * @memberof source._shared.$toolsProvider
+     *
+     * @description
+     * This method catch a list of elements as string separated comma, array of strings,
+     * object or array of objects and returns clean array only with string type elements.
+     * In case of object or array of objects given list, It's mandatory to send
+     * the variable: "objectProperties" that is a list of object properties.
+     * If variable "uniqueElements" is defined as "true", de returned array will contain only
+     * unique elements, no repeated elements.
+     *
+     * @param {String|Array|Object} list
+     * @param {String|Array} objectProperties
+     * @param {Boolean} uniqueElements
+     * @returns {Array}
+     * @throws Error
+     * @private
+     */
+    function _readStringList(list, objectProperties, uniqueElements) {
+      objectProperties = (objectProperties) ? _readStringListStrict(objectProperties, uniqueElements) : undefined ;
+      var output = list;
+      var _error = '';
+      if (angular.isObject(list) && !angular.isArray(list)) {
+        if (objectProperties) {
+          output = [];
+          angular.forEach(objectProperties, function(value) {
+            if (list.hasOwnProperty(value)) {
+              output.push(list[value]);
+            }
+          });
+        } else {
+          _error = [
+            'If given list is object type or array of objects, is mandatory',
+            'to send properties list variable ("objectProperties").'
+          ];
+          throw new Error(_error.join(' '));
+        }
+      } else if (angular.isArray(list)) {
+        var _arrayOfObjects = list.filter(angular.isObject);
+        if (objectProperties) {
+          output = [];
+          angular.forEach(_arrayOfObjects, function(element) {
+            angular.forEach(objectProperties, function(value) {
+              if (element.hasOwnProperty(value)) {
+                output.push(element[value]);
+              }
+            });
+          });
+        } else if (list.length === _arrayOfObjects.length) {
+          _error = [
+            'If given list is object type or array of objects, is mandatory',
+            'to send properties list variable ("objectProperties").'
+          ];
+          throw new Error(_error.join(' '));
+        }
+      }
+      return _readStringListStrict(output, uniqueElements);
     }
 
     /**
@@ -436,6 +543,38 @@
     }
 
     /**
+     * @name readStringListProvider
+     * @memberof source._shared.$toolsProvider.$tools
+     *
+     * @description
+     * Public provider method for _readStringList returning repeated elements array.
+     *
+     * @param {String|Array|Object} list
+     * @param {String|Array} [objectProperties]
+     * @returns {Array}
+     */
+    function readStringListProvider(list, objectProperties) {
+      objectProperties = objectProperties || null;
+      return _readStringList(list, objectProperties, $.REPEATED_ELEMENTS);
+    }
+
+    /**
+     * @name readStringListUniqueProvider
+     * @memberof source._shared.$toolsProvider.$tools
+     *
+     * @description
+     * Public provider method for _readStringList returning unique elements array.
+     *
+     * @param {String|Array|Object} list
+     * @param {String|Array} [objectProperties]
+     * @returns {Array}
+     */
+    function readStringListUniqueProvider(list, objectProperties) {
+      objectProperties = objectProperties || null;
+      return _readStringList(list, objectProperties, $.UNIQUE_ELEMENTS);
+    }
+
+    /**
      * @name arrayMergeProvider
      * @memberof source._shared.$toolsProvider
      *
@@ -508,6 +647,8 @@
         toCamelCase: toCamelCase,
         ucWords: ucWords,
         getRandomString: getRandomString,
+        readStringList: readStringList,
+        readStringListUnique: readStringListUnique,
         /* Array tools */
         removeArrayItem: removeArrayItem,
         removeArrayKey: removeArrayKey,
@@ -636,6 +777,38 @@
        */
       function getRandomString(stringLength) {
         return _getRandomString(stringLength);
+      }
+
+      /**
+       * @name readStringList
+       * @memberof source._shared.$toolsProvider.$tools
+       *
+       * @description
+       * Public factory method for _readStringList returning repeated elements array.
+       *
+       * @param {String|Array|Object} list
+       * @param {String|Array} [objectProperties]
+       * @returns {Array}
+       */
+      function readStringList(list, objectProperties) {
+        objectProperties = objectProperties || null;
+        return _readStringList(list, objectProperties, $.REPEATED_ELEMENTS);
+      }
+
+      /**
+       * @name readStringListUnique
+       * @memberof source._shared.$toolsProvider.$tools
+       *
+       * @description
+       * Public factory method for _readStringList returning unique elements array.
+       *
+       * @param {String|Array|Object} list
+       * @param {String|Array} [objectProperties]
+       * @returns {Array}
+       */
+      function readStringListUnique(list, objectProperties) {
+        objectProperties = objectProperties || null;
+        return _readStringList(list, objectProperties, $.UNIQUE_ELEMENTS);
       }
 
       /**

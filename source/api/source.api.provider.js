@@ -260,8 +260,9 @@
             if (reject.hasOwnProperty('data')) {
               promise.data = (reject.data && reject.data.plain) ? reject.data.plain() : reject.data ;
             }
-            if (reject.hasOwnProperty('errorAlert')) {
+            if (reject.hasOwnProperty('errorAlert') && reject.hasOwnProperty('error')) {
               $alert.error(reject.errorAlert);
+              console.error(Error(reject.error));
             }
             deferred.reject(promise);
             if (typeof callbackError === 'function') {

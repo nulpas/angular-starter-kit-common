@@ -29,7 +29,6 @@
         newData.error = [errorMessage.alert + ' ' + errorMessage.console + ' ' + errorMessage.helper];
         newData.errorAlert = [errorMessage.alert];
         deferred.reject(newData);
-        throw new Error(errorMessage.alert + ' ' + errorMessage.console + ' ' + errorMessage.helper);
       }
       return data;
     });
