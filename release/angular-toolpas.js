@@ -18,6 +18,7 @@
       'ngAnimate',
       'ngSanitize',
       'ngMaterial',
+      'ngTimePicker',
       'chart.js',
       'LocalStorageModule',
       'dndLists',
@@ -72,20 +73,6 @@
 (function() {
   'use strict';
 
-  angular
-    /**
-     * @namespace source.numbers
-     * @memberof source
-     *
-     * @description
-     * Definition of module "numbers" for several tools and filters about numbers and currency data.
-     */
-    .module('source.numbers', []);
-})();
-
-(function() {
-  'use strict';
-
   /**
    * @namespace $urlRouterProvider
    * @memberof ui.router
@@ -106,6 +93,20 @@
       /* External Modules */
       'ui.router'
     ]);
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    /**
+     * @namespace source.numbers
+     * @memberof source
+     *
+     * @description
+     * Definition of module "numbers" for several tools and filters about numbers and currency data.
+     */
+    .module('source.numbers', []);
 })();
 
 (function() {
@@ -1332,15 +1333,55 @@
   'use strict';
 
   angular
-    .module('source.date-time')
-    .run(dateTimeRun);
+  .module('source.router')
+  /**
+   * @namespace $router
+   * @memberof source.router
+   *
+   * @requires $state
+   * @requires $timeout
+   *
+   * @description
+   * Provider statement manage routing of the application.
+   */
+  .factory('$router', $router);
 
-  dateTimeRun.$inject = ['$mdDateLocale', '$translate'];
+  $router.$inject = ['$state', '$timeout'];
 
-  function dateTimeRun($mdDateLocale, $translate) {
-    console.log('#################################################');
-    console.log($mdDateLocale);
-    console.log($translate.getCurrentLanguage());
+  function $router($state, $timeout) {
+
+    return {
+      $state: $state,
+      resolveStateGo: resolveStateGo
+    };
+
+    /**
+     * @name _resolveStateGo
+     * @memberof source.router.$router
+     *
+     * @description
+     * Executes $state.go function into $timeout for use into state resolve.
+     *
+     * @param {String} stateName
+     */
+    function _resolveStateGo(stateName) {
+      $timeout(function() {
+        $state.go(stateName);
+      });
+    }
+
+    /**
+     * @name resolveStateGo
+     * @memberof source.router.$router
+     *
+     * @description
+     * Executes _resolveStateGo function.
+     *
+     * @param {String} stateName
+     */
+    function resolveStateGo(stateName) {
+      _resolveStateGo(stateName);
+    }
   }
 })();
 
@@ -1556,62 +1597,6 @@
         compound: null
       }
     };
-  }
-})();
-
-(function() {
-  'use strict';
-
-  angular
-  .module('source.router')
-  /**
-   * @namespace $router
-   * @memberof source.router
-   *
-   * @requires $state
-   * @requires $timeout
-   *
-   * @description
-   * Provider statement manage routing of the application.
-   */
-  .factory('$router', $router);
-
-  $router.$inject = ['$state', '$timeout'];
-
-  function $router($state, $timeout) {
-
-    return {
-      $state: $state,
-      resolveStateGo: resolveStateGo
-    };
-
-    /**
-     * @name _resolveStateGo
-     * @memberof source.router.$router
-     *
-     * @description
-     * Executes $state.go function into $timeout for use into state resolve.
-     *
-     * @param {String} stateName
-     */
-    function _resolveStateGo(stateName) {
-      $timeout(function() {
-        $state.go(stateName);
-      });
-    }
-
-    /**
-     * @name resolveStateGo
-     * @memberof source.router.$router
-     *
-     * @description
-     * Executes _resolveStateGo function.
-     *
-     * @param {String} stateName
-     */
-    function resolveStateGo(stateName) {
-      _resolveStateGo(stateName);
-    }
   }
 })();
 
@@ -2070,6 +2055,11 @@
       LOCAL_TRANSLATIONS_PATH: 'localTranslationsPath',
       DEFAULT_LANGUAGE_CLIENT: 'preferredDefaultLanguage',
 
+      LANGUAGE_OBJECT_LOCALE: 'locale',
+      LANGUAGE_OBJECT_NAME: 'name',
+      LANGUAGE_OBJECT_SOURCE_NAME: 'sourceName',
+      LANGUAGE_OBJECT_FIRST_DAY_OF_WEEK: 'firstDayOfWeek',
+
       AVAILABLE_LANGUAGES: {
         en: {
           locale: 'en',
@@ -2236,7 +2226,7 @@
       setLocalTranslationSections: setLocalTranslationSections,
       setTranslationsPath: setTranslationsPath,
       setPreferredLanguage: setPreferredLanguage,
-      $get: ['$q', '$api', 'translateModel', $get]
+      $get: ['$q', '$mdDateLocale', '$api', 'translateModel', $get]
     };
 
     /**
@@ -2390,7 +2380,7 @@
      * @description
      * Factory definition for translation labels.
      */
-    function $get($q, $api, translateModel) {
+    function $get($q, $mdDateLocale, $api, translateModel) {
       var $ = translateModel.$;
       var _appLanguage = null;
       var _appTranslations = {};
@@ -2438,6 +2428,11 @@
             '(' + _appLanguage.locale + ') automatically. Please, revise config statement.'
           ];
           console.error(ReferenceError(_referenceError.join(' ')));
+        }
+        var _appLanguageIsValidObject = (angular.isObject(_appLanguage) && Object.keys(_appLanguage).length);
+        var _existFirstDayOfWeek = (_appLanguage.hasOwnProperty($.LANGUAGE_OBJECT_FIRST_DAY_OF_WEEK));
+        if (_appLanguageIsValidObject && _existFirstDayOfWeek) {
+          $mdDateLocale.firstDayOfWeek = _appLanguage.firstDayOfWeek;
         }
         return _appLanguage;
       }

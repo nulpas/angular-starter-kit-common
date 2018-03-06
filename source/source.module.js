@@ -18,6 +18,7 @@
       'ngAnimate',
       'ngSanitize',
       'ngMaterial',
+      'ngTimePicker',
       'chart.js',
       'LocalStorageModule',
       'dndLists',

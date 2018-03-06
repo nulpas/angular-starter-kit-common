@@ -1,7 +1,7 @@
 {
   "name": "angular-toolpas",
   "description": "Angular Tool Box dependency",
-  "version": "0.10.0",
+  "version": "0.10.1",
   "main": "./release/angular-toolpas.js",
   "repository": {
     "type": "git",
@@ -37,7 +37,8 @@
     "angular-i18n": "^1.6.9",
     "ng-device-detector": "^5.0.2",
     "angular-drag-and-drop-lists": "^2.1.0",
-    "angular-material": "^1.1.6"
+    "angular-material": "^1.1.6",
+    "angular-material-time-picker": "^1.0.7"
   },
   "devDependencies": {},
   "resolutions": {
@@ -59,6 +60,12 @@
       "main": [
         "material.js",
         "material.css"
+      ]
+    },
+    "angular-material-time-picker": {
+      "main": [
+        "dist/md-time-picker.js",
+        "dist/md-time-picker.css"
       ]
     }
   }

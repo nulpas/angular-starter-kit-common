@@ -6,7 +6,6 @@
   var es = require('event-stream');
   var jshint = require('gulp-jshint');
   var jscs = require('gulp-jscs');
-  var useRef = require('gulp-useref');
   var concat = require('gulp-concat');
   var watch = require('gulp-watch');
   var templateCache = require('gulp-angular-templatecache');
@@ -57,7 +56,6 @@
   //## Compile source JS into release directory with concat
   gulp.task('source:concat', function() {
     return es.merge(gulp.src($.source.javascript.load), getTplCache())
-      .pipe(useRef())
       .pipe(concat($.files.core))
       .pipe(gulp.dest($.paths.release));
   });

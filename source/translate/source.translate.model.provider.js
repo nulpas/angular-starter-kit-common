@@ -25,6 +25,11 @@
       LOCAL_TRANSLATIONS_PATH: 'localTranslationsPath',
       DEFAULT_LANGUAGE_CLIENT: 'preferredDefaultLanguage',
 
+      LANGUAGE_OBJECT_LOCALE: 'locale',
+      LANGUAGE_OBJECT_NAME: 'name',
+      LANGUAGE_OBJECT_SOURCE_NAME: 'sourceName',
+      LANGUAGE_OBJECT_FIRST_DAY_OF_WEEK: 'firstDayOfWeek',
+
       AVAILABLE_LANGUAGES: {
         en: {
           locale: 'en',

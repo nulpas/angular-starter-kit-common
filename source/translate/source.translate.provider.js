@@ -31,7 +31,7 @@
       setLocalTranslationSections: setLocalTranslationSections,
       setTranslationsPath: setTranslationsPath,
       setPreferredLanguage: setPreferredLanguage,
-      $get: ['$q', '$api', 'translateModel', $get]
+      $get: ['$q', '$mdDateLocale', '$api', 'translateModel', $get]
     };
 
     /**
@@ -185,7 +185,7 @@
      * @description
      * Factory definition for translation labels.
      */
-    function $get($q, $api, translateModel) {
+    function $get($q, $mdDateLocale, $api, translateModel) {
       var $ = translateModel.$;
       var _appLanguage = null;
       var _appTranslations = {};
@@ -233,6 +233,11 @@
             '(' + _appLanguage.locale + ') automatically. Please, revise config statement.'
           ];
           console.error(ReferenceError(_referenceError.join(' ')));
+        }
+        var _appLanguageIsValidObject = (angular.isObject(_appLanguage) && Object.keys(_appLanguage).length);
+        var _existFirstDayOfWeek = (_appLanguage.hasOwnProperty($.LANGUAGE_OBJECT_FIRST_DAY_OF_WEEK));
+        if (_appLanguageIsValidObject && _existFirstDayOfWeek) {
+          $mdDateLocale.firstDayOfWeek = _appLanguage.firstDayOfWeek;
         }
         return _appLanguage;
       }
