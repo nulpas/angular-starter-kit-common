@@ -2,7 +2,7 @@
   'use strict';
 
   /**
-   * @namespace $urlRouterProvider
+   * //namespace $urlRouterProvider
    * @memberof ui.router
    *
    * @namespace $stateProvider
