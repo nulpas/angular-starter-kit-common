@@ -30,6 +30,11 @@
       LANGUAGE_OBJECT_SOURCE_NAME: 'sourceName',
       LANGUAGE_OBJECT_FIRST_DAY_OF_WEEK: 'firstDayOfWeek',
 
+      NO_TRANSLATION: 'noTranslationAvailable',
+
+      DATA_CONFIG_NAME: 'name',
+      DATA_CONFIG_LITERAL: 'literal',
+
       AVAILABLE_LANGUAGES: {
         en: {
           locale: 'en',
@@ -82,7 +87,12 @@
      * @property {Array} schemas.translateConfig.apiTranslationSections
      * @property {Array} schemas.translateConfig.localTranslationSource
      * @property {Array} schemas.translateConfig.localTranslationSections
+     * @property {String} schemas.translateConfig.localTranslationsPath
      * @property {String} schemas.translateConfig.preferredDefaultLanguage
+     *
+     * @property {Object} schemas.dataConfig
+     * @property {String} schemas.dataConfig.name
+     * @property {String} schemas.dataConfig.literal
      * @private
      */
     var _providerModel = {
@@ -94,6 +104,10 @@
           localTranslationSections: null,
           localTranslationsPath: '',
           preferredDefaultLanguage: ''
+        },
+        dataConfig: {
+          name: null,
+          literal: null
         }
       }
     };
