@@ -1046,13 +1046,14 @@
 
   function apiRun(Restangular, $state, $tools, $api, $alert) {
     var _apiConfiguration = $api.getApiConfig();
+    var $ = $api.$;
     Restangular.setBaseUrl(_apiConfiguration.apiBaseUrl);
 
     Restangular.setErrorInterceptor(function(rejection, deferred) {
       var _formatCondition = (rejection.hasOwnProperty('status') && rejection.hasOwnProperty('statusText'));
       if (angular.isObject(rejection) && _formatCondition && rejection.hasOwnProperty('data')) {
         var _errorSchema = _apiConfiguration.errorDefinition.errorSchema;
-        var _receivedError = $tools.setObjectUsingSchema(_errorSchema, rejection.data, $api.$.MERGE);
+        var _receivedError = $tools.setObjectUsingSchema(_errorSchema, rejection.data, $.NO_MERGE, [$.NO_EXCEPTIONS]);
         var _structureCondition01 = _receivedError.hasOwnProperty(_apiConfiguration.errorDefinition.errorMessage);
         var _structureCondition02 = _receivedError.hasOwnProperty(_apiConfiguration.errorDefinition.errorStatus);
         if (_structureCondition01 && _structureCondition02) {
