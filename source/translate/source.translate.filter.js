@@ -51,7 +51,7 @@
         throw new TypeError('Type not allowed for input: (' + typeof input + ').');
       }
       var _inputDotCase = _output.split('.');
-      var _lookingFor = _inputDotCase.pop();
+      var _lookingFor = angular.copy(_inputDotCase).pop();
       var _t = $translate.getTranslations();
       if (angular.isObject(_t) && Object.keys(_t).length) {
         if (_t.hasOwnProperty(_output)) {
