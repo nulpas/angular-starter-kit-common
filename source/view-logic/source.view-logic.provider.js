@@ -391,6 +391,7 @@
         if (angular.isObject(data)) {
           var _outputAux = [];
           var _outputNamesAux = [];
+          var _displayConcat = _setConcatWay(config[$.DATA_CONFIG_DISPLAY_CONCAT]);
           if (config[$.DATA_CONFIG_NAME].indexOf('.') > -1) {
             _outputAux.push($tools.getValueFromDotedKey(completeRowData, config[$.DATA_CONFIG_NAME]));
             var _arrayAux = config[$.DATA_CONFIG_NAME].split('.');
@@ -402,12 +403,80 @@
                 return element.trim();
               });
             }
+            var _maskWay = false;
+            var _masks = [];
             angular.forEach(_auxDisplayProperties, function(value) {
               if (data.hasOwnProperty(value)) {
                 _outputAux.push(data[value]);
                 _outputNamesAux.push(value);
+                _maskWay = (_maskWay || $.IS_NOT_MASK);
+              } else {
+                var _conditionStart = (value.indexOf($.DISPLAY_PROPERTIES_MASK_START) === 0);
+                var _conditionEnd = (value.substr(-1) === $.DISPLAY_PROPERTIES_MASK_END);
+                if (_conditionStart && _conditionEnd) {
+                  var _newMask = value.slice(0, -1).slice($.DISPLAY_PROPERTIES_MASK_START.length);
+                  _masks.push($.MASK_WRAPPER + _newMask + $.MASK_WRAPPER);
+                  _outputAux.push($.MASK_LABEL);
+                  _outputNamesAux.push($.MASK_LABEL);
+                  _maskWay = (_maskWay || $.IS_MASK);
+                }
               }
             });
+            if (_maskWay) {
+              var _outputAuxString = _outputAux.join($.MASK_GLUE);
+              var _outputNamesAuxString = _outputNamesAux.join($.MASK_GLUE);
+              var _evalOutputAux = _outputAuxString.split($.MASK_LABEL);
+              var _evalOutputNamesAux = _outputNamesAuxString.split($.MASK_LABEL);
+              if (!angular.copy(_evalOutputAux).shift()) {
+                _evalOutputAux.shift();
+                _evalOutputNamesAux.shift();
+              }
+              if (!angular.copy(_evalOutputAux).pop()) {
+                /* Last mask is ignored: */
+                _evalOutputAux.pop();
+                _evalOutputNamesAux.pop();
+                _masks.pop();
+              }
+              if (_masks.length < _evalOutputAux.length) {
+                /* Prevent use of displayConcat property: */
+                _masks = [$.MASK_WRAPPER + _displayConcat + $.MASK_WRAPPER].concat(_masks);
+              }
+              _outputAux = [];
+              _outputNamesAux = [];
+              angular.forEach(_evalOutputAux, function(value, key) {
+                var _evalElement = value.split($.MASK_GLUE);
+                var _evalElementNames = _evalOutputNamesAux[key].split($.MASK_GLUE);
+                if (!angular.copy(_evalElement).shift()) {
+                  _evalElement.shift();
+                  _evalElementNames.shift();
+                }
+                if (!angular.copy(_evalElement).pop()) {
+                  _evalElement.pop();
+                  _evalElementNames.pop();
+                }
+                if (_evalElement.length > 1) {
+                  var _usingMask = _masks[key].split($.MASK_WRAPPER).join('');
+                  angular.forEach(_evalElement, function(item, itemKey) {
+                    _outputAux.push(item);
+                    _outputNamesAux.push(_evalElementNames[itemKey]);
+                    if (itemKey < (_evalElement.length - 1)) {
+                      _outputAux.push(_usingMask);
+                      _outputNamesAux.push($.MASK_LABEL);
+                    }
+                  });
+                } else {
+                  _outputAux.push(_evalElement[0]);
+                  _outputNamesAux.push(_evalElementNames[0]);
+                }
+                if (key < (_evalOutputAux.length - 1)) {
+                  _outputAux.push(_masks[key + 1].split($.MASK_WRAPPER).join(''));
+                  _outputNamesAux.push($.MASK_LABEL);
+                }
+              });
+            }
+            _outputAux.push(_maskWay);
+            var _maskWayLabel = (_maskWay) ? $.HAS_MASK_LABEL : $.NOT_HAS_MASK_LABEL ;
+            _outputNamesAux.push(_maskWayLabel);
           } else {
             angular.forEach(data, function(value, key) {
               _outputAux.push(value);
@@ -417,13 +486,21 @@
 
           var _outputArrayAux = [];
           angular.forEach(_outputAux, function(value, key) {
-            var _filtered = applyFilter(value, config[$.DATA_CONFIG_FILTER], config[$.DATA_CONFIG_FILTER_PARAMS]);
-            var _filteredOk = (_filtered) ? _filtered : '' ;
-            var _names = (config[$.DATA_CONFIG_DISPLAY_PROPERTIES_NAME]) ? _outputNamesAux[key] + ': ' : '' ;
-            _outputArrayAux.push(_names + _filteredOk);
+            var _condition01 = (_outputNamesAux[key] !== $.MASK_LABEL);
+            var _condition02 = (_outputNamesAux[key] !== $.HAS_MASK_LABEL);
+            var _condition03 = (_outputNamesAux[key] !== $.NOT_HAS_MASK_LABEL);
+            if (_condition01 && _condition02 && _condition03) {
+              var _filtered = applyFilter(value, config[$.DATA_CONFIG_FILTER], config[$.DATA_CONFIG_FILTER_PARAMS]);
+              var _filteredOk = (_filtered) ? _filtered : '' ;
+              var _names = (config[$.DATA_CONFIG_DISPLAY_PROPERTIES_NAME]) ? _outputNamesAux[key] + ': ' : '' ;
+              _outputArrayAux.push(_names + _filteredOk);
+            } else {
+              _outputArrayAux.push(value);
+            }
           });
 
-          return _outputArrayAux.join(_setConcatWay(config[$.DATA_CONFIG_DISPLAY_CONCAT]));
+          var _concatWay = (_outputArrayAux.pop()) ? '' : _displayConcat ;
+          return _outputArrayAux.join(_concatWay);
         } else {
           throw new TypeError('Data given is not an object: ("' + data + '")');
         }

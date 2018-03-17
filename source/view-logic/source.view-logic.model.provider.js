@@ -50,7 +50,17 @@
       DATA_CONFIG_FILTER_PARAMS: 'filterParams',
       DATA_CONFIG_DISPLAY_CONCAT: 'displayConcat',
       DATA_CONFIG_DISPLAY_PROPERTIES: 'displayProperties',
-      DATA_CONFIG_DISPLAY_PROPERTIES_NAME: 'displayPropertiesName'
+      DATA_CONFIG_DISPLAY_PROPERTIES_NAME: 'displayPropertiesName',
+
+      DISPLAY_PROPERTIES_MASK_START: '::(',
+      DISPLAY_PROPERTIES_MASK_END: ')',
+      IS_MASK: true,
+      IS_NOT_MASK: false,
+      MASK_WRAPPER: '?!11032017!?',
+      MASK_GLUE: '@#%7391551210%#@',
+      MASK_LABEL: 'TOOL_PAS_DISPLAY_PROPERTIES_MASK',
+      HAS_MASK_LABEL: 'TOOL_PAS_DISPLAY_PROPERTIES_HAS_MASK',
+      NOT_HAS_MASK_LABEL: 'TOOL_PAS_DISPLAY_PROPERTIES_DOES_NOT_HAS_MASK'
     };
     var $ = angular.extend({}, _constants, $toolsProvider.$);
 
