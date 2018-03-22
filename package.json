@@ -1,7 +1,7 @@
 {
   "name": "angular-toolpas",
   "description": "Angular Tool Box dependency",
-  "version": "0.10.7",
+  "version": "0.10.8",
   "repository": {
     "type": "git",
     "url": "git@github.com:nulpas/angular-toolpas.git"
@@ -12,7 +12,9 @@
     "postinstall": "npm prune && bower install && bower prune",
     "build": "gulp concat"
   },
-  "dependencies": {},
+  "dependencies": {
+    "gulp-compiler": "^0.7.8"
+  },
   "devDependencies": {
     "event-stream": "^3.3.4",
     "gulp": "^3.9.1",

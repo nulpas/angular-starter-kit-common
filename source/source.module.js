@@ -29,6 +29,7 @@
       'source.numbers',
       'source.router',
       'source.static',
+      'source.strings',
       'source.toast',
       'source.translate',
       'source.view-logic'
