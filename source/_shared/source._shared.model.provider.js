@@ -28,7 +28,7 @@
       TITLE: 1,
       SUBTITLE: 2,
 
-      URL_NOT_ALLOWED_CHARS: ['\\.', '\\,', '\\;', '\\:'],
+      URL_NOT_ALLOWED_CHARS: ['\\.', '\\,', '\\;', '\\:', '\\\'', '\\"'],
 
       PROCESSES: 'processes',
       MODULES: 'modules',
