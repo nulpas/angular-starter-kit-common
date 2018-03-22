@@ -71,6 +71,7 @@
      *
      * @description
      * Function that encoding camelCase, or decoding camelCase, a given string.
+     * TODO: Remove url not allowed chars using $.URL_NOT_ALLOWED_CHARS array
      *
      * @param {String} string
      * @param {String} char
@@ -233,6 +234,27 @@
         }
       }
       return _readStringListStrict(output, uniqueElements);
+    }
+
+    /**
+     * @name _doFriendlyUrl
+     * @memberof source._shared.$toolsProvider
+     *
+     * @description
+     * This method transform string separated width "separator" param (white space default)
+     * and returns kebab-case string for use as friendly url.
+     * TODO: Introduce errors control.
+     *
+     * @param {String} string
+     * @param {String} separator
+     * @returns {String}
+     * @private
+     */
+    function _doFriendlyUrl(string, separator) {
+      separator = separator || ' ';
+      var _toCamelCase = _convertString(string, separator, $.FROM_OTHER_TO_CAMELCASE);
+      var _re = new RegExp('(' + $.URL_NOT_ALLOWED_CHARS.join('|') + ')', 'g');
+      return _convertString(_toCamelCase, '-', $.FROM_CAMELCASE_TO_OTHER).replace(_re, '');
     }
 
     /**
@@ -649,6 +671,7 @@
         getRandomString: getRandomString,
         readStringList: readStringList,
         readStringListUnique: readStringListUnique,
+        doFriendlyUrl: doFriendlyUrl,
         /* Array tools */
         removeArrayItem: removeArrayItem,
         removeArrayKey: removeArrayKey,
@@ -809,6 +832,21 @@
       function readStringListUnique(list, objectProperties) {
         objectProperties = objectProperties || null;
         return _readStringList(list, objectProperties, $.UNIQUE_ELEMENTS);
+      }
+
+      /**
+       * @name doFriendlyUrl
+       * @memberof source._shared.$toolsProvider.$tools
+       *
+       * @description
+       * Public factory method for _doFriendlyUrl.
+       *
+       * @param {String} string
+       * @param {String} separator
+       * @returns {String}
+       */
+      function doFriendlyUrl(string, separator) {
+        return _doFriendlyUrl(string, separator);
       }
 
       /**
