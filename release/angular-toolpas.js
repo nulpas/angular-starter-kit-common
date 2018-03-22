@@ -115,20 +115,6 @@
 
   angular
     /**
-     * @namespace static
-     * @memberof source
-     *
-     * @description
-     * Module static definition for manage static data in application like literals or config variables.
-     */
-    .module('source.static', []);
-})();
-
-(function() {
-  'use strict';
-
-  angular
-    /**
      * @namespace source.strings
      * @memberof source
      *
@@ -143,13 +129,13 @@
 
   angular
     /**
-     * @namespace translate
+     * @namespace static
      * @memberof source
      *
      * @description
-     * Definition of module "translate" for translation services.
+     * Module static definition for manage static data in application like literals or config variables.
      */
-    .module('source.translate', []);
+    .module('source.static', []);
 })();
 
 (function() {
@@ -174,13 +160,29 @@
 
   angular
     /**
+     * @namespace translate
+     * @memberof source
+     *
+     * @description
+     * Definition of module "translate" for translation services.
+     */
+    .module('source.translate', []);
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    /**
      * @namespace view-logic
      * @memberof source
      *
      * @description
      * Module View Logic definition: helper for application view presentations.
      */
-    .module('source.view-logic', []);
+    .module('source.view-logic', [
+      'ngVibrant'
+    ]);
 })();
 
 (function() {
@@ -1619,6 +1621,176 @@
 (function() {
   'use strict';
 
+  angular
+    .module('source.strings')
+    /**
+     * @namespace $strings
+     * @memberof source.strings
+     *
+     * @requires $tools
+     * @requires stringsModel
+     *
+     * @description
+     * Helper service to strings module.
+     */
+    .factory('$strings', $strings);
+
+  $strings.$inject = ['$tools', 'stringsModel'];
+
+  function $strings($tools, stringsModel) {
+    var $ = angular.extend({}, stringsModel.constants, $tools.$);
+
+    return {
+      $: $,
+      setParams: _setParams
+    };
+
+    /**
+     * @name _setParams
+     * @memberof source.strings.$strings
+     *
+     * @description
+     * Set the filter params to define several string filter configurations.
+     *
+     * @param {Object} filterParams
+     * @param {String} [paramsMode]
+     * @return {Object}
+     * @private
+     */
+    function _setParams(filterParams, paramsMode) {
+      filterParams = filterParams || {};
+      paramsMode = paramsMode || $.TRUNCATE;
+      var _output = {};
+      if (stringsModel.schemas.hasOwnProperty(paramsMode)) {
+        if (filterParams && angular.isObject(filterParams)) {
+          var _params = $tools.setObjectUsingSchema(stringsModel.schemas[paramsMode], filterParams, {});
+          angular.forEach(_params, function(value, property) {
+            var _condition = (filterParams.hasOwnProperty(property) && value);
+            _output[property] = (_condition) ? value : undefined ;
+          });
+        }
+        return _output;
+      } else {
+        throw new ReferenceError('Unknown numeric params mode: ' + paramsMode);
+      }
+    }
+  }
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    .module('source.strings')
+    /**
+     * @namespace truncate
+     * @memberof source.strings
+     *
+     * @requires $filter
+     * @requires $numbers
+     *
+     * @description
+     * Filter that truncates string in a given number of words.
+     */
+    .filter('truncate', truncate);
+
+  truncate.$inject = ['$filter', '$strings'];
+
+  function truncate($filter, $strings) {
+    return _truncate;
+
+    /**
+     * @name _truncate
+     * @memberof source.strings.truncate
+     *
+     * @description
+     * Private function for "truncate" filter.
+     * Returns data truncated if variable "data" is a valid string or returns the same input data.
+     * TODO: Select string to separate words.
+     * TODO: Select string to scape truncate string ('...').
+     * TODO: Select truncate by words or by characters number.
+     * TODO: Compare last char in last item with array of possibilities (['.', ',', ';', ':']).
+     * TODO: Develop best errors control.
+     *
+     * @param {*} data
+     * @param {Object} [filterParams]
+     * @returns {String|*}
+     * @private
+     */
+    function _truncate(data, filterParams) {
+      var _output = data;
+      if (typeof data === 'string') {
+        var _params = $strings.setParams(filterParams, $strings.$.TRUNCATE);
+        if (angular.isNumber(_params[$strings.$.WORDS])) {
+          var _auxArray = data.split(' ');
+          var _newArray = _auxArray.slice(0, _params[$strings.$.WORDS]);
+          if (_auxArray.length > _newArray.length) {
+            var _lastItem = _newArray.pop();
+            var _lastChar = _lastItem.substr(-1);
+            if (_lastChar === '.' || _lastChar === ',' || _lastChar === ';' || _lastChar === ':') {
+              _lastItem = _lastItem.slice(0, (_lastItem.length - 1));
+            }
+            _newArray.push(_lastItem + '...');
+          }
+          _output = _newArray.join(' ');
+        } else {
+          throw new TypeError('Param "words" must be a number.');
+        }
+      }
+      return _output;
+    }
+  }
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    .module('source.strings')
+    /**
+     * @namespace stringsModel
+     * @memberof source.strings
+     *
+     * @description
+     * Service that defines constants and schemas for strings module.
+     */
+    .service('stringsModel', stringsModel);
+
+  function stringsModel() {
+    /* jshint validthis: true */
+    /**
+     * @name constants
+     * @memberof source.strings.stringsModel
+     *
+     * @type {Object}
+     * @property {String} TRUNCATE
+     * @property {String} WORDS
+     */
+    this.constants = {
+      TRUNCATE: 'truncate',
+
+      WORDS: 'words'
+    };
+
+    /**
+     * @name schemas
+     * @memberof source.strings.stringsModel
+     *
+     * @type {Object}
+     * @property {Object} truncate
+     * @property {Number} truncate.words
+     */
+    this.schemas = {
+      truncate: {
+        words: null
+      }
+    };
+  }
+})();
+
+(function() {
+  'use strict';
+
   /**
    * @type Object
    * @property {String} documentName
@@ -1805,56 +1977,65 @@
   'use strict';
 
   angular
-    .module('source.strings')
+    .module('source.toast')
     /**
-     * @namespace $strings
-     * @memberof source.strings
-     *
-     * @requires $tools
-     * @requires stringsModel
+     * @namespace toastModelProvider
+     * @memberof source.toast
      *
      * @description
-     * Helper service to strings module.
+     * Provider that gets constants for toast services.
      */
-    .factory('$strings', $strings);
+    .provider('toastModel', toastModel);
 
-  $strings.$inject = ['$tools', 'stringsModel'];
+  toastModel.$inject = ['$toolsProvider'];
 
-  function $strings($tools, stringsModel) {
-    var $ = angular.extend({}, stringsModel.constants, $tools.$);
+  function toastModel($toolsProvider) {
+    var _constants = {
+      SUCCESS: 'SUCCESS',
+      INFO: 'INFO',
+      WARNING: 'WARNING',
+      ERROR: 'ERROR'
+    };
+    var $ = angular.extend({}, _constants, $toolsProvider.$);
 
     return {
       $: $,
-      setParams: _setParams
+      $get: ['toastr', $get]
     };
 
     /**
-     * @name _setParams
-     * @memberof source.strings.$strings
+     * @namespace toastModel
+     * @memberof source.toast.toastModelProvider
+     *
+     * @requires toastr
      *
      * @description
-     * Set the filter params to define several string filter configurations.
-     *
-     * @param {Object} filterParams
-     * @param {String} [paramsMode]
-     * @return {Object}
-     * @private
+     * Factory that gets constants for toast services.
      */
-    function _setParams(filterParams, paramsMode) {
-      filterParams = filterParams || {};
-      paramsMode = paramsMode || $.TRUNCATE;
-      var _output = {};
-      if (stringsModel.schemas.hasOwnProperty(paramsMode)) {
-        if (filterParams && angular.isObject(filterParams)) {
-          var _params = $tools.setObjectUsingSchema(stringsModel.schemas[paramsMode], filterParams, {});
-          angular.forEach(_params, function(value, property) {
-            var _condition = (filterParams.hasOwnProperty(property) && value);
-            _output[property] = (_condition) ? value : undefined ;
-          });
-        }
-        return _output;
-      } else {
-        throw new ReferenceError('Unknown numeric params mode: ' + paramsMode);
+    function $get(toastr) {
+      var _serviceModel = {
+        SUCCESS: toastr.success,
+        INFO: toastr.info,
+        WARNING: toastr.warning,
+        ERROR: toastr.error
+      };
+
+      return {
+        $: $,
+        get: getFactory
+      };
+
+      /**
+       * @name getFactory
+       * @memberof source.toast.toastModelProvider.toastModel
+       *
+       * @description
+       * Returns API model for Factory service.
+       *
+       * @returns {Object}
+       */
+      function getFactory() {
+        return _serviceModel;
       }
     }
   }
@@ -1864,110 +2045,149 @@
   'use strict';
 
   angular
-    .module('source.strings')
+    .module('source.toast')
     /**
-     * @namespace truncate
-     * @memberof source.strings
-     *
-     * @requires $filter
-     * @requires $numbers
+     * @namespace $alertProvider
+     * @memberof source.toast
      *
      * @description
-     * Filter that truncates string in a given number of words.
+     * Provider custom statement to use toast alert's messages.
      */
-    .filter('truncate', truncate);
+    .provider('$alert', $alert);
 
-  truncate.$inject = ['$filter', '$strings'];
+  $alert.$inject = ['toastModelProvider'];
 
-  function truncate($filter, $strings) {
-    return _truncate;
+  function $alert(toastModelProvider) {
+    var $ = toastModelProvider.$;
+    var _toastOptions = {
+      timeOut: 9999
+    };
+
+    return {
+      $: $,
+      setDuration: _setDuration,
+      $get: ['toastModel', $get]
+    };
 
     /**
-     * @name _truncate
-     * @memberof source.strings.truncate
+     * @name _setDuration
+     * @memberof source.toast.$alertProvider
      *
      * @description
-     * Private function for "truncate" filter.
-     * Returns data truncated if variable "data" is a valid string or returns the same input data.
-     * TODO: Select string to separate words.
-     * TODO: Select string to scape truncate string ('...').
-     * TODO: Select truncate by words or by characters number.
-     * TODO: Compare last char in last item with array of possibilities (['.', ',', ';', ':']).
-     * TODO: Develop best errors control.
+     * Set duration of toast message for provider configuration.
      *
-     * @param {*} data
-     * @param {Object} [filterParams]
-     * @returns {String|*}
+     * @param {Integer} time
      * @private
      */
-    function _truncate(data, filterParams) {
-      var _output = data;
-      if (typeof data === 'string') {
-        var _params = $strings.setParams(filterParams, $strings.$.TRUNCATE);
-        if (angular.isNumber(_params[$strings.$.WORDS])) {
-          var _auxArray = data.split(' ');
-          var _newArray = _auxArray.slice(0, _params[$strings.$.WORDS]);
-          if (_auxArray.length > _newArray.length) {
-            var _lastItem = _newArray.pop();
-            var _lastChar = _lastItem.substr(-1);
-            if (_lastChar === '.' || _lastChar === ',' || _lastChar === ';' || _lastChar === ':') {
-              _lastItem = _lastItem.slice(0, (_lastItem.length - 1));
-            }
-            _newArray.push(_lastItem + '...');
-          }
-          _output = _newArray.join(' ');
-        } else {
-          throw new TypeError('Param "words" must be a number.');
-        }
-      }
-      return _output;
+    function _setDuration(time) {
+      _toastOptions.timeOut = time;
     }
-  }
-})();
 
-(function() {
-  'use strict';
-
-  angular
-    .module('source.strings')
     /**
-     * @namespace stringsModel
-     * @memberof source.strings
+     * @name _launchToast
+     * @memberof source.toast.$alertProvider
      *
      * @description
-     * Service that defines constants and schemas for strings module.
-     */
-    .service('stringsModel', stringsModel);
-
-  function stringsModel() {
-    /* jshint validthis: true */
-    /**
-     * @name constants
-     * @memberof source.strings.stringsModel
+     * Launch angular-toaster alert message.
      *
-     * @type {Object}
-     * @property {String} TRUNCATE
-     * @property {String} WORDS
+     * @param {Object} toastFactoryModel
+     * @param {String|Array} message
+     * @param {String} type
+     * @param {String|Undefined} title
+     * @param {Integer|Undefined} duration
+     * @private
      */
-    this.constants = {
-      TRUNCATE: 'truncate',
-
-      WORDS: 'words'
-    };
-
-    /**
-     * @name schemas
-     * @memberof source.strings.stringsModel
-     *
-     * @type {Object}
-     * @property {Object} truncate
-     * @property {Number} truncate.words
-     */
-    this.schemas = {
-      truncate: {
-        words: null
+    function _launchToast(toastFactoryModel, message, type, title, duration) {
+      if (title !== undefined && typeof title !== 'string' && !duration) {
+        duration = title;
+        title = undefined;
       }
-    };
+
+      var toastOptions = (duration) ? angular.extend({}, _toastOptions, { timeOut: duration }) : _toastOptions ;
+      message = (angular.isArray(message)) ? message.join('<br>') : message ;
+      toastFactoryModel[type](message, title, toastOptions);
+    }
+
+    /**
+     * @namespace $alert
+     * @memberof source.toast.$alertProvider
+     *
+     * @requires toastr
+     *
+     * @description
+     * Factory statement for toast alert's messages.
+     */
+    function $get(toastModel) {
+      var toastFactoryModel = toastModel.get();
+
+      return {
+        $: $,
+        success: success,
+        info: info,
+        warning: warning,
+        error: error
+      };
+
+      /**
+       * @name success
+       * @memberof source.toast.$alertProvider.$alert
+       *
+       * @description
+       * Displays success toast message.
+       *
+       * @param {String} message
+       * @param {String} title
+       * @param {Integer|Undefined} duration
+       */
+      function success(message, title, duration) {
+        _launchToast(toastFactoryModel, message, $.SUCCESS, title, duration);
+      }
+
+      /**
+       * @name info
+       * @memberof source.toast.$alertProvider.$alert
+       *
+       * @description
+       * Displays info toast message.
+       *
+       * @param {String} message
+       * @param {String} title
+       * @param {Integer|Undefined} duration
+       */
+      function info(message, title, duration) {
+        _launchToast(toastFactoryModel, message, $.INFO, title, duration);
+      }
+
+      /**
+       * @name warning
+       * @memberof source.toast.$alertProvider.$alert
+       *
+       * @description
+       * Displays warning toast message.
+       *
+       * @param {String} message
+       * @param {String} title
+       * @param {Integer|Undefined} duration
+       */
+      function warning(message, title, duration) {
+        _launchToast(toastFactoryModel, message, $.WARNING, title, duration);
+      }
+
+      /**
+       * @name error
+       * @memberof source.toast.$alertProvider.$alert
+       *
+       * @description
+       * Displays error toast message.
+       *
+       * @param {String} message
+       * @param {String} title
+       * @param {Integer|Undefined} duration
+       */
+      function error(message, title, duration) {
+        _launchToast(toastFactoryModel, message, $.ERROR, title, duration);
+      }
+    }
   }
 })();
 
@@ -2586,224 +2806,6 @@
        */
       function getAvailableLanguages() {
         return $.AVAILABLE_LANGUAGES;
-      }
-    }
-  }
-})();
-
-(function() {
-  'use strict';
-
-  angular
-    .module('source.toast')
-    /**
-     * @namespace toastModelProvider
-     * @memberof source.toast
-     *
-     * @description
-     * Provider that gets constants for toast services.
-     */
-    .provider('toastModel', toastModel);
-
-  toastModel.$inject = ['$toolsProvider'];
-
-  function toastModel($toolsProvider) {
-    var _constants = {
-      SUCCESS: 'SUCCESS',
-      INFO: 'INFO',
-      WARNING: 'WARNING',
-      ERROR: 'ERROR'
-    };
-    var $ = angular.extend({}, _constants, $toolsProvider.$);
-
-    return {
-      $: $,
-      $get: ['toastr', $get]
-    };
-
-    /**
-     * @namespace toastModel
-     * @memberof source.toast.toastModelProvider
-     *
-     * @requires toastr
-     *
-     * @description
-     * Factory that gets constants for toast services.
-     */
-    function $get(toastr) {
-      var _serviceModel = {
-        SUCCESS: toastr.success,
-        INFO: toastr.info,
-        WARNING: toastr.warning,
-        ERROR: toastr.error
-      };
-
-      return {
-        $: $,
-        get: getFactory
-      };
-
-      /**
-       * @name getFactory
-       * @memberof source.toast.toastModelProvider.toastModel
-       *
-       * @description
-       * Returns API model for Factory service.
-       *
-       * @returns {Object}
-       */
-      function getFactory() {
-        return _serviceModel;
-      }
-    }
-  }
-})();
-
-(function() {
-  'use strict';
-
-  angular
-    .module('source.toast')
-    /**
-     * @namespace $alertProvider
-     * @memberof source.toast
-     *
-     * @description
-     * Provider custom statement to use toast alert's messages.
-     */
-    .provider('$alert', $alert);
-
-  $alert.$inject = ['toastModelProvider'];
-
-  function $alert(toastModelProvider) {
-    var $ = toastModelProvider.$;
-    var _toastOptions = {
-      timeOut: 9999
-    };
-
-    return {
-      $: $,
-      setDuration: _setDuration,
-      $get: ['toastModel', $get]
-    };
-
-    /**
-     * @name _setDuration
-     * @memberof source.toast.$alertProvider
-     *
-     * @description
-     * Set duration of toast message for provider configuration.
-     *
-     * @param {Integer} time
-     * @private
-     */
-    function _setDuration(time) {
-      _toastOptions.timeOut = time;
-    }
-
-    /**
-     * @name _launchToast
-     * @memberof source.toast.$alertProvider
-     *
-     * @description
-     * Launch angular-toaster alert message.
-     *
-     * @param {Object} toastFactoryModel
-     * @param {String|Array} message
-     * @param {String} type
-     * @param {String|Undefined} title
-     * @param {Integer|Undefined} duration
-     * @private
-     */
-    function _launchToast(toastFactoryModel, message, type, title, duration) {
-      if (title !== undefined && typeof title !== 'string' && !duration) {
-        duration = title;
-        title = undefined;
-      }
-
-      var toastOptions = (duration) ? angular.extend({}, _toastOptions, { timeOut: duration }) : _toastOptions ;
-      message = (angular.isArray(message)) ? message.join('<br>') : message ;
-      toastFactoryModel[type](message, title, toastOptions);
-    }
-
-    /**
-     * @namespace $alert
-     * @memberof source.toast.$alertProvider
-     *
-     * @requires toastr
-     *
-     * @description
-     * Factory statement for toast alert's messages.
-     */
-    function $get(toastModel) {
-      var toastFactoryModel = toastModel.get();
-
-      return {
-        $: $,
-        success: success,
-        info: info,
-        warning: warning,
-        error: error
-      };
-
-      /**
-       * @name success
-       * @memberof source.toast.$alertProvider.$alert
-       *
-       * @description
-       * Displays success toast message.
-       *
-       * @param {String} message
-       * @param {String} title
-       * @param {Integer|Undefined} duration
-       */
-      function success(message, title, duration) {
-        _launchToast(toastFactoryModel, message, $.SUCCESS, title, duration);
-      }
-
-      /**
-       * @name info
-       * @memberof source.toast.$alertProvider.$alert
-       *
-       * @description
-       * Displays info toast message.
-       *
-       * @param {String} message
-       * @param {String} title
-       * @param {Integer|Undefined} duration
-       */
-      function info(message, title, duration) {
-        _launchToast(toastFactoryModel, message, $.INFO, title, duration);
-      }
-
-      /**
-       * @name warning
-       * @memberof source.toast.$alertProvider.$alert
-       *
-       * @description
-       * Displays warning toast message.
-       *
-       * @param {String} message
-       * @param {String} title
-       * @param {Integer|Undefined} duration
-       */
-      function warning(message, title, duration) {
-        _launchToast(toastFactoryModel, message, $.WARNING, title, duration);
-      }
-
-      /**
-       * @name error
-       * @memberof source.toast.$alertProvider.$alert
-       *
-       * @description
-       * Displays error toast message.
-       *
-       * @param {String} message
-       * @param {String} title
-       * @param {Integer|Undefined} duration
-       */
-      function error(message, title, duration) {
-        _launchToast(toastFactoryModel, message, $.ERROR, title, duration);
       }
     }
   }

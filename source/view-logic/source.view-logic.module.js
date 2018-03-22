@@ -9,5 +9,7 @@
      * @description
      * Module View Logic definition: helper for application view presentations.
      */
-    .module('source.view-logic', []);
+    .module('source.view-logic', [
+      'ngVibrant'
+    ]);
 })();
