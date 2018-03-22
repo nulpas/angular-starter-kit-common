@@ -29,6 +29,7 @@
       'source.numbers',
       'source.router',
       'source.static',
+      'source.strings',
       'source.toast',
       'source.translate',
       'source.view-logic'
@@ -54,20 +55,6 @@
       /* External Modules */
       'restangular'
     ]);
-})();
-
-(function() {
-  'use strict';
-
-  angular
-    /**
-     * @namespace source.numbers
-     * @memberof source
-     *
-     * @description
-     * Definition of module "numbers" for several tools and filters about numbers and currency data.
-     */
-    .module('source.numbers', []);
 })();
 
 (function() {
@@ -114,6 +101,20 @@
 
   angular
     /**
+     * @namespace source.numbers
+     * @memberof source
+     *
+     * @description
+     * Definition of module "numbers" for several tools and filters about numbers and currency data.
+     */
+    .module('source.numbers', []);
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    /**
      * @namespace static
      * @memberof source
      *
@@ -138,6 +139,20 @@
       /* External Modules */
       'toastr'
     ]);
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    /**
+     * @namespace source.strings
+     * @memberof source
+     *
+     * @description
+     * Definition of module "strings" for several tools and filters tools.
+     */
+    .module('source.strings', []);
 })();
 
 (function() {
@@ -1084,221 +1099,6 @@
   'use strict';
 
   angular
-    .module('source.numbers')
-    /**
-     * @namespace $numbers
-     * @memberof source.numbers
-     *
-     * @requires $tools
-     * @requires numbersModel
-     *
-     * @description
-     * Helper service to numbers module.
-     */
-    .factory('$numbers', $numbers);
-
-  $numbers.$inject = ['$tools', 'numbersModel'];
-
-  function $numbers($tools, numbersModel) {
-    var $ = angular.extend({}, numbersModel.constants, $tools.$);
-
-    return {
-      $: $,
-      setParams: _setParams
-    };
-
-    /**
-     * @name _setParams
-     * @memberof source.numbers.$numbers
-     *
-     * @description
-     * Set the filter params to define several numeric filter configurations.
-     *
-     * @param {Object} filterParams
-     * @param {String} [paramsMode]
-     * @return {Object}
-     * @private
-     */
-    function _setParams(filterParams, paramsMode) {
-      filterParams = filterParams || {};
-      paramsMode = paramsMode || $.NUMBER;
-      var _output = {};
-      if (numbersModel.schemas.hasOwnProperty(paramsMode)) {
-        if (filterParams && angular.isObject(filterParams)) {
-          var _params = $tools.setObjectUsingSchema(numbersModel.schemas[paramsMode], filterParams, {});
-          angular.forEach(_params, function(value, property) {
-            var _condition = (filterParams.hasOwnProperty(property) && value);
-            _output[property] = (_condition) ? value : undefined ;
-          });
-          _output[$.SYMBOL] = (_output[$.SYMBOL]) ? ' ' + _output[$.SYMBOL] : undefined ;
-          _output[$.COMPOUND] = (_output[$.COMPOUND]) ? _output[$.COMPOUND] : '' ;
-        }
-        return _output;
-      } else {
-        throw new ReferenceError('Unknown numeric params mode: ' + paramsMode);
-      }
-    }
-  }
-})();
-
-(function() {
-  'use strict';
-
-  angular
-    .module('source.numbers')
-    /**
-     * @namespace money
-     * @memberof source.numbers
-     *
-     * @requires $filter
-     * @requires $numbers
-     *
-     * @description
-     * Filter that shows numbers as currency format with currency symbol.
-     */
-    .filter('money', money)
-
-    /**
-     * @namespace numeric
-     * @memberof source.numbers
-     *
-     * @requires $filter
-     * @requires $tools
-     *
-     * @description
-     * Filter that shows numbers as numeric format.
-     */
-    .filter('numeric', numeric);
-
-  money.$inject = ['$filter', '$numbers'];
-
-  function money($filter, $numbers) {
-    return _money;
-
-    /**
-     * @name _money
-     * @memberof source.numbers.money
-     *
-     * @description
-     * Private function for "money" filter.
-     * Returns data formatted if variable "data" is a valid number or returns the same input data.
-     *
-     * @param {*} data
-     * @param {Object} [filterParams]
-     * @returns {String|*}
-     * @private
-     */
-    function _money(data, filterParams) {
-      var _output = data;
-      if (angular.isNumber(data)) {
-        var _params = $numbers.setParams(filterParams, $numbers.$.CURRENCY);
-        _output = $filter('currency')(data, _params[$numbers.$.SYMBOL], _params[$numbers.$.FRACTION]);
-        _output += (_params[$numbers.$.COMPOUND]) ? ' ' + _params[$numbers.$.COMPOUND] : '' ;
-      }
-      return _output;
-    }
-  }
-
-  numeric.$inject = ['$filter', '$numbers'];
-
-  function numeric($filter, $numbers) {
-    return _numeric;
-
-    /**
-     * @name _numeric
-     * @memberof source.numbers.numeric
-     *
-     * @description
-     * Private function for "numeric" filter.
-     * Returns data formatted if variable "data" is a valid number or returns the same input data.
-     *
-     * @param {*} data
-     * @param {Object} [filterParams]
-     * @returns {String|*}
-     * @private
-     */
-    function _numeric(data, filterParams) {
-      var _output = data;
-      if (angular.isNumber(data)) {
-        var _params = $numbers.setParams(filterParams, $numbers.$.CURRENCY);
-        _output = $filter('number')(data, _params[$numbers.$.FRACTION]);
-        _output += (_params[$numbers.$.SYMBOL]) ? _params[$numbers.$.SYMBOL] : '' ;
-        _output += (_params[$numbers.$.COMPOUND]) ? ' ' + _params[$numbers.$.COMPOUND] : '' ;
-      }
-      return _output;
-    }
-  }
-})();
-
-(function() {
-  'use strict';
-
-  angular
-    .module('source.numbers')
-    /**
-     * @namespace numbersModel
-     * @memberof source.numbers
-     *
-     * @description
-     * Service that defines constants and schemas for numbers module.
-     */
-    .service('numbersModel', numbersModel);
-
-  function numbersModel() {
-    /* jshint validthis: true */
-    /**
-     * @name constants
-     * @memberof source.numbers.numbersModel
-     *
-     * @type {Object}
-     * @property {String} CURRENCY
-     * @property {String} NUMBER
-     * @property {String} SYMBOL
-     * @property {String} FRACTION
-     * @property {String} COMPOUND
-     */
-    this.constants = {
-      CURRENCY: 'currency',
-      NUMBER: 'number',
-
-      SYMBOL: 'symbol',
-      FRACTION: 'fractionSize',
-      COMPOUND: 'compound'
-    };
-
-    /**
-     * @name schemas
-     * @memberof source.numbers.numbersModel
-     *
-     * @type {Object}
-     * @property {Object} currency
-     * @property {String} currency.symbol
-     * @property {Number} currency.fractionSize
-     * @property {Number|String} currency.compound
-     * @property {Object} number
-     * @property {String} number.symbol
-     * @property {Number} number.fractionSize
-     * @property {Number|String} number.compound
-     */
-    this.schemas = {
-      currency: {
-        symbol: null,
-        fractionSize: null,
-        compound: null
-      },
-      number: {
-        symbol: null,
-        fractionSize: null,
-        compound: null
-      }
-    };
-  }
-})();
-
-(function() {
-  'use strict';
-
-  angular
     .module('source.date-time')
     /**
      * @namespace onlyHour
@@ -1598,6 +1398,221 @@
     function resolveStateGo(stateName) {
       _resolveStateGo(stateName);
     }
+  }
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    .module('source.numbers')
+    /**
+     * @namespace $numbers
+     * @memberof source.numbers
+     *
+     * @requires $tools
+     * @requires numbersModel
+     *
+     * @description
+     * Helper service to numbers module.
+     */
+    .factory('$numbers', $numbers);
+
+  $numbers.$inject = ['$tools', 'numbersModel'];
+
+  function $numbers($tools, numbersModel) {
+    var $ = angular.extend({}, numbersModel.constants, $tools.$);
+
+    return {
+      $: $,
+      setParams: _setParams
+    };
+
+    /**
+     * @name _setParams
+     * @memberof source.numbers.$numbers
+     *
+     * @description
+     * Set the filter params to define several numeric filter configurations.
+     *
+     * @param {Object} filterParams
+     * @param {String} [paramsMode]
+     * @return {Object}
+     * @private
+     */
+    function _setParams(filterParams, paramsMode) {
+      filterParams = filterParams || {};
+      paramsMode = paramsMode || $.NUMBER;
+      var _output = {};
+      if (numbersModel.schemas.hasOwnProperty(paramsMode)) {
+        if (filterParams && angular.isObject(filterParams)) {
+          var _params = $tools.setObjectUsingSchema(numbersModel.schemas[paramsMode], filterParams, {});
+          angular.forEach(_params, function(value, property) {
+            var _condition = (filterParams.hasOwnProperty(property) && value);
+            _output[property] = (_condition) ? value : undefined ;
+          });
+          _output[$.SYMBOL] = (_output[$.SYMBOL]) ? ' ' + _output[$.SYMBOL] : undefined ;
+          _output[$.COMPOUND] = (_output[$.COMPOUND]) ? _output[$.COMPOUND] : '' ;
+        }
+        return _output;
+      } else {
+        throw new ReferenceError('Unknown numeric params mode: ' + paramsMode);
+      }
+    }
+  }
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    .module('source.numbers')
+    /**
+     * @namespace money
+     * @memberof source.numbers
+     *
+     * @requires $filter
+     * @requires $numbers
+     *
+     * @description
+     * Filter that shows numbers as currency format with currency symbol.
+     */
+    .filter('money', money)
+
+    /**
+     * @namespace numeric
+     * @memberof source.numbers
+     *
+     * @requires $filter
+     * @requires $tools
+     *
+     * @description
+     * Filter that shows numbers as numeric format.
+     */
+    .filter('numeric', numeric);
+
+  money.$inject = ['$filter', '$numbers'];
+
+  function money($filter, $numbers) {
+    return _money;
+
+    /**
+     * @name _money
+     * @memberof source.numbers.money
+     *
+     * @description
+     * Private function for "money" filter.
+     * Returns data formatted if variable "data" is a valid number or returns the same input data.
+     *
+     * @param {*} data
+     * @param {Object} [filterParams]
+     * @returns {String|*}
+     * @private
+     */
+    function _money(data, filterParams) {
+      var _output = data;
+      if (angular.isNumber(data)) {
+        var _params = $numbers.setParams(filterParams, $numbers.$.CURRENCY);
+        _output = $filter('currency')(data, _params[$numbers.$.SYMBOL], _params[$numbers.$.FRACTION]);
+        _output += (_params[$numbers.$.COMPOUND]) ? ' ' + _params[$numbers.$.COMPOUND] : '' ;
+      }
+      return _output;
+    }
+  }
+
+  numeric.$inject = ['$filter', '$numbers'];
+
+  function numeric($filter, $numbers) {
+    return _numeric;
+
+    /**
+     * @name _numeric
+     * @memberof source.numbers.numeric
+     *
+     * @description
+     * Private function for "numeric" filter.
+     * Returns data formatted if variable "data" is a valid number or returns the same input data.
+     *
+     * @param {*} data
+     * @param {Object} [filterParams]
+     * @returns {String|*}
+     * @private
+     */
+    function _numeric(data, filterParams) {
+      var _output = data;
+      if (angular.isNumber(data)) {
+        var _params = $numbers.setParams(filterParams, $numbers.$.CURRENCY);
+        _output = $filter('number')(data, _params[$numbers.$.FRACTION]);
+        _output += (_params[$numbers.$.SYMBOL]) ? _params[$numbers.$.SYMBOL] : '' ;
+        _output += (_params[$numbers.$.COMPOUND]) ? ' ' + _params[$numbers.$.COMPOUND] : '' ;
+      }
+      return _output;
+    }
+  }
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    .module('source.numbers')
+    /**
+     * @namespace numbersModel
+     * @memberof source.numbers
+     *
+     * @description
+     * Service that defines constants and schemas for numbers module.
+     */
+    .service('numbersModel', numbersModel);
+
+  function numbersModel() {
+    /* jshint validthis: true */
+    /**
+     * @name constants
+     * @memberof source.numbers.numbersModel
+     *
+     * @type {Object}
+     * @property {String} CURRENCY
+     * @property {String} NUMBER
+     * @property {String} SYMBOL
+     * @property {String} FRACTION
+     * @property {String} COMPOUND
+     */
+    this.constants = {
+      CURRENCY: 'currency',
+      NUMBER: 'number',
+
+      SYMBOL: 'symbol',
+      FRACTION: 'fractionSize',
+      COMPOUND: 'compound'
+    };
+
+    /**
+     * @name schemas
+     * @memberof source.numbers.numbersModel
+     *
+     * @type {Object}
+     * @property {Object} currency
+     * @property {String} currency.symbol
+     * @property {Number} currency.fractionSize
+     * @property {Number|String} currency.compound
+     * @property {Object} number
+     * @property {String} number.symbol
+     * @property {Number} number.fractionSize
+     * @property {Number|String} number.compound
+     */
+    this.schemas = {
+      currency: {
+        symbol: null,
+        fractionSize: null,
+        compound: null
+      },
+      number: {
+        symbol: null,
+        fractionSize: null,
+        compound: null
+      }
+    };
   }
 })();
 
@@ -2001,6 +2016,176 @@
         _launchToast(toastFactoryModel, message, $.ERROR, title, duration);
       }
     }
+  }
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    .module('source.strings')
+    /**
+     * @namespace $strings
+     * @memberof source.strings
+     *
+     * @requires $tools
+     * @requires stringsModel
+     *
+     * @description
+     * Helper service to strings module.
+     */
+    .factory('$strings', $strings);
+
+  $strings.$inject = ['$tools', 'stringsModel'];
+
+  function $strings($tools, stringsModel) {
+    var $ = angular.extend({}, stringsModel.constants, $tools.$);
+
+    return {
+      $: $,
+      setParams: _setParams
+    };
+
+    /**
+     * @name _setParams
+     * @memberof source.strings.$strings
+     *
+     * @description
+     * Set the filter params to define several string filter configurations.
+     *
+     * @param {Object} filterParams
+     * @param {String} [paramsMode]
+     * @return {Object}
+     * @private
+     */
+    function _setParams(filterParams, paramsMode) {
+      filterParams = filterParams || {};
+      paramsMode = paramsMode || $.TRUNCATE;
+      var _output = {};
+      if (stringsModel.schemas.hasOwnProperty(paramsMode)) {
+        if (filterParams && angular.isObject(filterParams)) {
+          var _params = $tools.setObjectUsingSchema(stringsModel.schemas[paramsMode], filterParams, {});
+          angular.forEach(_params, function(value, property) {
+            var _condition = (filterParams.hasOwnProperty(property) && value);
+            _output[property] = (_condition) ? value : undefined ;
+          });
+        }
+        return _output;
+      } else {
+        throw new ReferenceError('Unknown numeric params mode: ' + paramsMode);
+      }
+    }
+  }
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    .module('source.strings')
+    /**
+     * @namespace truncate
+     * @memberof source.strings
+     *
+     * @requires $filter
+     * @requires $numbers
+     *
+     * @description
+     * Filter that truncates string in a given number of words.
+     */
+    .filter('truncate', truncate);
+
+  truncate.$inject = ['$filter', '$strings'];
+
+  function truncate($filter, $strings) {
+    return _truncate;
+
+    /**
+     * @name _truncate
+     * @memberof source.strings.truncate
+     *
+     * @description
+     * Private function for "truncate" filter.
+     * Returns data truncated if variable "data" is a valid string or returns the same input data.
+     * TODO: Select string to separate words.
+     * TODO: Select string to scape truncate string ('...').
+     * TODO: Select truncate by words or by characters number.
+     * TODO: Compare last char in last item with array of possibilities (['.', ',', ';', ':']).
+     * TODO: Develop best errors control.
+     *
+     * @param {*} data
+     * @param {Object} [filterParams]
+     * @returns {String|*}
+     * @private
+     */
+    function _truncate(data, filterParams) {
+      var _output = data;
+      if (typeof data === 'string') {
+        var _params = $strings.setParams(filterParams, $strings.$.TRUNCATE);
+        if (angular.isNumber(_params[$strings.$.WORDS])) {
+          var _auxArray = data.split(' ');
+          var _newArray = _auxArray.slice(0, _params[$strings.$.WORDS]);
+          if (_auxArray.length > _newArray.length) {
+            var _lastItem = _newArray.pop();
+            var _lastChar = _lastItem.substr(-1);
+            if (_lastChar === '.' || _lastChar === ',' || _lastChar === ';' || _lastChar === ':') {
+              _lastItem = _lastItem.slice(0, (_lastItem.length - 1));
+            }
+            _newArray.push(_lastItem + '...');
+          }
+          _output = _newArray.join(' ');
+        } else {
+          throw new TypeError('Param "words" must be a number.');
+        }
+      }
+      return _output;
+    }
+  }
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    .module('source.strings')
+    /**
+     * @namespace stringsModel
+     * @memberof source.strings
+     *
+     * @description
+     * Service that defines constants and schemas for strings module.
+     */
+    .service('stringsModel', stringsModel);
+
+  function stringsModel() {
+    /* jshint validthis: true */
+    /**
+     * @name constants
+     * @memberof source.strings.stringsModel
+     *
+     * @type {Object}
+     * @property {String} TRUNCATE
+     * @property {String} WORDS
+     */
+    this.constants = {
+      TRUNCATE: 'truncate',
+
+      WORDS: 'words'
+    };
+
+    /**
+     * @name schemas
+     * @memberof source.strings.stringsModel
+     *
+     * @type {Object}
+     * @property {Object} truncate
+     * @property {Number} truncate.words
+     */
+    this.schemas = {
+      truncate: {
+        words: null
+      }
+    };
   }
 })();
 
