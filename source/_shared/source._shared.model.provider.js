@@ -102,6 +102,8 @@
      *
      * @description
      * Factory that provides the global constants of the application.
+     *
+     * @returns {Object}
      */
     function $get() {
       return {

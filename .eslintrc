@@ -1,0 +1,33 @@
+{
+  "extends": "eslint:recommended",
+  "env": {
+    "browser": true,
+    "jquery": true,
+    "node": true
+  },
+  "globals": {
+    "angular": false,
+    "_": false,
+    "moment": false
+  },
+  "rules": {
+    "indent": [2, 2, {
+      "SwitchCase": 1
+    }],
+    "comma-style": [2, "last"],
+    "max-len": [2, 120],
+    "valid-jsdoc": [2, {
+      "requireReturn": false,
+      "requireParamDescription": false,
+      "requireReturnDescription": false
+    }],
+    "no-bitwise": 2,
+    "curly": 2,
+    "eqeqeq": 2,
+    "no-caller": 2,
+    "strict": [2, "function"],
+    "no-console": [2, {
+      "allow": ["error", "warn"]
+    }]
+  }
+}

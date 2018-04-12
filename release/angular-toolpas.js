@@ -62,20 +62,6 @@
 
   angular
     /**
-     * @namespace date-time
-     * @memberof source
-     *
-     * @description
-     * Definition of module "date time" for several tools and filters about datetime data.
-     */
-    .module('source.date-time', []);
-})();
-
-(function() {
-  'use strict';
-
-  angular
-    /**
      * @namespace source.numbers
      * @memberof source
      *
@@ -83,6 +69,20 @@
      * Definition of module "numbers" for several tools and filters about numbers and currency data.
      */
     .module('source.numbers', []);
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    /**
+     * @namespace date-time
+     * @memberof source
+     *
+     * @description
+     * Definition of module "date time" for several tools and filters about datetime data.
+     */
+    .module('source.date-time', []);
 })();
 
 (function() {
@@ -442,6 +442,10 @@
      *
      * @description
      * Factory that gets constants for API services.
+     *
+     * @param {Object} Restangular
+     * @param {Object} $tools
+     * @return {Object}
      */
     function $get(Restangular, $tools) {
       var _defaults = {
@@ -738,6 +742,12 @@
      *
      * @description
      * Factory statement for API calls.
+     *
+     * @param {Object} $q
+     * @param {Object} $tools
+     * @param {Object} $alert
+     * @param {Object} apiModel
+     * @returns {Object}
      */
     function $get($q, $tools, $alert, apiModel) {
       var $ = apiModel.$;
@@ -1101,6 +1111,221 @@
   'use strict';
 
   angular
+    .module('source.numbers')
+    /**
+     * @namespace $numbers
+     * @memberof source.numbers
+     *
+     * @requires $tools
+     * @requires numbersModel
+     *
+     * @description
+     * Helper service to numbers module.
+     */
+    .factory('$numbers', $numbers);
+
+  $numbers.$inject = ['$tools', 'numbersModel'];
+
+  function $numbers($tools, numbersModel) {
+    var $ = angular.extend({}, numbersModel.constants, $tools.$);
+
+    return {
+      $: $,
+      setParams: _setParams
+    };
+
+    /**
+     * @name _setParams
+     * @memberof source.numbers.$numbers
+     *
+     * @description
+     * Set the filter params to define several numeric filter configurations.
+     *
+     * @param {Object} filterParams
+     * @param {String} [paramsMode]
+     * @return {Object}
+     * @private
+     */
+    function _setParams(filterParams, paramsMode) {
+      filterParams = filterParams || {};
+      paramsMode = paramsMode || $.NUMBER;
+      var _output = {};
+      if (numbersModel.schemas.hasOwnProperty(paramsMode)) {
+        if (filterParams && angular.isObject(filterParams)) {
+          var _params = $tools.setObjectUsingSchema(numbersModel.schemas[paramsMode], filterParams, {});
+          angular.forEach(_params, function(value, property) {
+            var _condition = (filterParams.hasOwnProperty(property) && value);
+            _output[property] = (_condition) ? value : undefined ;
+          });
+          _output[$.SYMBOL] = (_output[$.SYMBOL]) ? ' ' + _output[$.SYMBOL] : undefined ;
+          _output[$.COMPOUND] = (_output[$.COMPOUND]) ? _output[$.COMPOUND] : '' ;
+        }
+        return _output;
+      } else {
+        throw new ReferenceError('Unknown numeric params mode: ' + paramsMode);
+      }
+    }
+  }
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    .module('source.numbers')
+    /**
+     * @namespace money
+     * @memberof source.numbers
+     *
+     * @requires $filter
+     * @requires $numbers
+     *
+     * @description
+     * Filter that shows numbers as currency format with currency symbol.
+     */
+    .filter('money', money)
+
+    /**
+     * @namespace numeric
+     * @memberof source.numbers
+     *
+     * @requires $filter
+     * @requires $tools
+     *
+     * @description
+     * Filter that shows numbers as numeric format.
+     */
+    .filter('numeric', numeric);
+
+  money.$inject = ['$filter', '$numbers'];
+
+  function money($filter, $numbers) {
+    return _money;
+
+    /**
+     * @name _money
+     * @memberof source.numbers.money
+     *
+     * @description
+     * Private function for "money" filter.
+     * Returns data formatted if variable "data" is a valid number or returns the same input data.
+     *
+     * @param {*} data
+     * @param {Object} [filterParams]
+     * @returns {String|*}
+     * @private
+     */
+    function _money(data, filterParams) {
+      var _output = data;
+      if (angular.isNumber(data)) {
+        var _params = $numbers.setParams(filterParams, $numbers.$.CURRENCY);
+        _output = $filter('currency')(data, _params[$numbers.$.SYMBOL], _params[$numbers.$.FRACTION]);
+        _output += (_params[$numbers.$.COMPOUND]) ? ' ' + _params[$numbers.$.COMPOUND] : '' ;
+      }
+      return _output;
+    }
+  }
+
+  numeric.$inject = ['$filter', '$numbers'];
+
+  function numeric($filter, $numbers) {
+    return _numeric;
+
+    /**
+     * @name _numeric
+     * @memberof source.numbers.numeric
+     *
+     * @description
+     * Private function for "numeric" filter.
+     * Returns data formatted if variable "data" is a valid number or returns the same input data.
+     *
+     * @param {*} data
+     * @param {Object} [filterParams]
+     * @returns {String|*}
+     * @private
+     */
+    function _numeric(data, filterParams) {
+      var _output = data;
+      if (angular.isNumber(data)) {
+        var _params = $numbers.setParams(filterParams, $numbers.$.CURRENCY);
+        _output = $filter('number')(data, _params[$numbers.$.FRACTION]);
+        _output += (_params[$numbers.$.SYMBOL]) ? _params[$numbers.$.SYMBOL] : '' ;
+        _output += (_params[$numbers.$.COMPOUND]) ? ' ' + _params[$numbers.$.COMPOUND] : '' ;
+      }
+      return _output;
+    }
+  }
+})();
+
+(function() {
+  'use strict';
+
+  angular
+    .module('source.numbers')
+    /**
+     * @namespace numbersModel
+     * @memberof source.numbers
+     *
+     * @description
+     * Service that defines constants and schemas for numbers module.
+     */
+    .service('numbersModel', numbersModel);
+
+  function numbersModel() {
+    /* jshint validthis: true */
+    /**
+     * @name constants
+     * @memberof source.numbers.numbersModel
+     *
+     * @type {Object}
+     * @property {String} CURRENCY
+     * @property {String} NUMBER
+     * @property {String} SYMBOL
+     * @property {String} FRACTION
+     * @property {String} COMPOUND
+     */
+    this.constants = {
+      CURRENCY: 'currency',
+      NUMBER: 'number',
+
+      SYMBOL: 'symbol',
+      FRACTION: 'fractionSize',
+      COMPOUND: 'compound'
+    };
+
+    /**
+     * @name schemas
+     * @memberof source.numbers.numbersModel
+     *
+     * @type {Object}
+     * @property {Object} currency
+     * @property {String} currency.symbol
+     * @property {Number} currency.fractionSize
+     * @property {Number|String} currency.compound
+     * @property {Object} number
+     * @property {String} number.symbol
+     * @property {Number} number.fractionSize
+     * @property {Number|String} number.compound
+     */
+    this.schemas = {
+      currency: {
+        symbol: null,
+        fractionSize: null,
+        compound: null
+      },
+      number: {
+        symbol: null,
+        fractionSize: null,
+        compound: null
+      }
+    };
+  }
+})();
+
+(function() {
+  'use strict';
+
+  angular
     .module('source.date-time')
     /**
      * @namespace onlyHour
@@ -1351,233 +1576,18 @@
   'use strict';
 
   angular
-    .module('source.numbers')
+    .module('source.router')
     /**
-     * @namespace $numbers
-     * @memberof source.numbers
+     * @namespace $router
+     * @memberof source.router
      *
-     * @requires $tools
-     * @requires numbersModel
+     * @requires $state
+     * @requires $timeout
      *
      * @description
-     * Helper service to numbers module.
+     * Provider statement manage routing of the application.
      */
-    .factory('$numbers', $numbers);
-
-  $numbers.$inject = ['$tools', 'numbersModel'];
-
-  function $numbers($tools, numbersModel) {
-    var $ = angular.extend({}, numbersModel.constants, $tools.$);
-
-    return {
-      $: $,
-      setParams: _setParams
-    };
-
-    /**
-     * @name _setParams
-     * @memberof source.numbers.$numbers
-     *
-     * @description
-     * Set the filter params to define several numeric filter configurations.
-     *
-     * @param {Object} filterParams
-     * @param {String} [paramsMode]
-     * @return {Object}
-     * @private
-     */
-    function _setParams(filterParams, paramsMode) {
-      filterParams = filterParams || {};
-      paramsMode = paramsMode || $.NUMBER;
-      var _output = {};
-      if (numbersModel.schemas.hasOwnProperty(paramsMode)) {
-        if (filterParams && angular.isObject(filterParams)) {
-          var _params = $tools.setObjectUsingSchema(numbersModel.schemas[paramsMode], filterParams, {});
-          angular.forEach(_params, function(value, property) {
-            var _condition = (filterParams.hasOwnProperty(property) && value);
-            _output[property] = (_condition) ? value : undefined ;
-          });
-          _output[$.SYMBOL] = (_output[$.SYMBOL]) ? ' ' + _output[$.SYMBOL] : undefined ;
-          _output[$.COMPOUND] = (_output[$.COMPOUND]) ? _output[$.COMPOUND] : '' ;
-        }
-        return _output;
-      } else {
-        throw new ReferenceError('Unknown numeric params mode: ' + paramsMode);
-      }
-    }
-  }
-})();
-
-(function() {
-  'use strict';
-
-  angular
-    .module('source.numbers')
-    /**
-     * @namespace money
-     * @memberof source.numbers
-     *
-     * @requires $filter
-     * @requires $numbers
-     *
-     * @description
-     * Filter that shows numbers as currency format with currency symbol.
-     */
-    .filter('money', money)
-
-    /**
-     * @namespace numeric
-     * @memberof source.numbers
-     *
-     * @requires $filter
-     * @requires $tools
-     *
-     * @description
-     * Filter that shows numbers as numeric format.
-     */
-    .filter('numeric', numeric);
-
-  money.$inject = ['$filter', '$numbers'];
-
-  function money($filter, $numbers) {
-    return _money;
-
-    /**
-     * @name _money
-     * @memberof source.numbers.money
-     *
-     * @description
-     * Private function for "money" filter.
-     * Returns data formatted if variable "data" is a valid number or returns the same input data.
-     *
-     * @param {*} data
-     * @param {Object} [filterParams]
-     * @returns {String|*}
-     * @private
-     */
-    function _money(data, filterParams) {
-      var _output = data;
-      if (angular.isNumber(data)) {
-        var _params = $numbers.setParams(filterParams, $numbers.$.CURRENCY);
-        _output = $filter('currency')(data, _params[$numbers.$.SYMBOL], _params[$numbers.$.FRACTION]);
-        _output += (_params[$numbers.$.COMPOUND]) ? ' ' + _params[$numbers.$.COMPOUND] : '' ;
-      }
-      return _output;
-    }
-  }
-
-  numeric.$inject = ['$filter', '$numbers'];
-
-  function numeric($filter, $numbers) {
-    return _numeric;
-
-    /**
-     * @name _numeric
-     * @memberof source.numbers.numeric
-     *
-     * @description
-     * Private function for "numeric" filter.
-     * Returns data formatted if variable "data" is a valid number or returns the same input data.
-     *
-     * @param {*} data
-     * @param {Object} [filterParams]
-     * @returns {String|*}
-     * @private
-     */
-    function _numeric(data, filterParams) {
-      var _output = data;
-      if (angular.isNumber(data)) {
-        var _params = $numbers.setParams(filterParams, $numbers.$.CURRENCY);
-        _output = $filter('number')(data, _params[$numbers.$.FRACTION]);
-        _output += (_params[$numbers.$.SYMBOL]) ? _params[$numbers.$.SYMBOL] : '' ;
-        _output += (_params[$numbers.$.COMPOUND]) ? ' ' + _params[$numbers.$.COMPOUND] : '' ;
-      }
-      return _output;
-    }
-  }
-})();
-
-(function() {
-  'use strict';
-
-  angular
-    .module('source.numbers')
-    /**
-     * @namespace numbersModel
-     * @memberof source.numbers
-     *
-     * @description
-     * Service that defines constants and schemas for numbers module.
-     */
-    .service('numbersModel', numbersModel);
-
-  function numbersModel() {
-    /* jshint validthis: true */
-    /**
-     * @name constants
-     * @memberof source.numbers.numbersModel
-     *
-     * @type {Object}
-     * @property {String} CURRENCY
-     * @property {String} NUMBER
-     * @property {String} SYMBOL
-     * @property {String} FRACTION
-     * @property {String} COMPOUND
-     */
-    this.constants = {
-      CURRENCY: 'currency',
-      NUMBER: 'number',
-
-      SYMBOL: 'symbol',
-      FRACTION: 'fractionSize',
-      COMPOUND: 'compound'
-    };
-
-    /**
-     * @name schemas
-     * @memberof source.numbers.numbersModel
-     *
-     * @type {Object}
-     * @property {Object} currency
-     * @property {String} currency.symbol
-     * @property {Number} currency.fractionSize
-     * @property {Number|String} currency.compound
-     * @property {Object} number
-     * @property {String} number.symbol
-     * @property {Number} number.fractionSize
-     * @property {Number|String} number.compound
-     */
-    this.schemas = {
-      currency: {
-        symbol: null,
-        fractionSize: null,
-        compound: null
-      },
-      number: {
-        symbol: null,
-        fractionSize: null,
-        compound: null
-      }
-    };
-  }
-})();
-
-(function() {
-  'use strict';
-
-  angular
-  .module('source.router')
-  /**
-   * @namespace $router
-   * @memberof source.router
-   *
-   * @requires $state
-   * @requires $timeout
-   *
-   * @description
-   * Provider statement manage routing of the application.
-   */
-  .factory('$router', $router);
+    .factory('$router', $router);
 
   $router.$inject = ['$state', '$timeout'];
 
@@ -1700,6 +1710,10 @@
      *
      * @description
      * Factory statement to manage static variables for application.
+     *
+     * @param {Object} $q
+     * @param {Object} $api
+     * @returns {Object}
      */
     function $get($q, $api) {
       return {
@@ -2011,6 +2025,9 @@
      *
      * @description
      * Factory that gets constants for toast services.
+     *
+     * @param {Object} toastr
+     * @returns {Object}
      */
     function $get(toastr) {
       var _serviceModel = {
@@ -2116,6 +2133,9 @@
      *
      * @description
      * Factory statement for toast alert's messages.
+     *
+     * @param {Object} toastModel
+     * @returns {Object}
      */
     function $get(toastModel) {
       var toastFactoryModel = toastModel.get();
@@ -2421,6 +2441,8 @@
      *
      * @description
      * Factory that gets constants and models for translate services.
+     *
+     * @returns {Object}
      */
     function $get() {
       return {
@@ -2630,6 +2652,12 @@
      *
      * @description
      * Factory definition for translation labels.
+     *
+     * @param {Object} $q
+     * @param {Object} $mdDateLocale
+     * @param {Object} $api
+     * @param {Object} translateModel
+     * @returns {Object}
      */
     function $get($q, $mdDateLocale, $api, translateModel) {
       var $ = translateModel.$;
@@ -2986,6 +3014,8 @@
      *
      * @description
      * Factory that gets constants and models for appView services.
+     *
+     * @returns {Object}
      */
     function $get() {
       return {
@@ -3054,7 +3084,7 @@
      * @description
      * Stores all animations different from defaults.
      *
-     * @param animationData --> It can be an Object or String.
+     * @param {String|Object} animationData - It can be an Object or String.
      * @param {Boolean} animationMode
      * @return {Object}
      * @throws TypeError
@@ -3274,6 +3304,11 @@
      *
      * @description
      * Factory statement for application view provider.
+     *
+     * @param {Object} $filter
+     * @param {Object} $injector
+     * @param {Object} $tools
+     * @returns {Object}
      */
     function $get($filter, $injector, $tools) {
       return {
@@ -3304,7 +3339,7 @@
        *
        * @param {Object} domElement
        * @param {Number} way
-       * @param animationData --> It can be an Object or String.
+       * @param {String|Object} animationData - It can be an Object or String.
        * @private
        */
       function _displayWayElement(domElement, way, animationData) {
@@ -3687,6 +3722,7 @@
        *
        * @param {Object} domElement
        * @param {String|Array} classes
+       * @throws TypeError
        * @returns {String|Boolean}
        */
       function checkElementByClass(domElement, classes) {
@@ -3724,7 +3760,7 @@
         if (animationData) {
           _registerExternalAnimation(animationData, $.MODE_ANIMATION_IN);
         }
-        return _displayWayElement(domElement, _showWay, animationData);
+        _displayWayElement(domElement, _showWay, animationData);
       }
 
       /**
@@ -3744,7 +3780,7 @@
         if (animationData) {
           _registerExternalAnimation(animationData, $.MODE_ANIMATION_OUT);
         }
-        return _displayWayElement(domElement, _hideWay, animationData);
+        _displayWayElement(domElement, _hideWay, animationData);
       }
     }
   }
@@ -3854,6 +3890,8 @@
      *
      * @description
      * Factory that provides the global constants of the application.
+     *
+     * @returns {Object}
      */
     function $get() {
       return {
@@ -4558,6 +4596,9 @@
      *
      * @description
      * Factory statement for several useful tools.
+     *
+     * @param {Object} $filter
+     * @returns {Object}
      */
     function $get($filter) {
       return {

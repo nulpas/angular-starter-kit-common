@@ -173,6 +173,8 @@
      *
      * @description
      * Factory that gets constants and models for appView services.
+     *
+     * @returns {Object}
      */
     function $get() {
       return {

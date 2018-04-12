@@ -73,6 +73,9 @@
      *
      * @description
      * Factory statement for toast alert's messages.
+     *
+     * @param {Object} toastModel
+     * @returns {Object}
      */
     function $get(toastModel) {
       var toastFactoryModel = toastModel.get();

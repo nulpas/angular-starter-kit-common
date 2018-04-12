@@ -42,7 +42,7 @@
      * @description
      * Stores all animations different from defaults.
      *
-     * @param animationData --> It can be an Object or String.
+     * @param {String|Object} animationData - It can be an Object or String.
      * @param {Boolean} animationMode
      * @return {Object}
      * @throws TypeError
@@ -262,6 +262,11 @@
      *
      * @description
      * Factory statement for application view provider.
+     *
+     * @param {Object} $filter
+     * @param {Object} $injector
+     * @param {Object} $tools
+     * @returns {Object}
      */
     function $get($filter, $injector, $tools) {
       return {
@@ -292,7 +297,7 @@
        *
        * @param {Object} domElement
        * @param {Number} way
-       * @param animationData --> It can be an Object or String.
+       * @param {String|Object} animationData - It can be an Object or String.
        * @private
        */
       function _displayWayElement(domElement, way, animationData) {
@@ -675,6 +680,7 @@
        *
        * @param {Object} domElement
        * @param {String|Array} classes
+       * @throws TypeError
        * @returns {String|Boolean}
        */
       function checkElementByClass(domElement, classes) {
@@ -712,7 +718,7 @@
         if (animationData) {
           _registerExternalAnimation(animationData, $.MODE_ANIMATION_IN);
         }
-        return _displayWayElement(domElement, _showWay, animationData);
+        _displayWayElement(domElement, _showWay, animationData);
       }
 
       /**
@@ -732,7 +738,7 @@
         if (animationData) {
           _registerExternalAnimation(animationData, $.MODE_ANIMATION_OUT);
         }
-        return _displayWayElement(domElement, _hideWay, animationData);
+        _displayWayElement(domElement, _hideWay, animationData);
       }
     }
   }

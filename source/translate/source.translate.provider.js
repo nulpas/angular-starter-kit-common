@@ -184,6 +184,12 @@
      *
      * @description
      * Factory definition for translation labels.
+     *
+     * @param {Object} $q
+     * @param {Object} $mdDateLocale
+     * @param {Object} $api
+     * @param {Object} translateModel
+     * @returns {Object}
      */
     function $get($q, $mdDateLocale, $api, translateModel) {
       var $ = translateModel.$;
