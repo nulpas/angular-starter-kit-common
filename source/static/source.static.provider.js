@@ -80,6 +80,10 @@
      *
      * @description
      * Factory statement to manage static variables for application.
+     *
+     * @param {Object} $q
+     * @param {Object} $api
+     * @returns {Object}
      */
     function $get($q, $api) {
       return {

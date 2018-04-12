@@ -2,18 +2,18 @@
   'use strict';
 
   angular
-  .module('source.router')
-  /**
-   * @namespace $router
-   * @memberof source.router
-   *
-   * @requires $state
-   * @requires $timeout
-   *
-   * @description
-   * Provider statement manage routing of the application.
-   */
-  .factory('$router', $router);
+    .module('source.router')
+    /**
+     * @namespace $router
+     * @memberof source.router
+     *
+     * @requires $state
+     * @requires $timeout
+     *
+     * @description
+     * Provider statement manage routing of the application.
+     */
+    .factory('$router', $router);
 
   $router.$inject = ['$state', '$timeout'];
 

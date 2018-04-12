@@ -1,7 +1,7 @@
 {
   "name": "angular-toolpas",
   "description": "Angular Tool Box dependency",
-  "version": "0.10.12",
+  "version": "0.10.13",
   "repository": {
     "type": "git",
     "url": "git@github.com:nulpas/angular-toolpas.git"
@@ -14,15 +14,9 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "event-stream": "^3.3.4",
-    "gulp": "^3.9.1",
-    "gulp-angular-templatecache": "^2.2.0",
+    "gulp": "gulpjs/gulp.git#4.0",
     "gulp-concat": "^2.6.1",
-    "gulp-htmlmin": "^4.0.0",
-    "gulp-jscs": "^4.1.0",
-    "gulp-jshint": "^2.1.0",
-    "gulp-watch": "^5.0.0",
-    "jshint": "^2.9.5",
-    "jshint-stylish": "^2.2.1"
+    "gulp-eslint": "^4.0.2",
+    "gulp-if": "^2.0.2"
   }
 }

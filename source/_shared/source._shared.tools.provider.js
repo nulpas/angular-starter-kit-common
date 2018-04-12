@@ -656,6 +656,9 @@
      *
      * @description
      * Factory statement for several useful tools.
+     *
+     * @param {Object} $filter
+     * @returns {Object}
      */
     function $get($filter) {
       return {

@@ -138,6 +138,10 @@
      *
      * @description
      * Factory that gets constants for API services.
+     *
+     * @param {Object} Restangular
+     * @param {Object} $tools
+     * @return {Object}
      */
     function $get(Restangular, $tools) {
       var _defaults = {

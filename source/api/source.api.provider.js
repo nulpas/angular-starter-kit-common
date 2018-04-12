@@ -121,6 +121,12 @@
      *
      * @description
      * Factory statement for API calls.
+     *
+     * @param {Object} $q
+     * @param {Object} $tools
+     * @param {Object} $alert
+     * @param {Object} apiModel
+     * @returns {Object}
      */
     function $get($q, $tools, $alert, apiModel) {
       var $ = apiModel.$;

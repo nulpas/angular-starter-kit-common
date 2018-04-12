@@ -36,6 +36,9 @@
      *
      * @description
      * Factory that gets constants for toast services.
+     *
+     * @param {Object} toastr
+     * @returns {Object}
      */
     function $get(toastr) {
       var _serviceModel = {
