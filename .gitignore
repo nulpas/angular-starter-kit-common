@@ -3,7 +3,6 @@ npm-debug.log
 node_modules/
 bower_components/
 local.app.config.js
-package-lock.json
 dist-dev/
 dist/
 
