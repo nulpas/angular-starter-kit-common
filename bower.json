@@ -1,7 +1,7 @@
 {
   "name": "angular-toolpas",
   "description": "Angular Tool Box dependency",
-  "version": "0.10.16",
+  "version": "0.10.17",
   "main": "./release/angular-toolpas.js",
   "repository": {
     "type": "git",
@@ -17,7 +17,9 @@
     "bower_components",
     "gulpfile*",
     "package.json",
-    "source"
+    "source",
+    "package-lock.json",
+    "yarn.lock"
   ],
   "dependencies": {
     "angular": "^1.6.10",
